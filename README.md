@@ -87,8 +87,8 @@ src/
 
 1. **Clonar el repositorio**
    ```bash
-   git clone https://github.com/jlchz19/Prueba1.git
-   cd Prueba1
+   git clone https://github.com/jlchz19/Prueba2.git
+   cd Prueba2
    ```
 
 2. **Instalar dependencias**
