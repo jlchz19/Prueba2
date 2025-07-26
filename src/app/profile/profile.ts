@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule, FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })
@@ -32,10 +33,11 @@ export class Profile implements OnInit {
   loadUserProfile() {
     const token = localStorage.getItem('token');
     if (token) {
-      this.http.get<any>(`${environment.apiUrl}/profile`, {
+      this.http.get<any>(`${environment.apiUrl}/api/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       }).subscribe({
         next: (data) => {
+          console.log('Datos del perfil recibidos:', data);
           this.user = {
             ...data
           };
@@ -64,7 +66,7 @@ export class Profile implements OnInit {
     this.isLoading = true;
     const token = localStorage.getItem('token');
     
-    this.http.put<any>(`${environment.apiUrl}/profile`, {
+    this.http.put<any>(`${environment.apiUrl}/api/auth/profile`, {
       name: this.user.name,
       email: this.user.email
     }, {
@@ -83,8 +85,6 @@ export class Profile implements OnInit {
       }
     });
   }
-
-
 
   showMessage(message: string, type: 'success' | 'error') {
     this.message = message;
