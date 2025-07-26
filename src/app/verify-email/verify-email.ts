@@ -15,10 +15,15 @@ import { environment } from '../../environments/environment';
 })
 export class VerifyEmail {
   constructor(
-    private router: Router, 
+    private router: Router,
     private http: HttpClient,
     private route: ActivatedRoute
-  ) {}
+  ) {
+    // DEBUG: Verificar la URL del API
+    console.log('🔧 DEBUG - API URL:', environment.apiUrl);
+    console.log('🔧 DEBUG - Version:', environment.version);
+    console.log('🔧 DEBUG - Timestamp:', environment.timestamp);
+  }
 
   verificationCode = '';
   isLoading = false;
@@ -36,11 +41,11 @@ export class VerifyEmail {
     // Obtener el email del localStorage (guardado durante el registro)
     this.email = localStorage.getItem('pendingEmail') || '';
       }
-      
+
       if (params['message']) {
         this.message = params['message'];
       }
-      
+
     if (!this.email) {
       this.router.navigate(['/register']);
     }
@@ -49,7 +54,7 @@ export class VerifyEmail {
 
   onSubmit(event: Event) {
     event.preventDefault();
-    
+
     if (!this.verificationCode.trim()) {
       this.errorMessage = 'Por favor, ingresa el código de verificación';
       return;
@@ -67,10 +72,10 @@ export class VerifyEmail {
       next: (res) => {
         this.isLoading = false;
         this.successMessage = '¡Email verificado exitosamente! Redirigiendo al login...';
-        
+
         // Limpiar datos temporales
         localStorage.removeItem('pendingEmail');
-        
+
         // Redirigir al login después de 2 segundos
         setTimeout(() => {
           this.router.navigate(['/']);
@@ -79,7 +84,7 @@ export class VerifyEmail {
       error: (err) => {
         this.isLoading = false;
         const errorMsg = err?.error?.message;
-        
+
         if (errorMsg) {
           this.errorMessage = errorMsg;
         } else if (err.status === 400) {
