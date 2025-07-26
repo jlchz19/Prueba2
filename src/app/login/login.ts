@@ -97,6 +97,22 @@ export class Login {
         this.isLoading = false;
         const errorMsg = err?.error?.message;
         
+        // Verificar si el error es por correo no verificado
+        if (err?.error?.requiresVerification) {
+          // Obtener el valor del campo de usuario
+          const usernameInput = document.getElementById('username') as HTMLInputElement;
+          const username = usernameInput ? usernameInput.value.trim() : '';
+          
+          // Redirigir a la pantalla de verificación de correo
+          this.router.navigate(['/verify-email'], { 
+            queryParams: { 
+              email: username,
+              message: 'Debes verificar tu correo electrónico antes de iniciar sesión'
+            }
+          });
+          return;
+        }
+        
         if (errorMsg) {
           this.errorMessage = errorMsg;
         } else if (err.status === 401) {

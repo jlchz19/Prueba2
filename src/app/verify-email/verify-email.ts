@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,20 +14,37 @@ import { environment } from '../../environments/environment';
   styleUrl: './verify-email.css'
 })
 export class VerifyEmail {
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(
+    private router: Router, 
+    private http: HttpClient,
+    private route: ActivatedRoute
+  ) {}
 
   verificationCode = '';
   isLoading = false;
   errorMessage = '';
   successMessage = '';
   email = '';
+  message = '';
 
   ngOnInit() {
-    // Obtener el email del localStorage (guardado durante el registro)
-    this.email = localStorage.getItem('pendingEmail') || '';
-    if (!this.email) {
-      this.router.navigate(['/register']);
-    }
+    // Obtener parámetros de consulta
+    this.route.queryParams.subscribe(params => {
+      if (params['email']) {
+        this.email = params['email'];
+      } else {
+        // Obtener el email del localStorage (guardado durante el registro)
+        this.email = localStorage.getItem('pendingEmail') || '';
+      }
+      
+      if (params['message']) {
+        this.message = params['message'];
+      }
+      
+      if (!this.email) {
+        this.router.navigate(['/register']);
+      }
+    });
   }
 
   onSubmit(event: Event) {
@@ -42,7 +59,7 @@ export class VerifyEmail {
     this.errorMessage = '';
     this.successMessage = '';
 
-              this.http.post<any>(`${environment.apiUrl}/verify-email`, {
+              this.http.post<any>(`${environment.apiUrl}/api/auth/verify-email`, {
             email: this.email,
             code: this.verificationCode
           })
@@ -81,7 +98,7 @@ export class VerifyEmail {
     this.errorMessage = '';
     this.successMessage = '';
 
-              this.http.post<any>(`${environment.apiUrl}/resend-code`, {
+              this.http.post<any>(`${environment.apiUrl}/api/auth/resend-code`, {
             email: this.email
           })
     .subscribe({

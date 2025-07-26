@@ -78,6 +78,27 @@
   text-align: center;
 }
 
+/* Mensaje personalizado */
+.custom-message {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  animation: slideIn 0.3s ease-out;
+}
+
+.info-icon {
+  font-size: 1.1rem;
+}
+
 .verify-info p {
   margin: 0.5rem 0;
   color: #6b7280;
