@@ -1,0 +1,12 @@
+<button class="sidebar-toggle" (click)="toggleSidebar()" aria-label="Mostrar/Ocultar menú">
+  <span>&#9776;</span>
+</button>
+<nav [class.collapsed]="sidebarCollapsed">
+  <ul>
+    <li><a routerLink="/dashboard/products" routerLinkActive="active"><span class="icon">📦</span> Productos</a></li>
+    <li><a routerLink="/dashboard/categories" routerLinkActive="active"><span class="icon">📂</span> Categorías</a></li>
+    <li><a routerLink="/dashboard/providers" routerLinkActive="active"><span class="icon">🚚</span> Proveedores</a></li>
+    <li><a routerLink="/dashboard/users" routerLinkActive="active"><span class="icon">👤</span> Usuarios</a></li>
+    <li><a routerLink="/logout"><span class="icon">🚪</span> Salir</a></li>
+  </ul>
+</nav>

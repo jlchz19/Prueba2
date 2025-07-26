@@ -1,0 +1,57 @@
+<div class="providers-header-bar">
+  <button type="button" class="btn btn-back" (click)="goToDashboard()">← Volver al inicio</button>
+  <div class="providers-header-title" style="margin: 0 auto; display: flex; align-items: center; gap: 0.7rem; font-size: 1.4rem;">
+    <span class="section-icon">🚚</span>
+    <span class="section-title">Gestión de Proveedores</span>
+    <span class="section-count">({{ proveedores.length }})</span>
+  </div>
+</div>
+<div class="providers-cards-bg">
+  <div class="providers-cards-container">
+    <div class="provider-card" *ngFor="let p of proveedores">
+      <div class="provider-card-icon">🚚</div>
+      <div class="provider-card-title">{{ p.nombre }}</div>
+      <div class="provider-card-contact">{{ p.contacto || p.telefono }}</div>
+      <div class="provider-card-actions">
+        <button class="btn btn-edit" (click)="openEditModal(p)"><i class="icon-edit"></i> Editar</button>
+        <button class="btn btn-delete" (click)="confirmDelete(p)"><i class="icon-delete"></i> Eliminar</button>
+      </div>
+    </div>
+    <div class="provider-card add-card" (click)="openAddModal()">
+      <div class="provider-card-icon">➕</div>
+      <div class="provider-card-title">Agregar Proveedor</div>
+    </div>
+  </div>
+</div>
+  <!-- Modal para agregar proveedor -->
+  <div class="modal-backdrop" *ngIf="showAddModal">
+    <div class="modal">
+      <h3>Agregar proveedor</h3>
+    <form (ngSubmit)="addProvider($event)">
+        <label>Nombre</label>
+        <input type="text" name="nombre" required>
+        <label>Teléfono</label>
+        <input type="number" name="telefono" required pattern="[0-9]+" min="0">
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">Agregar</button>
+          <button type="button" (click)="showAddModal = false">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Modal para editar proveedor -->
+  <div class="modal-backdrop" *ngIf="showEditModal">
+    <div class="modal">
+      <h3>Editar proveedor</h3>
+    <form (ngSubmit)="editProvider($event)">
+        <label>Nombre</label>
+        <input type="text" name="nombre" [(ngModel)]="editForm.nombre" required>
+        <label>Teléfono</label>
+        <input type="number" name="telefono" [(ngModel)]="editForm.telefono" required pattern="[0-9]+" min="0">
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">Guardar</button>
+          <button type="button" (click)="showEditModal = false">Cancelar</button>
+        </div>
+      </form>
+  </div>
+</div>

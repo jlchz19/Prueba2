@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Email - Sistema de Inventario</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .header-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .welcome-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .welcome-title {
+            font-size: 24px;
+            color: #1f2937;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .welcome-text {
+            font-size: 16px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+        
+        .verification-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .verification-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .verification-title {
+            font-size: 20px;
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .verification-text {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+        
+        .code-container {
+            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: inline-block;
+        }
+        
+        .code-label {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .verification-code {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .features-section {
+            margin: 30px 0;
+        }
+        
+        .features-title {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 10px;
+            border-left: 4px solid #6366f1;
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            color: #6366f1;
+        }
+        
+        .feature-text {
+            font-size: 14px;
+            color: #374151;
+        }
+        
+        .footer {
+            background: #f8fafc;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+        
+        .footer-title {
+            font-size: 16px;
+            color: #1f2937;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+        
+        .security-note {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .security-icon {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .security-text {
+            font-size: 14px;
+            color: #92400e;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header, .content, .footer {
+                padding: 20px;
+            }
+            
+            .verification-code {
+                font-size: 24px;
+                letter-spacing: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">📦</div>
+            <h1>Sistema de Inventario</h1>
+            <p>Gestión inteligente de tu inventario</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <div class="welcome-icon">🎉</div>
+                <h2 class="welcome-title">¡Bienvenido al Sistema!</h2>
+                <p class="welcome-text">
+                    Gracias por registrarte en nuestro sistema de inventario. 
+                    Estamos emocionados de tenerte como parte de nuestra comunidad.
+                </p>
+            </div>
+            
+            <!-- Verification Section -->
+            <div class="verification-section">
+                <div class="verification-icon">🔐</div>
+                <h3 class="verification-title">Verifica tu cuenta</h3>
+                <p class="verification-text">
+                    Para completar tu registro y acceder a todas las funcionalidades, 
+                    necesitamos verificar tu dirección de email.
+                </p>
+                
+                <div class="code-container">
+                    <div class="code-label">Tu código de verificación es:</div>
+                    <div class="verification-code">123456</div>
+                </div>
+                
+                <p class="verification-text">
+                    Copia este código y pégalo en la página de verificación para activar tu cuenta.
+                </p>
+            </div>
+            
+            <!-- Features Section -->
+            <div class="features-section">
+                <h3 class="features-title">✨ Lo que podrás hacer:</h3>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">Gestionar productos y categorías</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">👥</div>
+                    <div class="feature-text">Administrar usuarios y proveedores</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📈</div>
+                    <div class="feature-text">Generar reportes detallados</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-text">Buscar y filtrar información</div>
+                </div>
+            </div>
+            
+            <!-- Security Note -->
+            <div class="security-note">
+                <div class="security-icon">🔒</div>
+                <div class="security-text">
+                    <strong>Nota de seguridad:</strong> Este código expira en 15 minutos. 
+                    Si no solicitaste este registro, puedes ignorar este email.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-icon">🚀</div>
+            <h4 class="footer-title">¿Necesitas ayuda?</h4>
+            <p class="footer-text">
+                Si tienes problemas con la verificación, contacta a nuestro equipo de soporte.<br>
+                Estamos aquí para ayudarte a comenzar con tu sistema de inventario.
+            </p>
+        </div>
+    </div>
+</body>
+</html> 

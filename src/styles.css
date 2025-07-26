@@ -1,0 +1,110 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Temas globales */
+body.theme-dark {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+  color: #ffffff !important;
+}
+
+body.theme-dark .dashboard-header,
+body.theme-dark .profile-header,
+body.theme-dark .settings-header {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+body.theme-dark .dashboard-card,
+body.theme-dark .profile-card,
+body.theme-dark .settings-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+body.theme-dark .section-title,
+body.theme-dark .welcome-title,
+body.theme-dark .settings-title,
+body.theme-dark .profile-title {
+  color: #ffffff !important;
+}
+
+body.theme-dark .welcome-subtitle,
+body.theme-dark .setting-info p {
+  color: #cccccc !important;
+}
+
+body.theme-dark .setting-info label {
+  color: #ffffff !important;
+}
+
+body.theme-dark .setting-select,
+body.theme-dark .setting-input {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+body.theme-dark .setting-select option {
+  background: #1a1a2e !important;
+  color: #ffffff !important;
+}
+
+body.theme-dark .message-success {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #10B981 !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+body.theme-dark .message-error {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #EF4444 !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+body.theme-light {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: #333333 !important;
+}
+
+/* Tamaños de fuente globales */
+body.font-small {
+  font-size: 0.9rem !important;
+}
+
+body.font-medium {
+  font-size: 1rem !important;
+}
+
+body.font-large {
+  font-size: 1.2rem !important;
+}
+
+body.font-small .section-title,
+body.font-small .welcome-title,
+body.font-small .settings-title,
+body.font-small .profile-title {
+  font-size: 1.3rem !important;
+}
+
+body.font-medium .section-title,
+body.font-medium .welcome-title,
+body.font-medium .settings-title,
+body.font-medium .profile-title {
+  font-size: 1.5rem !important;
+}
+
+body.font-large .section-title,
+body.font-large .welcome-title,
+body.font-large .settings-title,
+body.font-large .profile-title {
+  font-size: 1.8rem !important;
+}
+
+/* Idiomas (preparado para futuras implementaciones) */
+.lang-es {
+  /* Estilos específicos para español */
+}
+
+.lang-en {
+  /* Estilos específicos para inglés */
+}

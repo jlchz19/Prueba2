@@ -1,0 +1,119 @@
+<!-- Header del Dashboard -->
+<div class="dashboard-header">
+  <div class="header-left">
+    <div class="welcome-section">
+      <h1 class="welcome-title">{{ translationService.translate('welcome_back', { name: username }) }}</h1>
+      <p class="welcome-subtitle">{{ translationService.translate('dashboard_subtitle') }}</p>
+    </div>
+    <div class="session-info">
+      <span class="session-time">🕒 {{ translationService.translate('session_started', { date: loginDate }) }}</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="user-menu">
+      <div class="user-avatar">
+        <span>{{ username.charAt(0).toUpperCase() }}</span>
+      </div>
+      <div class="user-dropdown">
+        <button class="user-button" (click)="toggleUserMenu()">
+          {{ username }}
+          <span class="dropdown-arrow">▼</span>
+        </button>
+        <div class="dropdown-menu" [class.show]="showUserMenu">
+          <div class="dropdown-item" (click)="navigateTo('/profile')">
+            <span>👤</span>
+            <span>{{ translationService.translate('my_profile') }}</span>
+          </div>
+          <div class="dropdown-item" (click)="navigateTo('/settings')">
+            <span>⚙️</span>
+            <span>{{ translationService.translate('settings') }}</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item logout-item" (click)="logout()">
+            <span>🚪</span>
+            <span>{{ translationService.translate('logout') }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notificaciones -->
+<div class="notifications-container" *ngIf="notifications.length > 0">
+  <div class="notification" *ngFor="let notification of notifications; let i = index" 
+       [class]="'notification-' + notification.type">
+    <div class="notification-icon">
+      <span *ngIf="notification.type === 'success'">✅</span>
+      <span *ngIf="notification.type === 'warning'">⚠️</span>
+      <span *ngIf="notification.type === 'error'">❌</span>
+      <span *ngIf="notification.type === 'info'">ℹ️</span>
+    </div>
+    <div class="notification-content">
+      <h4>{{ notification.title }}</h4>
+      <p>{{ notification.message }}</p>
+    </div>
+    <button class="notification-close" (click)="removeNotification(i)">×</button>
+  </div>
+</div>
+
+
+
+<!-- Acciones rápidas -->
+<div class="quick-actions">
+  <h2 class="section-title">{{ translationService.translate('quick_actions') }}</h2>
+  <div class="actions-grid">
+    <button class="action-btn" (click)="navigateTo('/products')">
+      <span class="action-icon">➕</span>
+      <span>{{ translationService.translate('add_product') }}</span>
+    </button>
+    <button class="action-btn" (click)="navigateTo('/categories')">
+      <span class="action-icon">📁</span>
+      <span>{{ translationService.translate('new_category') }}</span>
+    </button>
+    <button class="action-btn" (click)="navigateTo('/providers')">
+      <span class="action-icon">🏢</span>
+      <span>{{ translationService.translate('add_provider') }}</span>
+    </button>
+
+  </div>
+</div>
+
+
+
+<!-- Actividad reciente -->
+<div class="recent-activity">
+  <h2 class="section-title">{{ translationService.translate('recent_activity') }}</h2>
+  <div class="activity-list">
+    <div class="activity-item" *ngFor="let activity of recentActivity">
+      <div class="activity-icon" [class]="'activity-' + activity.type">
+        <span *ngIf="activity.type === 'product'">📦</span>
+        <span *ngIf="activity.type === 'category'">📂</span>
+        <span *ngIf="activity.type === 'provider'">🚚</span>
+
+      </div>
+      <div class="activity-content">
+        <h4>{{ activity.title }}</h4>
+        <p>{{ activity.description }}</p>
+        <span class="activity-time">{{ activity.time }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer del Dashboard -->
+<div class="dashboard-footer">
+  <div class="footer-content">
+    <p>{{ translationService.translate('system_version') }}</p>
+    <div class="footer-links">
+      <a href="#" class="footer-link">{{ translationService.translate('help') }}</a>
+      <a href="#" class="footer-link">{{ translationService.translate('support') }}</a>
+      <a href="#" class="footer-link">{{ translationService.translate('documentation') }}</a>
+    </div>
+  </div>
+</div>
+
+<!-- Router outlet para el contenido dinámico -->
+<div class="dashboard-content-area">
+  <router-outlet></router-outlet>
+</div>

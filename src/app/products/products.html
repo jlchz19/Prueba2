@@ -1,0 +1,77 @@
+<div class="products-header-bar">
+  <button type="button" class="btn btn-back" (click)="goToDashboard()">← Volver al inicio</button>
+  <div class="products-header-title" style="margin: 0 auto; display: flex; align-items: center; gap: 0.7rem; font-size: 1.4rem;">
+    <span class="section-icon">📦</span>
+    <span class="section-title">Gestión de Productos</span>
+    <span class="section-count">({{ productos.length }})</span>
+  </div>
+</div>
+<div class="products-cards-bg">
+  <div class="products-cards-container">
+    <div class="product-card" *ngFor="let p of productos">
+      <div class="product-card-icon">📦</div>
+      <div class="product-card-title">{{ p.nombre }}</div>
+      <div class="product-card-category">
+        <span class="category-badge" [style.backgroundColor]="getCategoryColor(p.categoria)">
+          {{ p.categoria }}
+        </span>
+      </div>
+      <div class="product-card-desc">{{ p.descripcion }}</div>
+      <div class="product-card-price">{{ p.precio | currency:'USD':'symbol':'1.2-2' }}</div>
+      <div class="product-card-actions">
+        <button class="btn btn-edit" (click)="openEditModal(p)"><i class="icon-edit"></i> Editar</button>
+        <button class="btn btn-delete" (click)="confirmDelete(p)"><i class="icon-delete"></i> Eliminar</button>
+      </div>
+    </div>
+    <div class="product-card add-card" (click)="openAddModal()">
+      <div class="product-card-icon">➕</div>
+      <div class="product-card-title">Agregar Producto</div>
+    </div>
+  </div>
+</div>
+  <!-- Modal para agregar producto -->
+  <div class="modal-backdrop" *ngIf="showAddModal">
+    <div class="modal">
+      <h3>Agregar producto</h3>
+    <form (ngSubmit)="addProduct($event)">
+        <label>Nombre</label>
+        <input type="text" name="nombre" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+">
+        <label>Categoría</label>
+        <select name="categoria" required>
+          <option value="" disabled selected>Selecciona una categoría</option>
+          <option *ngFor="let c of categorias" [value]="c.nombre">{{ c.nombre }}</option>
+        </select>
+        <label>Descripción</label>
+        <input type="text" name="descripcion" required>
+        <label>Precio</label>
+        <input type="number" name="precio" min="0" step="0.01" required pattern="[0-9]+(\.[0-9]{1,2})?">
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">Agregar</button>
+          <button type="button" (click)="showAddModal = false">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Modal para editar producto -->
+  <div class="modal-backdrop" *ngIf="showEditModal">
+    <div class="modal">
+      <h3>Editar producto</h3>
+    <form (ngSubmit)="editProduct($event)">
+        <label>Nombre</label>
+        <input type="text" name="nombre" [(ngModel)]="editForm.nombre" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+">
+        <label>Categoría</label>
+        <select name="categoria" [(ngModel)]="editForm.categoria" required>
+          <option value="" disabled>Selecciona una categoría</option>
+          <option *ngFor="let c of categorias" [value]="c.nombre">{{ c.nombre }}</option>
+        </select>
+        <label>Descripción</label>
+        <input type="text" name="descripcion" [(ngModel)]="editForm.descripcion" required>
+        <label>Precio</label>
+        <input type="number" name="precio" [(ngModel)]="editForm.precio" min="0" step="0.01" required pattern="[0-9]+(\.[0-9]{1,2})?">
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">Guardar</button>
+          <button type="button" (click)="showEditModal = false">Cancelar</button>
+        </div>
+      </form>
+  </div>
+</div>
