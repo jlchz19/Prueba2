@@ -5,6 +5,7 @@ import { HttpClient, HttpClientModule, HttpErrorResponse } from '@angular/common
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 
+// Componente de perfil mejorado con mejor manejo de errores y logging
 @Component({
   selector: 'app-profile',
   standalone: true,
