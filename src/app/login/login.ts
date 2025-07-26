@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { environment } from '../../environments/environment';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +13,7 @@ import { environment } from '../../environments/environment';
   styleUrl: './login.css'
 })
 export class Login {
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   showPassword = false;
   isLoading = false;
@@ -83,37 +83,30 @@ export class Login {
       localStorage.removeItem('rememberedUser');
     }
 
-    this.http.post<any>(`${environment.apiUrl}/api/auth/login`, { name: username, password })
-      .subscribe({
-        next: (res) => {
-          this.isLoading = false;
-          if (res && res.token) {
-            localStorage.setItem('token', res.token);
-            localStorage.setItem('username', username);
-            this.successMessage = '¡Inicio de sesión exitoso! Redirigiendo...';
-            
-            // Redirigir después de mostrar el mensaje
-            setTimeout(() => {
-              this.router.navigate(['/dashboard']);
-            }, 1500);
-          } else {
-            this.errorMessage = 'Respuesta inesperada del servidor. Inténtalo de nuevo.';
-          }
-        },
-        error: (err) => {
-          this.isLoading = false;
-          const errorMsg = err?.error?.message;
-          
-          if (errorMsg) {
-            this.errorMessage = errorMsg;
-          } else if (err.status === 401) {
-            this.errorMessage = 'Usuario o contraseña incorrectos';
-          } else if (err.status === 0 || err.status === 500) {
-            this.errorMessage = 'Error de conexión. Verifica tu internet e inténtalo de nuevo.';
-          } else {
-            this.errorMessage = 'Error al iniciar sesión. Inténtalo de nuevo.';
-          }
+    this.authService.login(username, password).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.successMessage = '¡Inicio de sesión exitoso! Redirigiendo...';
+        
+        // Redirigir después de mostrar el mensaje
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 1500);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        const errorMsg = err?.error?.message;
+        
+        if (errorMsg) {
+          this.errorMessage = errorMsg;
+        } else if (err.status === 401) {
+          this.errorMessage = 'Usuario o contraseña incorrectos';
+        } else if (err.status === 0 || err.status === 500) {
+          this.errorMessage = 'Error de conexión. Verifica tu internet e inténtalo de nuevo.';
+        } else {
+          this.errorMessage = 'Error al iniciar sesión. Inténtalo de nuevo.';
         }
-      });
+      }
+    });
   }
 }

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { environment } from '../../environments/environment';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -24,7 +24,7 @@ export class ForgotPassword {
   showPassword = false;
   showConfirmPassword = false;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   // Paso 1: Solicitar código de recuperación
   async requestCode() {
@@ -43,7 +43,7 @@ export class ForgotPassword {
     this.successMessage = '';
 
     try {
-      await this.http.post(`${environment.apiUrl}/api/auth/forgot`, { email: this.email }).toPromise();
+      await this.authService.forgotPassword(this.email).toPromise();
       this.successMessage = 'Se ha enviado un código de verificación a tu email';
       this.step = 2;
     } catch (error: any) {
@@ -80,12 +80,7 @@ export class ForgotPassword {
     this.successMessage = '';
 
     try {
-      await this.http.post(`${environment.apiUrl}/api/auth/reset`, {
-        email: this.email,
-        code: this.code,
-        password: this.newPassword
-      }).toPromise();
-
+      await this.authService.resetPassword(this.email, this.code, this.newPassword).toPromise();
       this.successMessage = 'Contraseña restablecida correctamente';
       setTimeout(() => {
         this.router.navigate(['/']);
@@ -104,7 +99,7 @@ export class ForgotPassword {
     this.successMessage = '';
 
     try {
-      await this.http.post(`${environment.apiUrl}/api/auth/forgot`, { email: this.email }).toPromise();
+      await this.authService.forgotPassword(this.email).toPromise();
       this.successMessage = 'Se ha enviado un nuevo código de verificación';
     } catch (error: any) {
       this.errorMessage = error.error?.message || 'Error al reenviar el código';

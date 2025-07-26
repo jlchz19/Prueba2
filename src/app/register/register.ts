@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { environment } from '../../environments/environment';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -14,7 +13,7 @@ import { environment } from '../../environments/environment';
   styleUrl: './register.css'
 })
 export class Register {
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   showPassword = false;
   showConfirmPassword = false;
@@ -228,43 +227,41 @@ export class Register {
     const userData = { name, email, password };
     console.log('Enviando datos al backend:', { ...userData, password: '***' });
 
-    // Enviar al backend
-    this.http.post<any>(`${environment.apiUrl}/api/auth/register`, userData)
-      .subscribe({
-        next: (res) => {
-          console.log('Respuesta exitosa del backend:', res);
-          this.isLoading = false;
-          // Limpiar intentos fallidos en caso de éxito
-          localStorage.removeItem('registerAttempts');
-          localStorage.removeItem('lastRegisterAttempt');
-          
-          // Guardar el email para la verificación
-          localStorage.setItem('pendingEmail', email);
-          
-          this.successMessage = res?.message || '¡Registro exitoso! Verifica tu email para continuar.';
-          
-          // Redirigir a la verificación de email después de mostrar el mensaje
-          setTimeout(() => {
-            this.router.navigate(['/verify-email']);
-          }, 2000);
-        },
-        error: (err) => {
-          console.error('Error en el registro:', err);
-          this.isLoading = false;
-          this.recordFailedAttempt();
-          
-          const errorMsg = err?.error?.message;
-          
-          if (errorMsg) {
-            this.errorMessage = errorMsg;
-          } else if (err.status === 409) {
-            this.errorMessage = 'El usuario o correo ya existe';
-          } else if (err.status === 0 || err.status === 500) {
-            this.errorMessage = 'Error de conexión. Verifica tu internet e inténtalo de nuevo.';
-          } else {
-            this.errorMessage = 'Error al registrar usuario. Inténtalo de nuevo.';
-          }
+    this.authService.register(userData).subscribe({
+      next: (res) => {
+        console.log('Respuesta exitosa del backend:', res);
+        this.isLoading = false;
+        // Limpiar intentos fallidos en caso de éxito
+        localStorage.removeItem('registerAttempts');
+        localStorage.removeItem('lastRegisterAttempt');
+        
+        // Guardar el email para la verificación
+        localStorage.setItem('pendingEmail', email);
+        
+        this.successMessage = res?.message || '¡Registro exitoso! Verifica tu email para continuar.';
+        
+        // Redirigir a la verificación de email después de mostrar el mensaje
+        setTimeout(() => {
+          this.router.navigate(['/verify-email']);
+        }, 2000);
+      },
+      error: (err) => {
+        console.error('Error en el registro:', err);
+        this.isLoading = false;
+        this.recordFailedAttempt();
+        
+        const errorMsg = err?.error?.message;
+        
+        if (errorMsg) {
+          this.errorMessage = errorMsg;
+        } else if (err.status === 409) {
+          this.errorMessage = 'El usuario o correo ya existe';
+        } else if (err.status === 0 || err.status === 500) {
+          this.errorMessage = 'Error de conexión. Verifica tu internet e inténtalo de nuevo.';
+        } else {
+          this.errorMessage = 'Error al registrar usuario. Inténtalo de nuevo.';
         }
-      });
+      }
+    });
   }
 }
