@@ -33,17 +33,17 @@ export class VerifyEmail {
       if (params['email']) {
         this.email = params['email'];
       } else {
-        // Obtener el email del localStorage (guardado durante el registro)
-        this.email = localStorage.getItem('pendingEmail') || '';
+    // Obtener el email del localStorage (guardado durante el registro)
+    this.email = localStorage.getItem('pendingEmail') || '';
       }
       
       if (params['message']) {
         this.message = params['message'];
       }
       
-      if (!this.email) {
-        this.router.navigate(['/register']);
-      }
+    if (!this.email) {
+      this.router.navigate(['/register']);
+    }
     });
   }
 
