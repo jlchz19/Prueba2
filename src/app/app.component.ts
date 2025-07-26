@@ -1,11 +1,22 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { SharedModule } from './shared';
+import { Router } from '@angular/router';
+import { AuthService } from './services/auth.service';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SharedModule],
-  template: '<router-outlet></router-outlet>'
+  imports: [],
+  templateUrl: './app.html',
+  styleUrl: './app.css'
 })
-export class AppComponent { } 
+export class AppComponent {
+  constructor(private router: Router, private authService: AuthService) {
+    // DEBUG: Verificar configuración del API al iniciar la aplicación
+    console.log('🚀 APP INICIADA');
+    console.log('🔧 API URL:', environment.apiUrl);
+    console.log('🔧 Version:', environment.version);
+    console.log('🔧 Backend Render:', 'https://prueba1-5jnd.onrender.com');
+    console.log('✅ Configuración verificada');
+  }
+} 
