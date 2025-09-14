@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Evento - {{ animal.identificacion }} - AgroGest{% endblock %}
+{% block page_title %}Registrar Evento{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('historial_animal', animal_id=animal.id) }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver al Historial
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-calendar-plus me-2"></i>Registrar Evento para {{ animal.identificacion }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <strong>Estado Actual:</strong> {{ animal.estado|title }} | 
+                    <strong>Peso Actual:</strong> {{ animal.peso }} kg
+                </div>
+                
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="tipo_evento" name="tipo_evento" required>
+                                    <option value="">Seleccionar tipo de evento...</option>
+                                    <option value="venta">Venta</option>
+                                    <option value="fallecimiento">Fallecimiento</option>
+                                    <option value="cambio_estado">Cambio de Estado</option>
+                                </select>
+                                <label for="tipo_evento">Tipo de Evento *</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos para Venta -->
+                        <div id="campos_venta" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="fecha_venta" name="fecha_venta" placeholder="Fecha de venta">
+                                    <label for="fecha_venta">Fecha de Venta</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="comprador" name="comprador" placeholder="Comprador">
+                                    <label for="comprador">Comprador</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" step="0.1" class="form-control" id="peso_venta" name="peso_venta" placeholder="Peso al momento de la venta">
+                                    <label for="peso_venta">Peso al Momento de la Venta (kg)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" step="0.01" class="form-control" id="precio_venta" name="precio_venta" placeholder="Precio de venta">
+                                    <label for="precio_venta">Precio de Venta ($)</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos para Fallecimiento -->
+                        <div id="campos_fallecimiento" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="fecha_fallecimiento" name="fecha_fallecimiento" placeholder="Fecha de fallecimiento">
+                                    <label for="fecha_fallecimiento">Fecha de Fallecimiento</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="causa_fallecimiento" name="causa_fallecimiento" placeholder="Causa del fallecimiento">
+                                    <label for="causa_fallecimiento">Causa del Fallecimiento</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" id="disposicion_final" name="disposicion_final">
+                                        <option value="">Seleccionar disposición...</option>
+                                        <option value="Incineración">Incineración</option>
+                                        <option value="Entierro">Entierro</option>
+                                        <option value="Donación">Donación</option>
+                                        <option value="Otro">Otro</option>
+                                    </select>
+                                    <label for="disposicion_final">Disposición Final</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos para Cambio de Estado -->
+                        <div id="campos_cambio_estado" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" id="nuevo_estado" name="nuevo_estado">
+                                        <option value="">Seleccionar nuevo estado...</option>
+                                        <option value="activo">Activo</option>
+                                        <option value="en_engorde">En Engorde</option>
+                                        <option value="semental">Semental</option>
+                                        <option value="reproductora">Reproductora</option>
+                                        <option value="lechón">Lechón</option>
+                                        <option value="vendido">Vendido</option>
+                                        <option value="muerto">Muerto</option>
+                                    </select>
+                                    <label for="nuevo_estado">Nuevo Estado</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('historial_animal', animal_id=animal.id) }}" class="btn btn-secondary me-2">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-save me-2"></i>Registrar Evento
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoEventoSelect = document.getElementById('tipo_evento');
+    const camposVenta = document.getElementById('campos_venta');
+    const camposFallecimiento = document.getElementById('campos_fallecimiento');
+    const camposCambioEstado = document.getElementById('campos_cambio_estado');
+    
+    function mostrarCampos() {
+        // Ocultar todos los campos
+        camposVenta.style.display = 'none';
+        camposFallecimiento.style.display = 'none';
+        camposCambioEstado.style.display = 'none';
+        
+        // Mostrar campos según el tipo de evento
+        const tipoEvento = tipoEventoSelect.value;
+        if (tipoEvento === 'venta') {
+            camposVenta.style.display = 'block';
+        } else if (tipoEvento === 'fallecimiento') {
+            camposFallecimiento.style.display = 'block';
+        } else if (tipoEvento === 'cambio_estado') {
+            camposCambioEstado.style.display = 'block';
+        }
+    }
+    
+    tipoEventoSelect.addEventListener('change', mostrarCampos);
+    
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock %} 

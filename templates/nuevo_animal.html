@@ -1,0 +1,578 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Animal - AgroGest{% endblock %}
+{% block page_title %}Registrar Nuevo Animal{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('animales') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-paw me-2"></i>Registro Completo de Animal
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <!-- Campo de imagen -->
+                    <div class="image-upload-area mb-4">
+                        <div class="col-md-12">
+                            <label for="imagen" class="form-label fw-bold mb-3"><i class="fas fa-camera me-2"></i>Foto del Animal</label>
+                            <input class="form-control" type="file" id="imagen" name="imagen" accept="image/*">
+                            <div class="form-text mt-2">Formatos permitidos: jpg, jpeg, png, gif (máximo 5MB)</div>
+                            <div id="preview" class="mt-3"></div>
+                        </div>
+                    </div>
+                    <!-- Sección 1: Identificación y Datos Generales -->
+                    <div class="section-header mb-4">
+                        <h5 class="section-title"><i class="fas fa-info-circle me-2"></i>Identificación y Datos Generales</h5>
+                        <p class="section-subtitle">Información básica del animal</p>
+                    </div>
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="identificacion" name="identificacion" placeholder="Identificación" required>
+                                <label for="identificacion">Identificador Único (Arete/Chip) *</label>
+                                <div class="form-text">Ej: VACA-001, CERDO-015</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre del animal">
+                                <label for="nombre">Nombre (Opcional)</label>
+                                <div class="form-text">Ej: Clara, Roco, Luna</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="tipo" name="tipo" placeholder="Tipo de animal" required list="tipos-animales">
+                                <datalist id="tipos-animales">
+                                    <option value="Bovino">
+                                    <option value="Porcino">
+                                    <option value="Ovino">
+                                    <option value="Caprino">
+                                    <option value="Equino">
+                                    <option value="Aviar">
+                                    <option value="Cunícola">
+                                    <option value="Búfalo">
+                                    <option value="Llama">
+                                    <option value="Alpaca">
+                                    <option value="Avestruz">
+                                    <option value="Codorniz">
+                                    <option value="Pavo">
+                                    <option value="Ganso">
+                                    <option value="Pato">
+                                    <option value="Pollo">
+                                    <option value="Gallina">
+                                    <option value="Gallo">
+                                    <option value="Cabra">
+                                    <option value="Chivo">
+                                    <option value="Oveja">
+                                    <option value="Carnero">
+                                    <option value="Vaca">
+                                    <option value="Toro">
+                                    <option value="Novillo">
+                                    <option value="Ternero">
+                                    <option value="Cerdo">
+                                    <option value="Cerda">
+                                    <option value="Lechón">
+                                    <option value="Caballo">
+                                    <option value="Yegua">
+                                    <option value="Potro">
+                                    <option value="Burro">
+                                    <option value="Mula">
+                                    <option value="Conejo">
+                                    <option value="Pez">
+                                    <option value="Tilapia">
+                                    <option value="Trucha">
+                                    <option value="Camarón">
+                                </datalist>
+                                <label for="tipo">Tipo de Animal *</label>
+                                <div class="form-text">Ej: Bovino, Porcino, Ovino, Caprino, Equino, Aviar, etc.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="raza" name="raza" placeholder="Raza" required>
+                                <label for="raza">Raza *</label>
+                                <div class="form-text">Ej: Holstein, Duroc x Landrace</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="sexo" name="sexo" required>
+                                    <option value="">Seleccionar sexo...</option>
+                                    <option value="macho">Macho</option>
+                                    <option value="hembra">Hembra</option>
+                                </select>
+                                <label for="sexo">Sexo *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                                <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.1" class="form-control" id="peso_nacimiento" name="peso_nacimiento" placeholder="Peso al nacer">
+                                <label for="peso_nacimiento">Peso al Nacimiento (kg)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.1" class="form-control" id="peso_actual" name="peso_actual" placeholder="Peso actual" required>
+                                <label for="peso_actual">Peso Actual (kg) *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="color_senas" name="color_senas" placeholder="Color y señas">
+                                <label for="color_senas">Color/Señas Particulares</label>
+                                <div class="form-text">Ej: Blanca con manchas negras</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="estado" name="estado" required>
+                                    <option value="activo">Activo</option>
+                                    <option value="en_produccion">En Producción</option>
+                                    <option value="gestante">Gestante</option>
+                                    <option value="en_engorde">En Engorde</option>
+                                    <option value="semental">Semental</option>
+                                    <option value="reproductora">Reproductora</option>
+                                    <option value="lechon">Lechón</option>
+                                    <option value="vendido">Vendido</option>
+                                    <option value="muerto">Fallecido</option>
+                                </select>
+                                <label for="estado">Estado Actual *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="ubicacion_id" name="ubicacion_id">
+                                    <option value="">Seleccionar ubicación...</option>
+                                    <optgroup label="Potreros">
+                                        {% for potrero in potreros %}
+                                        <option value="potrero_{{ potrero.id }}">{{ potrero.nombre }} - {{ potrero.area }} ha</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    <optgroup label="Otras Ubicaciones">
+                                        {% for ubicacion in ubicaciones %}
+                                        <option value="ubicacion_{{ ubicacion.id }}">{{ ubicacion.nombre }} ({{ ubicacion.tipo }})</option>
+                                        {% endfor %}
+                                    </optgroup>
+                                </select>
+                                <label for="ubicacion_id">Ubicación del Animal</label>
+                                <div class="form-text">Selecciona potrero para bovinos o ubicación específica para otros animales</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección 2: Parentesco y Genética -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-dna me-2"></i>Parentesco y Genética</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="padre_id" name="padre_id" placeholder="ID del padre">
+                                <label for="padre_id">Padre (ID)</label>
+                                <div class="form-text">Ej: TORO-005</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="padre_nombre" name="padre_nombre" placeholder="Nombre del padre">
+                                <label for="padre_nombre">Nombre del Padre</label>
+                                <div class="form-text">Ej: Max</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="padre_raza" name="padre_raza" placeholder="Raza del padre">
+                                <label for="padre_raza">Raza del Padre</label>
+                                <div class="form-text">Ej: Holstein</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="madre_id" name="madre_id" placeholder="ID de la madre">
+                                <label for="madre_id">Madre (ID)</label>
+                                <div class="form-text">Ej: VACA-020</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="madre_nombre" name="madre_nombre" placeholder="Nombre de la madre">
+                                <label for="madre_nombre">Nombre de la Madre</label>
+                                <div class="form-text">Ej: Luna</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="madre_raza" name="madre_raza" placeholder="Raza de la madre">
+                                <label for="madre_raza">Raza de la Madre</label>
+                                <div class="form-text">Ej: Holstein</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="historial_genetico" name="historial_genetico" placeholder="Historial genético" style="height: 100px"></textarea>
+                                <label for="historial_genetico">Historial Genético Relevante</label>
+                                <div class="form-text">Datos sobre productividad de padres, características genéticas</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección 3: Datos Reproductivos y de Producción -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-heart me-2"></i>Datos Reproductivos y de Producción</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="numero_crias_camada" name="numero_crias_camada" placeholder="Número de crías">
+                                <label for="numero_crias_camada">Número de Crías por Camada/Parto</label>
+                                <div class="form-text">Lechones, terneros, corderos, cabritos, pollitos, etc.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.1" class="form-control" id="peso_promedio_crias" name="peso_promedio_crias" placeholder="Peso promedio">
+                                <label for="peso_promedio_crias">Peso Promedio de las Crías (kg)</label>
+                                <div class="form-text">Al nacer o al destete según aplique</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.1" class="form-control" id="produccion_diaria" name="produccion_diaria" placeholder="Producción diaria">
+                                <label for="produccion_diaria">Producción Diaria</label>
+                                <div class="form-text">Litros de leche, huevos, etc.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="unidad_produccion" name="unidad_produccion" placeholder="Unidad">
+                                <label for="unidad_produccion">Unidad de Producción</label>
+                                <div class="form-text">Ej: litros, huevos, kg, etc.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección 4: Información de Compra/Venta -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-dollar-sign me-2"></i>Información de Compra/Venta</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_compra" name="fecha_compra" placeholder="Fecha de compra">
+                                <label for="fecha_compra">Fecha de Compra</label>
+                                <div class="form-text">Dejar vacío si nació en la finca</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.01" class="form-control" id="precio_compra" name="precio_compra" placeholder="Precio de compra">
+                                <label for="precio_compra">Precio de Compra ($)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección 5: Observaciones Adicionales -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-sticky-note me-2"></i>Observaciones Adicionales</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="observaciones_adicionales" name="observaciones_adicionales" placeholder="Observaciones" style="height: 100px"></textarea>
+                                <label for="observaciones_adicionales">Observaciones Adicionales</label>
+                                <div class="form-text">Cualquier información relevante para el manejo o historial del animal</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="btn-group-custom">
+                        <button type="button" class="btn btn-secondary btn-custom" onclick="history.back()">
+                            <i class="fas fa-arrow-left me-2"></i>Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-custom">
+                            <i class="fas fa-save me-2"></i>Registrar Animal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+/* Estilos específicos para mejorar la visibilidad de formularios */
+.section-header {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary);
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    color: #6c757d;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+.form-floating {
+    margin-bottom: 1rem;
+}
+
+.form-floating > .form-control,
+.form-floating > .form-select {
+    background-color: #fff;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem;
+    font-size: 1rem;
+    height: calc(3.5rem + 2px);
+    transition: all 0.3s ease;
+}
+
+.form-floating > .form-control:focus,
+.form-floating > .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.1);
+    background-color: #fff;
+}
+
+.form-floating > label {
+    padding: 1rem;
+    font-weight: 500;
+    color: #495057;
+    background-color: transparent;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.btn-group-custom {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.btn-custom {
+    min-width: 150px;
+    padding: 12px 24px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.image-upload-area {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.image-upload-area:hover {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
+}
+
+.required-field::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.row.g-4 > * {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Mejoras para datalist */
+datalist {
+    display: none;
+}
+
+input[list]::-webkit-calendar-picker-indicator {
+    display: none !important;
+}
+
+/* Estilos para campos obligatorios */
+.form-floating > .form-control[required],
+.form-floating > .form-select[required] {
+    border-left: 4px solid #ffc107;
+}
+
+.form-floating > .form-control[required]:focus,
+.form-floating > .form-select[required]:focus {
+    border-left: 4px solid var(--success);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+
+    // Mostrar sugerencias dinámicas según el tipo de animal
+    const tipoInput = document.getElementById('tipo');
+    const razaInput = document.getElementById('raza');
+    
+    // Sugerencias de razas por tipo de animal
+    const razasPorTipo = {
+        'Bovino': ['Holstein', 'Angus', 'Brahman', 'Charolais', 'Hereford', 'Simmental', 'Limousin'],
+        'Porcino': ['Duroc', 'Yorkshire', 'Landrace', 'Hampshire', 'Pietrain', 'Large White'],
+        'Ovino': ['Dorper', 'Santa Inés', 'Morada Nova', 'Somalis', 'Pelibuey'],
+        'Caprino': ['Boer', 'Anglo Nubian', 'Saanen', 'Toggenburg', 'Alpina'],
+        'Equino': ['Cuarto de Milla', 'Criollo', 'Paso Fino', 'Árabe', 'Pura Sangre'],
+        'Aviar': ['Rhode Island', 'Leghorn', 'Plymouth Rock', 'New Hampshire', 'Brahma'],
+        'Cunícola': ['Nueva Zelanda', 'California', 'Chinchilla', 'Mariposa', 'Flemish Giant']
+    };
+    
+    tipoInput.addEventListener('input', function() {
+        const tipo = this.value;
+        const razas = razasPorTipo[tipo];
+        
+        // Limpiar datalist anterior
+        let datalistRazas = document.getElementById('razas-sugeridas');
+        if (datalistRazas) {
+            datalistRazas.remove();
+        }
+        
+        // Crear nuevo datalist con razas específicas
+        if (razas) {
+            datalistRazas = document.createElement('datalist');
+            datalistRazas.id = 'razas-sugeridas';
+            razas.forEach(raza => {
+                const option = document.createElement('option');
+                option.value = raza;
+                datalistRazas.appendChild(option);
+            });
+            document.body.appendChild(datalistRazas);
+            razaInput.setAttribute('list', 'razas-sugeridas');
+        } else {
+            razaInput.removeAttribute('list');
+        }
+    });
+
+    // Filtrar opciones de ubicación según tipo de animal
+    const tipoAnimalInput = document.getElementById('tipo');
+    const ubicacionSelect = document.getElementById('ubicacion_id');
+    const allOptions = Array.from(ubicacionSelect.options);
+    
+    function filterLocationOptions() {
+        const tipo = tipoAnimalInput.value.toLowerCase();
+        const esBovino = ['bovino', 'vaca', 'toro', 'novillo', 'ternero'].includes(tipo);
+        
+        // Limpiar todas las opciones excepto la primera
+        ubicacionSelect.innerHTML = '<option value="">Seleccionar ubicación...</option>';
+        
+        if (esBovino) {
+            // Para bovinos: mostrar principalmente potreros
+            const optgroupPotreros = document.createElement('optgroup');
+            optgroupPotreros.label = 'Potreros (Recomendado)';
+            
+            const optgroupOtras = document.createElement('optgroup');
+            optgroupOtras.label = 'Otras Ubicaciones';
+            
+            allOptions.forEach(option => {
+                if (option.value.startsWith('potrero_')) {
+                    optgroupPotreros.appendChild(option.cloneNode(true));
+                } else if (option.value.startsWith('ubicacion_')) {
+                    optgroupOtras.appendChild(option.cloneNode(true));
+                }
+            });
+            
+            if (optgroupPotreros.children.length > 0) {
+                ubicacionSelect.appendChild(optgroupPotreros);
+            }
+            if (optgroupOtras.children.length > 0) {
+                ubicacionSelect.appendChild(optgroupOtras);
+            }
+        } else {
+            // Para otros animales: mostrar principalmente ubicaciones específicas
+            const optgroupUbicaciones = document.createElement('optgroup');
+            optgroupUbicaciones.label = 'Ubicaciones Específicas (Recomendado)';
+            
+            const optgroupPotreros = document.createElement('optgroup');
+            optgroupPotreros.label = 'Potreros';
+            
+            allOptions.forEach(option => {
+                if (option.value.startsWith('ubicacion_')) {
+                    optgroupUbicaciones.appendChild(option.cloneNode(true));
+                } else if (option.value.startsWith('potrero_')) {
+                    optgroupPotreros.appendChild(option.cloneNode(true));
+                }
+            });
+            
+            if (optgroupUbicaciones.children.length > 0) {
+                ubicacionSelect.appendChild(optgroupUbicaciones);
+            }
+            if (optgroupPotreros.children.length > 0) {
+                ubicacionSelect.appendChild(optgroupPotreros);
+            }
+        }
+    }
+    
+    // Ejecutar al cargar y al cambiar tipo
+    tipoAnimalInput.addEventListener('change', filterLocationOptions);
+    tipoAnimalInput.addEventListener('input', filterLocationOptions);
+    filterLocationOptions(); // Ejecutar al cargar
+
+    // Previsualización de imagen
+    const inputImagen = document.getElementById('imagen');
+    const preview = document.getElementById('preview');
+    if (inputImagen) {
+        inputImagen.addEventListener('change', function(e) {
+            preview.innerHTML = '';
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'img-thumbnail mt-2';
+                    img.style.maxWidth = '180px';
+                    img.style.maxHeight = '180px';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

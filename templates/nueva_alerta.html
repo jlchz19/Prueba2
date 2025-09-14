@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block title %}Nueva Alerta - AgroGest{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-bell me-2"></i>Nueva Alerta
+        </h1>
+        <a href="{{ url_for('alertas') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Volver a Alertas
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-plus me-2"></i>Crear Nueva Alerta
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="alertaForm">
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="titulo" class="form-label">Título de la Alerta *</label>
+                                <input type="text" class="form-control" id="titulo" name="titulo" required
+                                       placeholder="Ej: Vacunación de terneros, Revisión veterinaria">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="tipo_alerta" class="form-label">Tipo de Alerta *</label>
+                                <select class="form-select" id="tipo_alerta" name="tipo_alerta" required>
+                                    <option value="">Seleccionar tipo</option>
+                                    <option value="general">General</option>
+                                    <option value="animal">Animal Específico</option>
+                                    <option value="vacuna">Vacunación</option>
+                                    <option value="produccion">Producción</option>
+                                    <option value="empleado">Empleado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3"
+                                    placeholder="Describe los detalles de la alerta..."></textarea>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="fecha" class="form-label">Fecha *</label>
+                                <input type="date" class="form-control" id="fecha" name="fecha" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="hora" class="form-label">Hora *</label>
+                                <input type="time" class="form-control" id="hora" name="hora" required>
+                            </div>
+                        </div>
+
+                        <!-- Campo animal (solo visible cuando se selecciona tipo animal) -->
+                        <div class="mb-3" id="animalField" style="display: none;">
+                            <label for="animal_id" class="form-label">Animal Específico</label>
+                            <select class="form-select" id="animal_id" name="animal_id">
+                                <option value="">Seleccionar animal</option>
+                                {% for animal in animales %}
+                                <option value="{{ animal.id }}">{{ animal.identificacion }} - {{ animal.tipo }} ({{ animal.raza }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Opciones de repetición -->
+                        <div class="card border-light mb-3">
+                            <div class="card-header bg-light">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="repetir" name="repetir">
+                                    <label class="form-check-label" for="repetir">
+                                        <strong>Repetir esta alerta</strong>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="card-body" id="repetirOptions" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="frecuencia" class="form-label">Frecuencia</label>
+                                        <select class="form-select" id="frecuencia" name="frecuencia">
+                                            <option value="diaria">Diaria</option>
+                                            <option value="semanal">Semanal</option>
+                                            <option value="mensual">Mensual</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Información</label>
+                                        <div class="alert alert-info mb-0">
+                                            <small>
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                La alerta se repetirá automáticamente según la frecuencia seleccionada.
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel de ayuda -->
+                        <div class="card border-primary mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-lightbulb me-2"></i>Guía de Alertas
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Tipos de Alertas:</h6>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-circle text-secondary me-2"></i><strong>General:</strong> Recordatorios generales</li>
+                                            <li><i class="fas fa-circle text-primary me-2"></i><strong>Animal:</strong> Específica para un animal</li>
+                                            <li><i class="fas fa-circle text-success me-2"></i><strong>Vacuna:</strong> Recordatorios de vacunación</li>
+                                            <li><i class="fas fa-circle text-warning me-2"></i><strong>Producción:</strong> Metas de producción</li>
+                                            <li><i class="fas fa-circle text-info me-2"></i><strong>Empleado:</strong> Tareas de empleados</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-primary">Ejemplos de Alertas:</h6>
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-bell me-2 text-muted"></i>Vacunación de terneros</li>
+                                            <li><i class="fas fa-bell me-2 text-muted"></i>Revisión veterinaria mensual</li>
+                                            <li><i class="fas fa-bell me-2 text-muted"></i>Cambio de potrero</li>
+                                            <li><i class="fas fa-bell me-2 text-muted"></i>Control de peso semanal</li>
+                                            <li><i class="fas fa-bell me-2 text-muted"></i>Mantenimiento de instalaciones</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('alertas') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Crear Alerta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoAlerta = document.getElementById('tipo_alerta');
+    const animalField = document.getElementById('animalField');
+    const repetirCheckbox = document.getElementById('repetir');
+    const repetirOptions = document.getElementById('repetirOptions');
+    const fechaInput = document.getElementById('fecha');
+    const horaInput = document.getElementById('hora');
+
+    // Establecer fecha y hora por defecto
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    fechaInput.value = tomorrow.toISOString().split('T')[0];
+    horaInput.value = '08:00';
+
+    // Mostrar/ocultar campo animal según el tipo
+    tipoAlerta.addEventListener('change', function() {
+        if (this.value === 'animal' || this.value === 'vacuna') {
+            animalField.style.display = 'block';
+            document.getElementById('animal_id').required = true;
+        } else {
+            animalField.style.display = 'none';
+            document.getElementById('animal_id').required = false;
+            document.getElementById('animal_id').value = '';
+        }
+    });
+
+    // Mostrar/ocultar opciones de repetición
+    repetirCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            repetirOptions.style.display = 'block';
+        } else {
+            repetirOptions.style.display = 'none';
+        }
+    });
+
+    // Validación del formulario
+    document.getElementById('alertaForm').addEventListener('submit', function(e) {
+        const fecha = new Date(fechaInput.value + 'T' + horaInput.value);
+        const ahora = new Date();
+
+        if (fecha <= ahora) {
+            e.preventDefault();
+            alert('La fecha y hora de la alerta debe ser futura.');
+            return false;
+        }
+
+        // Mostrar confirmación
+        const titulo = document.getElementById('titulo').value;
+        const fechaFormateada = fecha.toLocaleString('es-ES');
+        
+        if (!confirm(`¿Crear alerta "${titulo}" para el ${fechaFormateada}?`)) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Auto-completar título según el tipo
+    tipoAlerta.addEventListener('change', function() {
+        const tituloInput = document.getElementById('titulo');
+        if (!tituloInput.value) {
+            switch(this.value) {
+                case 'vacuna':
+                    tituloInput.value = 'Vacunación programada';
+                    break;
+                case 'produccion':
+                    tituloInput.value = 'Revisión de producción';
+                    break;
+                case 'empleado':
+                    tituloInput.value = 'Tarea asignada';
+                    break;
+                case 'animal':
+                    tituloInput.value = 'Revisión de animal';
+                    break;
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

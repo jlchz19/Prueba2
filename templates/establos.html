@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Establos y Corrales - AgroGest{% endblock %}
+{% block page_title %}Gestión de Establos y Corrales{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('nueva_ubicacion') }}?tipo=establo" class="btn btn-primary">
+    <i class="fas fa-plus me-2"></i>Nuevo Establo/Corral
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-home me-2"></i>Establos y Corrales Registrados
+                    <span class="badge bg-primary ms-2">{{ establos|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if establos %}
+                <div class="row">
+                    {% for establo in establos %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card border-left-info">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="card-title mb-0">{{ establo.nombre }}</h6>
+                                    <span class="badge bg-{{ 'success' if establo.estado == 'disponible' else 'warning' if establo.estado == 'ocupado' else 'danger' }}">
+                                        {{ establo.estado|title }}
+                                    </span>
+                                </div>
+                                
+                                <div class="row text-center mb-3">
+                                    <div class="col-6">
+                                        <div class="border-end">
+                                            <h4 class="text-info mb-0">{{ animales_por_establo.get(establo.id, 0) }}</h4>
+                                            <small class="text-muted">Equinos</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h4 class="text-primary mb-0">{{ establo.capacidad }}</h4>
+                                        <small class="text-muted">Capacidad</small>
+                                    </div>
+                                </div>
+
+                                {% if establo.area %}
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-ruler-combined me-1"></i>
+                                    Área: {{ establo.area }} m²
+                                </p>
+                                {% endif %}
+
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-tag me-1"></i>
+                                    Tipo: {{ establo.tipo_ubicacion|title }}
+                                </p>
+
+                                {% if establo.descripcion %}
+                                <p class="text-muted small mb-3">{{ establo.descripcion }}</p>
+                                {% endif %}
+
+                                <!-- Animales en este establo -->
+                                {% set equinos_establo = animales|selectattr('ubicacion_id', 'equalto', establo.id)|list %}
+                                {% if equinos_establo %}
+                                <div class="mb-3">
+                                    <h6 class="text-muted">Equinos en este {{ establo.tipo_ubicacion }}:</h6>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% for equino in equinos_establo %}
+                                        <span class="badge bg-light text-dark">
+                                            {{ equino.identificacion }}
+                                            {% if equino.nombre %}- {{ equino.nombre }}{% endif %}
+                                        </span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('editar_ubicacion', id=establo.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                    <a href="{{ url_for('eliminar_ubicacion', id=establo.id) }}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-home fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No hay establos o corrales registrados</h5>
+                    <p class="text-muted">Comienza agregando tu primer establo o corral para tus caballos</p>
+                    <a href="{{ url_for('nueva_ubicacion') }}?tipo=establo" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Agregar Primer Establo/Corral
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumen de estadísticas -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ establos|length }}</h4>
+                        <span>Total Establos/Corrales</span>
+                    </div>
+                    <i class="fas fa-home fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ animales|length }}</h4>
+                        <span>Total Equinos</span>
+                    </div>
+                    <i class="fas fa-horse fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ establos|selectattr('estado', 'equalto', 'disponible')|list|length }}</h4>
+                        <span>Disponibles</span>
+                    </div>
+                    <i class="fas fa-check-circle fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ establos|sum(attribute='capacidad') or 0 }}</h4>
+                        <span>Capacidad Total</span>
+                    </div>
+                    <i class="fas fa-chart-bar fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

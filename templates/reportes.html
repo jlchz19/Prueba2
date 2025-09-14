@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+{% block title %}Sistema de Reportes - AgroGest{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <span style="font-size: 1.2rem; margin-right: 8px;">📊</span>Sistema de Reportes
+        </h1>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" onclick="window.print()">
+                <span style="font-size: 1rem; margin-right: 4px;">🖨️</span>Imprimir Página
+            </button>
+        </div>
+    </div>
+
+    <!-- Estadísticas Generales -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Animales
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_animales }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <span style="font-size: 2rem;">🐾</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Vacunaciones
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_vacunas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-syringe fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Empleados
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_empleados }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Alertas Activas
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_alertas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-bell fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Reportes -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-file-pdf me-2"></i>Generar Reportes PDF
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Reporte de Animales -->
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card border-left-primary h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-circle bg-primary me-3">
+                                            <i class="fas fa-paw text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title mb-1">Reporte de Animales</h5>
+                                            <p class="card-text text-muted small">Listado completo de todos los animales</p>
+                                        </div>
+                                    </div>
+                                    <a href="{{ url_for('reporte_pdf', tipo='animales') }}" class="btn btn-primary btn-sm w-100">
+                                        <i class="fas fa-download me-1"></i>Descargar PDF
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reporte de Vacunas -->
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card border-left-success h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-circle bg-success me-3">
+                                            <i class="fas fa-syringe text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title mb-1">Reporte de Vacunas</h5>
+                                            <p class="card-text text-muted small">Historial de vacunaciones</p>
+                                        </div>
+                                    </div>
+                                    <a href="{{ url_for('reporte_pdf', tipo='vacunas') }}" class="btn btn-success btn-sm w-100">
+                                        <i class="fas fa-download me-1"></i>Descargar PDF
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reporte de Salud -->
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card border-left-info h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-circle bg-info me-3">
+                                            <i class="fas fa-heartbeat text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title mb-1">Historial de Salud</h5>
+                                            <p class="card-text text-muted small">Eventos de salud y tratamientos</p>
+                                        </div>
+                                    </div>
+                                    <a href="{{ url_for('reporte_pdf', tipo='salud') }}" class="btn btn-info btn-sm w-100">
+                                        <i class="fas fa-download me-1"></i>Descargar PDF
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reporte de Empleados -->
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card border-left-warning h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-circle bg-warning me-3">
+                                            <i class="fas fa-users text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title mb-1">Reporte de Empleados</h5>
+                                            <p class="card-text text-muted small">Listado de empleados activos</p>
+                                        </div>
+                                    </div>
+                                    <a href="{{ url_for('reporte_pdf', tipo='empleados') }}" class="btn btn-warning btn-sm w-100">
+                                        <i class="fas fa-download me-1"></i>Descargar PDF
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reporte de Alertas -->
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card border-left-danger h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-circle bg-danger me-3">
+                                            <i class="fas fa-bell text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title mb-1">Reporte de Alertas</h5>
+                                            <p class="card-text text-muted small">Alertas programadas y enviadas</p>
+                                        </div>
+                                    </div>
+                                    <a href="{{ url_for('reporte_pdf', tipo='alertas') }}" class="btn btn-danger btn-sm w-100">
+                                        <i class="fas fa-download me-1"></i>Descargar PDF
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reporte de Producción -->
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card border-left-secondary h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-circle bg-secondary me-3">
+                                            <i class="fas fa-egg text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title mb-1">Reporte de Producción</h5>
+                                            <p class="card-text text-muted small">Registros de producción</p>
+                                        </div>
+                                    </div>
+                                    <a href="{{ url_for('reporte_pdf', tipo='produccion') }}" class="btn btn-secondary btn-sm w-100">
+                                        <i class="fas fa-download me-1"></i>Descargar PDF
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+.border-left-secondary {
+    border-left: 0.25rem solid #858796 !important;
+}
+
+.icon-circle {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-xs {
+    font-size: 0.7rem;
+}
+
+.shadow {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let produccionChart;
+    const yearSelector = document.getElementById('yearSelector');
+
+    // Populate year selector
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= currentYear - 5; year--) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearSelector.appendChild(option);
+    }
+
+    function renderProduccionChart(data) {
+        if (produccionChart) {
+            produccionChart.destroy();
+        }
+        const produccionCtx = document.getElementById('produccionMensualChart').getContext('2d');
+        produccionChart = new Chart(produccionCtx, {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Producción de Leche (L)',
+                    data: data.valores,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+    }
+    
+    function fetchDataForYear(year) {
+        fetch(`{{ url_for('api_reportes') }}?year=${year}`)
+            .then(response => response.json())
+            .then(data => {
+                // Render all charts
+                renderProduccionChart(data.produccion_leche_mensual);
+
+                // Inventario Chart
+                const inventarioCtx = document.getElementById('inventarioChart').getContext('2d');
+                new Chart(inventarioCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.inventario_categoria.labels,
+                        datasets: [{
+                            data: data.inventario_categoria.valores,
+                            backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#6c757d']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+
+                // Animales Chart
+                const animalesCtx = document.getElementById('animalesPorTipoChart').getContext('2d');
+                new Chart(animalesCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.animales_por_tipo.labels,
+                        datasets: [{
+                            label: 'Cantidad de Animales',
+                            data: data.animales_por_tipo.cantidades,
+                            backgroundColor: 'rgba(25, 135, 84, 0.6)'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+                });
+            })
+            .catch(error => console.error('Error fetching report data:', error));
+    }
+
+    yearSelector.addEventListener('change', () => {
+        fetchDataForYear(yearSelector.value);
+    });
+
+    // Initial fetch
+    fetchDataForYear(yearSelector.value);
+});
+</script>
+{% endblock %} 

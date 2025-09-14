@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Evento Reproductivo - {{ animal.nombre or animal.identificacion }}{% endblock %}
+{% block page_title %}Registrar Evento Reproductivo{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('historial_animal', id=animal.id) }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver al Historial
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-baby me-2"></i>Registrar Evento Reproductivo
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Animal:</strong> {{ animal.nombre or animal.identificacion }} ({{ animal.tipo|title }} - {{ animal.sexo|title }})
+                </div>
+                
+                <form method="POST" class="needs-validation" novalidate>
+                    <!-- Servicio/Inseminación -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-heart me-2"></i>Servicio/Inseminación</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_servicio" name="fecha_servicio">
+                                <label for="fecha_servicio">Fecha de Servicio/Inseminación</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="tipo_servicio" name="tipo_servicio">
+                                    <option value="">Seleccionar tipo...</option>
+                                    <option value="Inseminación Artificial">Inseminación Artificial</option>
+                                    <option value="Monta Natural">Monta Natural</option>
+                                </select>
+                                <label for="tipo_servicio">Tipo de Servicio</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="semental_id" name="semental_id" placeholder="ID del semental">
+                                <label for="semental_id">Semental (ID)</label>
+                                <div class="form-text">Ej: TORO-010</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="semental_nombre" name="semental_nombre" placeholder="Nombre del semental">
+                                <label for="semental_nombre">Nombre del Semental</label>
+                                <div class="form-text">Ej: Bruno</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="edad_primer_servicio" name="edad_primer_servicio" placeholder="Edad en meses">
+                                <label for="edad_primer_servicio">Edad al Primer Servicio (meses)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Parto -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-baby me-2"></i>Parto</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_estimada_parto" name="fecha_estimada_parto">
+                                <label for="fecha_estimada_parto">Fecha Estimada de Parto</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_real_parto" name="fecha_real_parto">
+                                <label for="fecha_real_parto">Fecha Real de Parto</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="tipo_parto" name="tipo_parto">
+                                    <option value="">Seleccionar tipo...</option>
+                                    <option value="Natural">Natural</option>
+                                    <option value="Asistido">Asistido</option>
+                                </select>
+                                <label for="tipo_parto">Tipo de Parto</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="numero_lactancias" name="numero_lactancias" placeholder="Número de lactancias">
+                                <label for="numero_lactancias">Número de Lactancias</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="complicaciones" name="complicaciones" placeholder="Complicaciones" style="height: 80px"></textarea>
+                                <label for="complicaciones">Complicaciones</label>
+                                <div class="form-text">Describir cualquier complicación durante el parto</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="crias_nacidas" name="crias_nacidas" placeholder="Crías nacidas" style="height: 80px"></textarea>
+                                <label for="crias_nacidas">Crías Nacidas</label>
+                                <div class="form-text">Listar las crías nacidas con sus IDs y sexo</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Producción de Leche -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-milk me-2"></i>Producción de Leche</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="intervalo_entre_partos" name="intervalo_entre_partos" placeholder="Intervalo en meses">
+                                <label for="intervalo_entre_partos">Intervalo entre Partos (meses)</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="produccion_leche_lactancia" name="produccion_leche_lactancia" placeholder="Datos de producción" style="height: 100px"></textarea>
+                                <label for="produccion_leche_lactancia">Producción de Leche por Lactancia</label>
+                                <div class="form-text">Ej: Lactancia 1 (2022): 8,500 litros (pico 30 L/día)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aborto -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-exclamation-triangle me-2"></i>Aborto (Si aplica)</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_aborto" name="fecha_aborto">
+                                <label for="fecha_aborto">Fecha de Aborto</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="causa_aborto" name="causa_aborto" placeholder="Causa del aborto">
+                                <label for="causa_aborto">Causa del Aborto</label>
+                                <div class="form-text">Ej: Brucelosis, estrés, etc.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-sticky-note me-2"></i>Observaciones</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="observaciones" name="observaciones" placeholder="Observaciones" style="height: 100px"></textarea>
+                                <label for="observaciones">Observaciones</label>
+                                <div class="form-text">Cualquier información adicional relevante</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('historial_animal', id=animal.id) }}" class="btn btn-secondary me-2">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Guardar Evento Reproductivo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock %} 

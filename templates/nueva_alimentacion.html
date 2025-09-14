@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Alimentación - {{ animal.nombre or animal.identificacion }}{% endblock %}
+{% block page_title %}Registrar Nueva Alimentación{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('historial_animal', id=animal.id) }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver al Historial
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-utensils me-2"></i>Registrar Nueva Alimentación
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Animal:</strong> {{ animal.nombre or animal.identificacion }} ({{ animal.tipo|title }})
+                </div>
+                
+                <form method="POST" class="needs-validation" novalidate>
+                    <!-- Información Básica -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-info-circle me-2"></i>Información Básica</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha" name="fecha" required value="{{ today }}">
+                                <label for="fecha">Fecha de Cambio de Dieta *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="tipo_dieta" name="tipo_dieta" required>
+                                    <option value="">Seleccionar tipo...</option>
+                                    <option value="Pastoreo">Pastoreo</option>
+                                    <option value="Forraje suplementario">Forraje Suplementario</option>
+                                    <option value="Concentrado">Concentrado</option>
+                                    <option value="Leche materna">Leche Materna</option>
+                                    <option value="Pre-inicio">Pre-inicio</option>
+                                    <option value="Inicio">Inicio</option>
+                                    <option value="Crecimiento">Crecimiento</option>
+                                    <option value="Engorde">Engorde</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                <label for="tipo_dieta">Tipo de Dieta *</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detalles de la Alimentación -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-pills me-2"></i>Detalles de la Alimentación</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="alimento_especifico" name="alimento_especifico" placeholder="Alimento específico">
+                                <label for="alimento_especifico">Alimento Específico</label>
+                                <div class="form-text">Ej: Concentrado para vacas lecheras, Pasto natural</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.1" class="form-control" id="cantidad_diaria" name="cantidad_diaria" placeholder="Cantidad diaria">
+                                <label for="cantidad_diaria">Cantidad Diaria</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="unidad_cantidad" name="unidad_cantidad">
+                                    <option value="">Seleccionar unidad...</option>
+                                    <option value="kg">Kilogramos (kg)</option>
+                                    <option value="litros">Litros (L)</option>
+                                    <option value="gramos">Gramos (g)</option>
+                                    <option value="ml">Mililitros (ml)</option>
+                                    <option value="libre">Libre acceso</option>
+                                </select>
+                                <label for="unidad_cantidad">Unidad de Cantidad</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="frecuencia" name="frecuencia" placeholder="Frecuencia">
+                                <label for="frecuencia">Frecuencia</label>
+                                <div class="form-text">Ej: 2 veces al día, Libre acceso</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Eficiencia y Razones -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-chart-line me-2"></i>Eficiencia y Razones</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.1" class="form-control" id="conversion_alimenticia" name="conversion_alimenticia" placeholder="Conversión alimenticia">
+                                <label for="conversion_alimenticia">Conversión Alimenticia</label>
+                                <div class="form-text">Eficiencia de conversión de alimento a peso</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="razon_cambio" name="razon_cambio" placeholder="Razón del cambio">
+                                <label for="razon_cambio">Razón del Cambio</label>
+                                <div class="form-text">Por qué se cambió la dieta</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-sticky-note me-2"></i>Observaciones</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="observaciones" name="observaciones" placeholder="Observaciones" style="height: 100px"></textarea>
+                                <label for="observaciones">Observaciones</label>
+                                <div class="form-text">Aceptación del alimento, comportamiento, etc.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('historial_animal', id=animal.id) }}" class="btn btn-secondary me-2">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Guardar Alimentación
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock %} 

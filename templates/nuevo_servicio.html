@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Servicio Reproductivo{% endblock %}
+{% block page_title %}Nuevo Servicio Reproductivo{% endblock %}
+
+{% block extra_head %}
+<style>
+    .form-card {
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-radius: 15px;
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .animal-info {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card form-card">
+                <div class="form-header">
+                    <h4 class="mb-0"><i class="fas fa-heart me-2"></i>Registrar Servicio Reproductivo</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" id="servicioForm">
+                        <div class="row g-3">
+                            <!-- Selección de Animal -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-cow me-2"></i>Seleccionar Hembra
+                                </label>
+                                <select name="animal_id" class="form-select" required>
+                                    <option value="">Seleccione una hembra...</option>
+                                    {% for hembra in hembras %}
+                                    <option value="{{ hembra.id }}">
+                                        {{ hembra.nombre or hembra.identificacion }} - {{ hembra.raza }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <!-- Fecha y Tipo -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-calendar me-2"></i>Fecha del Servicio
+                                </label>
+                                <input type="date" class="form-control" name="fecha" value="{{ date.today() }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-cogs me-2"></i>Tipo de Servicio
+                                </label>
+                                <select name="tipo_servicio" class="form-select" required>
+                                    <option value="">Seleccione tipo...</option>
+                                    <option value="monta_natural">Monta Natural</option>
+                                    <option value="inseminacion">Inseminación Artificial</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Información del Semental -->
+                            <div class="col-12">
+                                <h6 class="text-primary mt-3 mb-3">
+                                    <i class="fas fa-male me-2"></i>Información del Semental
+                                </h6>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Semental (Propio)</label>
+                                <select name="semental_id" class="form-select">
+                                    <option value="">Seleccione semental propio...</option>
+                                    {% for macho in machos %}
+                                    <option value="{{ macho.id }}">
+                                        {{ macho.nombre or macho.identificacion }} - {{ macho.raza }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Semental Externo</label>
+                                <input type="text" class="form-control" name="semental_nombre" 
+                                       placeholder="Nombre/ID del semental externo">
+                            </div>
+                            
+                            <!-- Responsable -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-user me-2"></i>Responsable
+                                </label>
+                                <input type="text" class="form-control" name="responsable" 
+                                       placeholder="Nombre del encargado">
+                            </div>
+                            
+                            <!-- Observaciones -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-notes-medical me-2"></i>Observaciones
+                                </label>
+                                <textarea class="form-control" name="observaciones" rows="4" 
+                                          placeholder="Detalles adicionales del servicio..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex gap-2 justify-content-end">
+                            <a class="btn btn-outline-secondary" href="{{ url_for('calendario_reproductivo') }}">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-save me-2"></i>Registrar Servicio
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel de Ayuda -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Tipos de Servicio:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Monta Natural:</strong> Servicio directo con semental</li>
+                        <li><strong>Inseminación:</strong> Inseminación artificial</li>
+                    </ul>
+                    
+                    <h6 class="mt-3">Recordatorios:</h6>
+                    <ul class="list-unstyled">
+                        <li>• Realizar diagnóstico a los 30-45 días</li>
+                        <li>• Registrar la fecha exacta del servicio</li>
+                        <li>• Anotar cualquier observación relevante</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validación del formulario
+    const form = document.getElementById('servicioForm');
+    const sementalPropio = document.querySelector('select[name="semental_id"]');
+    const sementalExterno = document.querySelector('input[name="semental_nombre"]');
+    
+    // Limpiar el otro campo cuando se selecciona uno
+    sementalPropio.addEventListener('change', function() {
+        if (this.value) {
+            sementalExterno.value = '';
+        }
+    });
+    
+    sementalExterno.addEventListener('input', function() {
+        if (this.value) {
+            sementalPropio.value = '';
+        }
+    });
+    
+    // Validación antes del envío
+    form.addEventListener('submit', function(e) {
+        if (!sementalPropio.value && !sementalExterno.value) {
+            e.preventDefault();
+            alert('Debe especificar el semental (propio o externo)');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}
+
+

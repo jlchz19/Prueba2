@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Potrero - AgroGest{% endblock %}
+{% block page_title %}Editar Potrero{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('potreros') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-map-marked-alt me-2"></i>Editar Información del Potrero
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    <input type="hidden" name="form_type" value="info_potrero">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre del Potrero" value="{{ potrero.nombre }}" required>
+                                <label for="nombre">Nombre del Potrero *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.1" class="form-control" id="area" name="area" placeholder="Área (hectáreas)" value="{{ potrero.area }}" required>
+                                <label for="area">Área (hectáreas) *</label>
+                                <div class="form-text">Ejemplo: 1 vaca/ha, 10 cerdos/ha. El sistema puede sugerir la capacidad.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="capacidad" name="capacidad" placeholder="Capacidad de Animales" value="{{ potrero.capacidad }}" required>
+                                <label for="capacidad">Capacidad de Animales *</label>
+                                <div class="form-text" id="capacidad-sugerida"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="estado" name="estado" required>
+                                    <option value="disponible" {% if potrero.estado == 'disponible' %}selected{% endif %}>Disponible</option>
+                                    <option value="ocupado" {% if potrero.estado == 'ocupado' %}selected{% endif %}>Ocupado</option>
+                                    <option value="mantenimiento" {% if potrero.estado == 'mantenimiento' %}selected{% endif %}>Mantenimiento</option>
+                                </select>
+                                <label for="estado">Estado *</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="funcion" name="funcion" placeholder="Función" value="{{ potrero.funcion }}" required>
+                                <label for="funcion">Función *</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Cálculo sugerido de capacidad
+    const areaInput = document.getElementById('area');
+    const capacidadInput = document.getElementById('capacidad');
+    const funcionInput = document.getElementById('funcion');
+    const sugeridaDiv = document.getElementById('capacidad-sugerida');
+
+    function sugerirCapacidad() {
+        const area = parseFloat(areaInput.value);
+        const funcion = funcionInput.value.toLowerCase();
+        let sugerida = 0;
+        let texto = '';
+        if (!isNaN(area)) {
+            if (funcion.includes('cerdo') || funcion.includes('lechon')) {
+                sugerida = Math.round(area * 10); // 10 cerdos/ha
+                texto = `Sugerido: ${sugerida} cerdos para ${area} ha (10 cerdos/ha)`;
+            } else {
+                sugerida = Math.round(area * 1); // 1 vaca/ha
+                texto = `Sugerido: ${sugerida} vacas para ${area} ha (1 vaca/ha)`;
+            }
+            sugeridaDiv.textContent = texto;
+            if (!capacidadInput.value || capacidadInput.value == '0') {
+                capacidadInput.value = sugerida;
+            }
+        } else {
+            sugeridaDiv.textContent = '';
+        }
+    }
+    areaInput.addEventListener('input', sugerirCapacidad);
+    funcionInput.addEventListener('input', sugerirCapacidad);
+    sugerirCapacidad();
+});
+</script>
+{% endblock %}

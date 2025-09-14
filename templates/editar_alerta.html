@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Alerta - AgroGest{% endblock %}
+{% block page_title %}Editar Alerta{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <span style="font-size: 1rem; margin-right: 8px;">✏️</span>Editar Alerta
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="titulo" class="form-label">Título de la Alerta</label>
+                                    <input type="text" class="form-control" id="titulo" name="titulo" 
+                                           value="{{ alerta.titulo }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="tipo_alerta" class="form-label">Tipo de Alerta</label>
+                                    <select class="form-select" id="tipo_alerta" name="tipo_alerta" required>
+                                        <option value="vacunacion" {{ 'selected' if alerta.tipo_alerta == 'vacunacion' }}>💉 Vacunación</option>
+                                        <option value="tratamiento" {{ 'selected' if alerta.tipo_alerta == 'tratamiento' }}>💊 Tratamiento</option>
+                                        <option value="revision" {{ 'selected' if alerta.tipo_alerta == 'revision' }}>🔍 Revisión</option>
+                                        <option value="alimentacion" {{ 'selected' if alerta.tipo_alerta == 'alimentacion' }}>🌾 Alimentación</option>
+                                        <option value="reproduccion" {{ 'selected' if alerta.tipo_alerta == 'reproduccion' }}>🐄 Reproducción</option>
+                                        <option value="general" {{ 'selected' if alerta.tipo_alerta == 'general' }}>📋 General</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required>{{ alerta.descripcion }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="fecha" class="form-label">Fecha</label>
+                                    <input type="date" class="form-control" id="fecha" name="fecha" 
+                                           value="{{ alerta.fecha_programada.strftime('%Y-%m-%d') }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="hora" class="form-label">Hora</label>
+                                    <input type="time" class="form-control" id="hora" name="hora" 
+                                           value="{{ alerta.fecha_programada.strftime('%H:%M') }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="animal_id" class="form-label">Animal (Opcional)</label>
+                            <select class="form-select" id="animal_id" name="animal_id">
+                                <option value="">Seleccionar animal...</option>
+                                {% for animal in animales %}
+                                <option value="{{ animal.id }}" {{ 'selected' if alerta.animal_id == animal.id }}>
+                                    {{ animal.identificacion }} - {{ animal.nombre or 'Sin nombre' }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="repetir" name="repetir" 
+                                       {{ 'checked' if alerta.repetir }} onchange="toggleFrecuencia()">
+                                <label class="form-check-label" for="repetir">
+                                    Repetir alerta
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" id="frecuencia-container" {% if not alerta.repetir %}style="display: none;"{% endif %}>
+                            <label for="frecuencia" class="form-label">Frecuencia</label>
+                            <select class="form-select" id="frecuencia" name="frecuencia">
+                                <option value="diaria" {{ 'selected' if alerta.frecuencia == 'diaria' }}>Diaria</option>
+                                <option value="semanal" {{ 'selected' if alerta.frecuencia == 'semanal' }}>Semanal</option>
+                                <option value="mensual" {{ 'selected' if alerta.frecuencia == 'mensual' }}>Mensual</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <span style="font-size: 1rem; margin-right: 4px;">💾</span>Actualizar Alerta
+                            </button>
+                            <a href="{{ url_for('alertas') }}" class="btn btn-secondary">
+                                <span style="font-size: 1rem; margin-right: 4px;">↩️</span>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <span style="font-size: 1rem; margin-right: 8px;">💡</span>Información de la Alerta
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Estado:</strong>
+                        <span class="badge bg-{{ 'warning' if alerta.estado == 'pendiente' else 'success' if alerta.estado == 'completada' else 'secondary' }}">
+                            {{ alerta.estado|title }}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Creada:</strong><br>
+                        <small class="text-muted">{{ alerta.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</small>
+                    </div>
+                    {% if alerta.animal_id and alerta.animal %}
+                    <div class="mb-3">
+                        <strong>Animal asociado:</strong><br>
+                        <small class="text-muted">{{ alerta.animal.identificacion }} - {{ alerta.animal.nombre or 'Sin nombre' }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">
+                        <span style="font-size: 1rem; margin-right: 8px;">⚠️</span>Consejos
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <span style="font-size: 0.9rem; margin-right: 4px;">📅</span>
+                            <small>Programa las alertas con suficiente anticipación</small>
+                        </li>
+                        <li class="mb-2">
+                            <span style="font-size: 0.9rem; margin-right: 4px;">🔔</span>
+                            <small>Recibirás notificaciones por email</small>
+                        </li>
+                        <li class="mb-2">
+                            <span style="font-size: 0.9rem; margin-right: 4px;">🐄</span>
+                            <small>Asocia alertas a animales específicos cuando sea necesario</small>
+                        </li>
+                        <li>
+                            <span style="font-size: 0.9rem; margin-right: 4px;">🔄</span>
+                            <small>Usa alertas repetitivas para tareas rutinarias</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleFrecuencia() {
+    const repetirCheckbox = document.getElementById('repetir');
+    const frecuenciaContainer = document.getElementById('frecuencia-container');
+    
+    if (repetirCheckbox.checked) {
+        frecuenciaContainer.style.display = 'block';
+    } else {
+        frecuenciaContainer.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

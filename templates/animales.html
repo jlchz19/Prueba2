@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+
+{% block title %}Animales - AgroGest{% endblock %}
+{% block page_title %}Gestión de Animales{% endblock %}
+
+{% block content %}
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-header bg-gradient text-white d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <div class="icon-circle me-3">
+                <span style="font-size: 1.2rem;">🐄</span>
+            </div>
+            <h5 class="mb-0 fw-semibold">Gestión de Animales</h5>
+        </div>
+        <a href="{{ url_for('nuevo_animal') }}" class="btn btn-light btn-sm shadow-sm" id="addAnimalBtn">
+            <span style="font-size: 1rem; margin-right: 4px;">➕</span> Nuevo Animal
+        </a>
+    </div>
+    <div class="card-body p-4">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="input-group shadow-sm">
+                    <span class="input-group-text bg-light border-0">
+                        <span style="font-size: 1rem;">🔍</span>
+                    </span>
+                    <input type="text" class="form-control border-0" id="searchInput" placeholder="Buscar por ID, nombre o raza...">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select shadow-sm border-0" id="typeFilter">
+                    <option value="">Todos los tipos</option>
+                    {% set tipos = animales|map(attribute='tipo')|unique|list %}
+                    {% for tipo in tipos %}
+                        <option value="{{ tipo }}">{{ tipo|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="animalesTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Raza</th>
+                        <th>Edad</th>
+                        <th>Peso (kg)</th>
+                        <th>Ubicación</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for animal in animales %}
+                    <tr>
+                        <td><strong class="text-primary">{{ animal.identificacion }}</strong></td>
+                        <td class="text-primary">{{ animal.nombre or '-' }}</td>
+                        <td class="text-primary">{{ animal.tipo|title }}</td>
+                        <td class="text-primary">{{ animal.raza }}</td>
+                        <td class="text-primary">
+                            {% set edad_dias = (today - animal.fecha_nacimiento).days %}
+                            {% set años = edad_dias // 365 %}
+                            {% set meses = (edad_dias % 365) // 30 %}
+                            {% if años > 0 %}
+                                {{ años }} año(s) y {{ meses }} mes(es)
+                            {% else %}
+                                {{ meses }} mes(es)
+                            {% endif %}
+                        </td>
+                        <td class="text-primary">{{ animal.peso }}</td>
+                        <td>
+                            {% if animal.potrero %}
+                                <span class="text-primary">{{ animal.potrero.nombre }}</span>
+                            {% elif animal.ubicacion_asignada %}
+                                <span class="text-primary">{{ animal.ubicacion_asignada.nombre }}</span>
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill bg-{{ 'success' if animal.estado == 'activo' else 'secondary' }}">{{ animal.estado|title }}</span>
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ url_for('historial_animal', animal_id=animal.id) }}" class="btn btn-sm btn-outline-info" title="Historial completo">
+                                <i class="fas fa-history"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="showAnimalDetails('{{ animal.id }}')" title="Ver detalles" 
+                                    data-animal-id="{{ animal.id }}" 
+                                    data-animal-identificacion="{{ animal.identificacion }}" 
+                                    data-animal-nombre="{{ animal.nombre or '-' }}" 
+                                    data-animal-tipo="{{ animal.tipo }}" 
+                                    data-animal-raza="{{ animal.raza }}" 
+                                    data-animal-sexo="{{ animal.sexo or '-' }}" 
+                                    data-animal-fecha="{{ animal.fecha_nacimiento.strftime('%d/%m/%Y') }}" 
+                                    data-animal-peso-nacimiento="{{ animal.peso_nacimiento or '-' }}" 
+                                    data-animal-peso="{{ animal.peso }}" 
+                                    data-animal-color="{{ animal.color_señas or '-' }}" 
+                                    data-animal-ubicacion="{% if animal.potrero %}{{ animal.potrero.nombre }}{% elif animal.ubicacion_asignada %}{{ animal.ubicacion_asignada.nombre }}{% else %}N/A{% endif %}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <a href="{{ url_for('editar_animal', id=animal.id) }}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('eliminar_animal', animal_id=animal.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este animal? Esta acción no se puede deshacer.');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                    <i class="fas fa-trash-alt me-1"></i>Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div id="noResults" class="text-center py-5" style="display: none;">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No se encontraron animales</h5>
+                <p class="text-muted">Intenta con otros filtros o términos de búsqueda.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de detalles personalizado -->
+<div id="animalDetailsModal" class="custom-modal" style="display: none;">
+    <div class="custom-modal-overlay" onclick="closeAnimalModal()"></div>
+    <div class="custom-modal-content">
+        <div class="custom-modal-header">
+            <h5 id="modalTitle"><i class="fas fa-paw me-2"></i>Detalles del Animal</h5>
+            <button type="button" class="custom-close-btn" onclick="closeAnimalModal()">&times;</button>
+        </div>
+        <div class="custom-modal-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary mb-3"><i class="fas fa-info-circle me-2"></i>Información Básica</h6>
+                            <p class="mb-2"><strong class="text-dark">ID:</strong> <span class="text-dark" id="modalId"></span></p>
+                            <p class="mb-2"><strong class="text-dark">Nombre:</strong> <span class="text-dark" id="modalNombre"></span></p>
+                            <p class="mb-2"><strong class="text-dark">Tipo:</strong> <span class="text-dark" id="modalTipo"></span></p>
+                            <p class="mb-2"><strong class="text-dark">Raza:</strong> <span class="text-dark" id="modalRaza"></span></p>
+                            <p class="mb-0"><strong class="text-dark">Sexo:</strong> <span class="text-dark" id="modalSexo"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary mb-3"><i class="fas fa-chart-line me-2"></i>Datos Físicos</h6>
+                            <p class="mb-2"><strong class="text-dark">Fecha de Nacimiento:</strong> <span class="text-dark" id="modalFecha"></span></p>
+                            <p class="mb-2"><strong class="text-dark">Peso al Nacimiento:</strong> <span class="text-dark" id="modalPesoNacimiento"></span> kg</p>
+                            <p class="mb-2"><strong class="text-dark">Peso Actual:</strong> <span class="text-dark" id="modalPeso"></span> kg</p>
+                            <p class="mb-2"><strong class="text-dark">Color/Señas:</strong> <span class="text-dark" id="modalColor"></span></p>
+                            <p class="mb-0"><strong class="text-dark">Ubicación:</strong> <span class="text-dark" id="modalUbicacion"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="custom-modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeAnimalModal()">
+                <i class="fas fa-times me-1"></i>Cerrar
+            </button>
+            <a id="modalHistorialLink" href="#" class="btn btn-primary">
+                <i class="fas fa-history me-1"></i>Ver Historial Completo
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.custom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.custom-modal-content {
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.custom-modal-header {
+    background: #0d6efd;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-modal-body {
+    padding: 1.5rem;
+}
+
+.custom-modal-footer {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-radius: 0 0 8px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-close-btn:hover {
+    opacity: 0.8;
+}
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const typeFilter = document.getElementById('typeFilter');
+    const table = document.getElementById('animalesTable');
+    const rows = table.querySelectorAll('tbody tr');
+    const noResults = document.getElementById('noResults');
+
+    function filterAnimals() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedType = typeFilter.value.toLowerCase();
+        let visibleRows = 0;
+
+        rows.forEach(row => {
+            // Extraer información de la fila
+            const tipo = row.cells[2].textContent.toLowerCase();
+            const rowText = row.textContent.toLowerCase();
+            
+            const typeMatch = selectedType === '' || tipo === selectedType;
+            const searchMatch = searchTerm === '' || rowText.includes(searchTerm);
+            
+            if (typeMatch && searchMatch) {
+                row.style.display = '';
+                visibleRows++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        noResults.style.display = visibleRows > 0 ? 'none' : 'block';
+    }
+
+    searchInput.addEventListener('input', filterAnimals);
+    typeFilter.addEventListener('change', filterAnimals);
+});
+
+// Funciones del modal personalizado
+function showAnimalDetails(animalId) {
+    const button = event.target.closest('button');
+    const data = button.dataset;
+    
+    // Llenar los datos del modal
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-paw me-2"></i>Detalles de ' + data.animalIdentificacion;
+    document.getElementById('modalId').textContent = data.animalIdentificacion;
+    document.getElementById('modalNombre').textContent = data.animalNombre;
+    document.getElementById('modalTipo').textContent = data.animalTipo;
+    document.getElementById('modalRaza').textContent = data.animalRaza;
+    document.getElementById('modalSexo').textContent = data.animalSexo;
+    document.getElementById('modalFecha').textContent = data.animalFecha;
+    document.getElementById('modalPesoNacimiento').textContent = data.animalPesoNacimiento;
+    document.getElementById('modalPeso').textContent = data.animalPeso;
+    document.getElementById('modalColor').textContent = data.animalColor;
+    document.getElementById('modalUbicacion').textContent = data.animalUbicacion;
+    
+    // Configurar el enlace del historial
+    document.getElementById('modalHistorialLink').href = '/historial_animal/' + animalId;
+    
+    // Mostrar el modal
+    document.getElementById('animalDetailsModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAnimalModal() {
+    document.getElementById('animalDetailsModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeAnimalModal();
+    }
+});
+</script>
+{% endblock %}

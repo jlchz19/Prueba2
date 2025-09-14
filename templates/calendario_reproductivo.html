@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Calendario Reproductivo{% endblock %}
+{% block page_title %}Calendario Reproductivo{% endblock %}
+
+{% block extra_head %}
+<style>
+    .reproductive-card {
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .reproductive-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .timeline-item {
+        border-left: 3px solid #e9ecef;
+        padding-left: 1rem;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -6px;
+        top: 0.5rem;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #007bff;
+    }
+    
+    .timeline-item.urgent::before {
+        background: #dc3545;
+    }
+    
+    .timeline-item.warning::before {
+        background: #ffc107;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block page_actions %}
+<div class="btn-group" role="group">
+    <a href="{{ url_for('nuevo_servicio') }}" class="btn btn-primary">
+        <i class="fas fa-heart me-2"></i>Nuevo Servicio
+    </a>
+    <a href="{{ url_for('nuevo_diagnostico') }}" class="btn btn-info">
+        <i class="fas fa-stethoscope me-2"></i>Diagnóstico
+    </a>
+    <a href="{{ url_for('nuevo_parto') }}" class="btn btn-success">
+        <i class="fas fa-baby me-2"></i>Registrar Parto
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Estadísticas Rápidas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ hembras|length }}</div>
+            <div>Hembras Totales</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ servicios_recientes|length }}</div>
+            <div>Servicios (30 días)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ servicios_sin_diagnostico|length }}</div>
+            <div>Diagnósticos Pendientes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ partos_proximos|length }}</div>
+            <div>Partos Esperados</div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Columna Izquierda: Alertas y Próximos Eventos -->
+        <div class="col-lg-6">
+            <!-- Partos Próximos -->
+            <div class="card reproductive-card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-baby me-2"></i>Partos Próximos</h5>
+                </div>
+                <div class="card-body">
+                    {% if partos_proximos %}
+                        {% for parto in partos_proximos[:5] %}
+                        <div class="timeline-item {% if parto.dias_restantes <= 7 %}urgent{% elif parto.dias_restantes <= 30 %}warning{% endif %}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ parto.animal.nombre or parto.animal.identificacion }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ parto.animal.raza }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold">{{ parto.fecha_parto.strftime('%d/%m/%Y') }}</div>
+                                    <span class="badge bg-{% if parto.dias_restantes <= 7 %}danger{% elif parto.dias_restantes <= 30 %}warning{% else %}primary{% endif %}">
+                                        {{ parto.dias_restantes }} días
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-baby fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay partos próximos registrados</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Diagnósticos Pendientes -->
+            <div class="card reproductive-card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Diagnósticos Pendientes</h5>
+                </div>
+                <div class="card-body">
+                    {% if servicios_sin_diagnostico %}
+                        {% for servicio, animal in servicios_sin_diagnostico[:5] %}
+                        <div class="timeline-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ animal.nombre or animal.identificacion }}</strong>
+                                    <br>
+                                    <small class="text-muted">Servicio: {{ servicio.fecha.strftime('%d/%m/%Y') }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-warning">
+                                        {{ (date.today() - servicio.fecha).days }} días
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <p class="text-muted">Todos los diagnósticos están al día</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Servicios Recientes -->
+        <div class="col-lg-6">
+            <div class="card reproductive-card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-heart me-2"></i>Servicios Recientes</h5>
+                </div>
+                <div class="card-body">
+                    {% if servicios_recientes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Animal</th>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for servicio, animal in servicios_recientes %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ animal.nombre or animal.identificacion }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ animal.raza }}</small>
+                                        </td>
+                                        <td>{{ servicio.fecha.strftime('%d/%m/%Y') }}</td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                {{ servicio.tipo_servicio|title }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% set dias_transcurridos = (date.today() - servicio.fecha).days %}
+                                            {% if dias_transcurridos >= 30 %}
+                                                <span class="badge bg-warning">Pendiente diagnóstico</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Reciente</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-heart fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay servicios recientes registrados</p>
+                            <a href="{{ url_for('nuevo_servicio') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Registrar Primer Servicio
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animar números en las tarjetas de estadísticas
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(number => {
+        const target = parseInt(number.textContent);
+        if (target > 0) {
+            let current = 0;
+            const increment = target / 20;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    number.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    number.textContent = Math.floor(current);
+                }
+            }, 50);
+        }
+    });
+});
+</script>
+{% endblock %}

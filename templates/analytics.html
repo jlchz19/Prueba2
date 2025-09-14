@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Avanzado - AgroGest{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-chart-line text-primary me-2"></i>Analytics Avanzado</h1>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" onclick="exportReport('pdf')">
+                        <i class="fas fa-file-pdf me-2"></i>Exportar PDF
+                    </button>
+                    <button type="button" class="btn btn-outline-success" onclick="exportReport('excel')">
+                        <i class="fas fa-file-excel me-2"></i>Exportar Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPIs Dashboard -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-gradient-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1">Rentabilidad Mensual</h6>
+                            <h3 class="mb-0">${{ rentabilidad_mensual|round(2) }}</h3>
+                            <small class="opacity-75">
+                                {% if crecimiento_rentabilidad > 0 %}
+                                    <i class="fas fa-arrow-up"></i> +{{ crecimiento_rentabilidad|round(1) }}%
+                                {% else %}
+                                    <i class="fas fa-arrow-down"></i> {{ crecimiento_rentabilidad|round(1) }}%
+                                {% endif %}
+                            </small>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-gradient-success text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1">Conversión Alimenticia</h6>
+                            <h3 class="mb-0">{{ conversion_alimenticia|round(2) }}</h3>
+                            <small class="opacity-75">kg alimento/kg peso</small>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-chart-pie fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-gradient-info text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1">Tasa Mortalidad</h6>
+                            <h3 class="mb-0">{{ tasa_mortalidad|round(2) }}%</h3>
+                            <small class="opacity-75">Últimos 12 meses</small>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-heartbeat fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-gradient-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h6 class="card-title mb-1">Eficiencia Reproductiva</h6>
+                            <h3 class="mb-0">{{ eficiencia_reproductiva|round(1) }}%</h3>
+                            <small class="opacity-75">Partos exitosos</small>
+                        </div>
+                        <div class="ms-3">
+                            <i class="fas fa-baby fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos Principales -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Tendencia de Ingresos vs Gastos</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="ingresoGastoChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Distribución de Gastos</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="gastosChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Análisis de Crecimiento -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-weight me-2"></i>Curva de Crecimiento Promedio</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="crecimientoChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Calendario Reproductivo</h5>
+                </div>
+                <div class="card-body">
+                    <div id="calendarioReproductivo"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas Predictivas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Alertas Predictivas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for alerta in alertas_predictivas %}
+                        <div class="col-md-4 mb-3">
+                            <div class="alert alert-{{ alerta.tipo }} d-flex align-items-center">
+                                <i class="fas fa-{{ alerta.icono }} me-2"></i>
+                                <div>
+                                    <strong>{{ alerta.titulo }}</strong><br>
+                                    <small>{{ alerta.descripcion }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Análisis de Rentabilidad por Animal -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-coins me-2"></i>Análisis de Rentabilidad por Animal</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary active" onclick="filtrarRentabilidad(this, 'todos')">Todos</button>
+                        <button class="btn btn-outline-primary" onclick="filtrarRentabilidad(this, 'bovinos')">Bovinos</button>
+                        <button class="btn btn-outline-primary" onclick="filtrarRentabilidad(this, 'porcinos')">Porcinos</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="rentabilidadTable">
+                            <thead>
+                                <tr>
+                                    <th>Animal</th>
+                                    <th>Tipo</th>
+                                    <th>Edad</th>
+                                    <th>Peso Actual</th>
+                                    <th>Inversión Total</th>
+                                    <th>Valor Estimado</th>
+                                    <th>ROI</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for animal in analisis_rentabilidad %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ animal.identificacion }}</strong><br>
+                                        <small class="text-muted">{{ animal.nombre or 'Sin nombre' }}</small>
+                                    </td>
+                                    <td>{{ animal.tipo|title }}</td>
+                                    <td>{{ animal.edad_meses }} meses</td>
+                                    <td>{{ animal.peso_actual }} kg</td>
+                                    <td class="text-danger">${{ animal.inversion_total|round(2) }}</td>
+                                    <td class="text-success">${{ animal.valor_estimado|round(2) }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if animal.roi > 0 else 'danger' }}">
+                                            {{ animal.roi|round(1) }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if animal.estado == 'activo' else 'secondary' }}">
+                                            {{ animal.estado|title }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Configuración de gráficos
+const chartColors = {
+    primary: '#3b82f6',
+    success: '#10b981',
+    warning: '#f59e0b',
+    danger: '#ef4444',
+    info: '#06b6d4'
+};
+
+// Gráfico de Ingresos vs Gastos
+const ingresoGastoCtx = document.getElementById('ingresoGastoChart').getContext('2d');
+new Chart(ingresoGastoCtx, {
+    type: 'line',
+    data: {
+        labels: JSON.parse('{{ meses_labels|tojson|safe }}'),
+        datasets: [{
+            label: 'Ingresos',
+            data: JSON.parse('{{ ingresos_mensuales|tojson|safe }}'),
+            borderColor: chartColors.success,
+            backgroundColor: chartColors.success + '20',
+            fill: true
+        }, {
+            label: 'Gastos',
+            data: JSON.parse('{{ gastos_mensuales|tojson|safe }}'),
+            borderColor: chartColors.danger,
+            backgroundColor: chartColors.danger + '20',
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '$' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Gráfico de Distribución de Gastos
+const gastosCtx = document.getElementById('gastosChart').getContext('2d');
+new Chart(gastosCtx, {
+    type: 'doughnut',
+    data: {
+        labels: JSON.parse('{{ categorias_gastos|tojson|safe }}'),
+        datasets: [{
+            data: JSON.parse('{{ montos_gastos|tojson|safe }}'),
+            backgroundColor: [
+                chartColors.primary,
+                chartColors.success,
+                chartColors.warning,
+                chartColors.danger,
+                chartColors.info
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Gráfico de Crecimiento
+const crecimientoCtx = document.getElementById('crecimientoChart').getContext('2d');
+new Chart(crecimientoCtx, {
+    type: 'line',
+    data: {
+        labels: JSON.parse('{{ edades_crecimiento|tojson|safe }}'),
+        datasets: [{
+            label: 'Peso Promedio (kg)',
+            data: JSON.parse('{{ pesos_crecimiento|tojson|safe }}'),
+            borderColor: chartColors.primary,
+            backgroundColor: chartColors.primary + '20',
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Peso (kg)'
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Edad (meses)'
+                }
+            }
+        }
+    }
+});
+
+// Funciones de exportación
+function exportReport(format) {
+    const url = format === 'pdf' ? '/analytics/export/pdf' : '/analytics/export/excel';
+    window.open(url, '_blank');
+}
+
+// Filtrar tabla de rentabilidad
+function filtrarRentabilidad(btn, tipo) {
+    // Actualizar botones activos
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (btn) { btn.classList.add('active'); }
+    
+    // Filtrar filas de la tabla
+    const rows = document.querySelectorAll('#rentabilidadTable tbody tr');
+    rows.forEach(row => {
+        const tipoAnimal = row.cells[1].textContent.toLowerCase();
+        if (tipo === 'todos' || tipoAnimal.includes(tipo.slice(0, -1))) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Calendario reproductivo simple
+function initCalendarioReproductivo() {
+    const calendario = document.getElementById('calendarioReproductivo');
+    const eventos = JSON.parse('{{ eventos_reproductivos|tojson|safe }}');
+    
+    let html = '<div class="row">';
+    eventos.forEach((evento, index) => {
+        if (index % 2 === 0 && index > 0) html += '</div><div class="row">';
+        
+        html += `
+            <div class="col-md-6 mb-2">
+                <div class="d-flex align-items-center p-2 border rounded">
+                    <div class="me-3">
+                        <i class="fas fa-calendar text-${evento.tipo === 'parto' ? 'success' : 'primary'}"></i>
+                    </div>
+                    <div>
+                        <strong>${evento.animal}</strong><br>
+                        <small>${evento.descripcion} - ${evento.fecha}</small>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+    
+    calendario.innerHTML = html;
+}
+
+// Inicializar calendario al cargar la página
+document.addEventListener('DOMContentLoaded', initCalendarioReproductivo);
+</script>
+{% endblock %}

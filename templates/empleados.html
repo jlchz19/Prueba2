@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Empleados - AgroGest{% endblock %}
+{% block page_title %}Gestión de Empleados{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4">Listado de Empleados</h2>
+    <a href="{{ url_for('nuevo_empleado') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Nuevo Empleado
+    </a>
+</div>
+
+<div class="row">
+    {% for empleado in empleados %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 employee-card">
+            <div class="card-body text-center">
+                <div class="avatar avatar-lg rounded-circle bg-primary text-white mb-3">
+                    {% if empleado.cargo == 'Veterinario' %}
+                        <i class="fas fa-stethoscope"></i>
+                    {% elif empleado.cargo == 'Vaquero' %}
+                        <i class="fas fa-horse"></i>
+                    {% elif empleado.cargo == 'Porquero' %}
+                        <i class="fas fa-bacon"></i>
+                    {% elif empleado.cargo == 'Administrador' %}
+                        <i class="fas fa-briefcase"></i>
+                    {% elif empleado.cargo == 'Supervisor' %}
+                        <i class="fas fa-binoculars"></i>
+                    {% elif empleado.cargo == 'Operario' %}
+                        <i class="fas fa-tools"></i>
+                    {% elif empleado.cargo == 'Contador' %}
+                        <i class="fas fa-chart-line"></i>
+                    {% elif empleado.cargo == 'Secretario' %}
+                        <i class="fas fa-keyboard"></i>
+                    {% elif empleado.cargo == 'Técnico Agrícola' %}
+                        <i class="fas fa-tractor"></i>
+                    {% elif empleado.cargo == 'Mecánico' %}
+                        <i class="fas fa-wrench"></i>
+                    {% elif empleado.cargo == 'Conductor' %}
+                        <i class="fas fa-truck"></i>
+                    {% elif empleado.cargo == 'Auxiliar' %}
+                        <i class="fas fa-hands-helping"></i>
+                    {% else %}
+                        <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+                <h5 class="card-title">{{ empleado.nombre }} {{ empleado.apellido }}</h5>
+                <p class="card-text text-muted">{{ empleado.cargo }}</p>
+                <span class="badge rounded-pill {% if empleado.estado == 'activo' %}bg-success{% else %}bg-danger{% endif %}">{{ empleado.estado|title }}</span>
+            </div>
+            <div class="card-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary btn-sm w-100 mb-2" data-bs-toggle="modal" data-bs-target="#empleadoModal{{ empleado.id }}">
+                    Ver Detalles
+                </button>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('editar_empleado', empleado_id=empleado.id) }}" class="btn btn-outline-primary btn-sm flex-grow-1">
+                        <i class="fas fa-edit me-1"></i>Editar
+                    </a>
+                    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ empleado.id }}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="empleadoModal{{ empleado.id }}" tabindex="-1" aria-labelledby="empleadoModalLabel{{ empleado.id }}" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="empleadoModalLabel{{ empleado.id }}">
+                        {% if empleado.cargo == 'Veterinario' %}
+                            <i class="fas fa-stethoscope me-2"></i>
+                        {% elif empleado.cargo == 'Vaquero' %}
+                            <i class="fas fa-horse me-2"></i>
+                        {% elif empleado.cargo == 'Porquero' %}
+                            <i class="fas fa-bacon me-2"></i>
+                        {% elif empleado.cargo == 'Administrador' %}
+                            <i class="fas fa-briefcase me-2"></i>
+                        {% elif empleado.cargo == 'Supervisor' %}
+                            <i class="fas fa-binoculars me-2"></i>
+                        {% elif empleado.cargo == 'Operario' %}
+                            <i class="fas fa-tools me-2"></i>
+                        {% elif empleado.cargo == 'Contador' %}
+                            <i class="fas fa-chart-line me-2"></i>
+                        {% elif empleado.cargo == 'Secretario' %}
+                            <i class="fas fa-keyboard me-2"></i>
+                        {% elif empleado.cargo == 'Técnico Agrícola' %}
+                            <i class="fas fa-tractor me-2"></i>
+                        {% elif empleado.cargo == 'Mecánico' %}
+                            <i class="fas fa-wrench me-2"></i>
+                        {% elif empleado.cargo == 'Conductor' %}
+                            <i class="fas fa-truck me-2"></i>
+                        {% elif empleado.cargo == 'Auxiliar' %}
+                            <i class="fas fa-hands-helping me-2"></i>
+                        {% else %}
+                            <i class="fas fa-user me-2"></i>
+                        {% endif %}
+                        {{ empleado.nombre }} {{ empleado.apellido }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="text-primary mb-3"><i class="fas fa-id-card me-2"></i>Información Personal</h6>
+                                            <div class="mb-2">
+                                                <small class="text-muted">Cédula:</small><br>
+                                                <strong>{{ empleado.cedula }}</strong>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">Teléfono:</small><br>
+                                                <strong>{{ empleado.telefono }}</strong>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">Dirección:</small><br>
+                                                <strong>{{ empleado.direccion }}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6 class="text-success mb-3"><i class="fas fa-briefcase me-2"></i>Información Laboral</h6>
+                                            <div class="mb-2">
+                                                <small class="text-muted">Cargo:</small><br>
+                                                <span class="badge bg-primary">{{ empleado.cargo }}</span>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">Estado:</small><br>
+                                                <span class="badge {% if empleado.estado == 'activo' %}bg-success{% else %}bg-danger{% endif %}">{{ empleado.estado|title }}</span>
+                                            </div>
+                                            {% if empleado.fecha_contratacion %}
+                                            <div class="mb-2">
+                                                <small class="text-muted">Fecha de Contratación:</small><br>
+                                                <strong>{{ empleado.fecha_contratacion.strftime('%d/%m/%Y') }}</strong>
+                                            </div>
+                                            {% endif %}
+                                            {% if empleado.salario %}
+                                            <div class="mb-2">
+                                                <small class="text-muted">Salario:</small><br>
+                                                <strong>${{ "{:,.0f}".format(empleado.salario) }}</strong>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% if empleado.descripcion %}
+                                    <hr>
+                                    <div>
+                                        <h6 class="text-info mb-2"><i class="fas fa-clipboard-list me-2"></i>Descripción del Cargo</h6>
+                                        <p class="mb-0">{{ empleado.descripcion }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ url_for('editar_empleado', empleado_id=empleado.id) }}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Editar Empleado
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div class="modal fade" id="deleteModal{{ empleado.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ empleado.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel{{ empleado.id }}">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar al empleado <strong>{{ empleado.nombre }} {{ empleado.apellido }}</strong>?</p>
+                    <p class="text-danger"><small>Esta acción no se puede deshacer.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form action="{{ url_for('eliminar_empleado', empleado_id=empleado.id) }}" method="POST">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not empleados %}
+<div class="text-center py-5">
+    <i class="fas fa-users fa-4x text-muted mb-3"></i>
+    <h5 class="text-muted mb-3">No hay empleados registrados</h5>
+    <p>Añade a tu equipo para empezar a gestionar.</p>
+    <a href="{{ url_for('nuevo_empleado') }}" class="btn btn-primary mt-2">
+        <i class="fas fa-plus me-2"></i>Registrar Empleado
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fix modal backdrop issues
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(function(modal) {
+        modal.addEventListener('hidden.bs.modal', function () {
+            // Remove any lingering backdrop
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            
+            // Restore body scroll
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+        
+        modal.addEventListener('show.bs.modal', function () {
+            // Ensure proper modal behavior
+            document.body.classList.add('modal-open');
+        });
+    });
+    
+    // Handle click outside modal to close
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('modal')) {
+            const modal = bootstrap.Modal.getInstance(event.target);
+            if (modal) {
+                modal.hide();
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

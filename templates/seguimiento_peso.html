@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Seguimiento de Peso{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">
+                <i class="fas fa-weight text-primary me-2"></i>
+                Seguimiento de Peso
+            </h2>
+            <p class="text-muted mb-0">Monitoreo del peso y condición corporal del ganado</p>
+        </div>
+        <a href="{{ url_for('nuevo_registro_peso') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nuevo Registro
+        </a>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+                            <i class="fas fa-chart-line text-primary fa-2x"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-primary mb-1">{{ stats.total_registros }}</h3>
+                    <p class="text-muted mb-0">Total Registros</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                            <i class="fas fa-cow text-success fa-2x"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-success mb-1">{{ stats.total_animales }}</h3>
+                    <p class="text-muted mb-0">Animales Monitoreados</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3">
+                            <i class="fas fa-balance-scale text-info fa-2x"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-info mb-1">{{ stats.peso_promedio }} kg</h3>
+                    <p class="text-muted mb-0">Peso Promedio</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center mb-2">
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3">
+                            <i class="fas fa-chart-bar text-warning fa-2x"></i>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold text-warning mb-1">8.5</h3>
+                    <p class="text-muted mb-0">Condición Promedio</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registros Recientes -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="mb-0">
+                <i class="fas fa-history text-muted me-2"></i>
+                Registros Recientes
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            {% if stats.registros_recientes %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="border-0 ps-4">Animal</th>
+                            <th class="border-0">Peso</th>
+                            <th class="border-0">Condición Corporal</th>
+                            <th class="border-0">Fecha</th>
+                            <th class="border-0">Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for registro, numero, nombre in stats.registros_recientes %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-3">
+                                        <i class="fas fa-cow text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">{{ numero }}</div>
+                                        {% if nombre %}
+                                        <small class="text-muted">{{ nombre }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info bg-opacity-10 text-info px-3 py-2">
+                                    {{ registro.peso if registro.peso is not none else '-' }}{% if registro.peso is not none %} kg{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if registro.condicion_corporal %}
+                                <div class="d-flex align-items-center">
+                                    <div class="progress me-2" style="width: 60px; height: 8px;">
+                                        <div class="progress-bar bg-success cc-bar" 
+                                             data-cc="{{ registro.condicion_corporal or 0 }}"></div>
+                                    </div>
+                                    <span class="small">{{ registro.condicion_corporal or 0 }}/9</span>
+                                </div>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="text-muted">{{ registro.fecha.strftime('%d/%m/%Y') if registro.fecha else '-' }}</span>
+                            </td>
+                            <td>
+                                {% if registro.observaciones %}
+                                <span class="small text-muted">{{ registro.observaciones[:50] }}{% if registro.observaciones|length > 50 %}...{% endif %}</span>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-weight fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No hay registros de peso</h5>
+                <p class="text-muted mb-4">Comienza registrando el peso de tus animales</p>
+                <a href="{{ url_for('nuevo_registro_peso') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Crear Primer Registro
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        </div>
+</div>
+
+<style>
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.progress {
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Set width for body condition score bars from data-cc (1-9 scale)
+  document.querySelectorAll('.cc-bar').forEach(function(el){
+    var cc = parseFloat(el.getAttribute('data-cc') || '0');
+    if (isNaN(cc) || cc < 0) cc = 0;
+    if (cc > 9) cc = 9;
+    var pct = Math.round(cc / 9 * 100);
+    el.style.width = pct + '%';
+  });
+});
+</script>
+{% endblock %}

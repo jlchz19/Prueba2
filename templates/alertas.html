@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+{% block title %}Sistema de Alertas - AgroGest{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-bell me-2"></i>Sistema de Alertas
+        </h1>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('nueva_alerta') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>Nueva Alerta
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Estado</label>
+                    <select class="form-select" id="filtroEstado">
+                        <option value="">Todos</option>
+                        <option value="pendiente">Pendientes</option>
+                        <option value="enviada">Enviadas</option>
+                        <option value="cancelada">Canceladas</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" id="filtroTipo">
+                        <option value="">Todos</option>
+                        <option value="general">General</option>
+                        <option value="animal">Animal</option>
+                        <option value="vacuna">Vacuna</option>
+                        <option value="produccion">Producción</option>
+                        <option value="empleado">Empleado</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Fecha Desde</label>
+                    <input type="date" class="form-control" id="fechaDesde">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Fecha Hasta</label>
+                    <input type="date" class="form-control" id="fechaHasta">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Alertas -->
+    <div class="card shadow">
+        <div class="card-header py-3 bg-primary">
+            <h6 class="m-0 font-weight-bold text-white">
+                <i class="fas fa-calendar-alt me-2"></i>Alertas Programadas
+            </h6>
+        </div>
+        <div class="card-body">
+            {% if alertas %}
+            <div class="table-responsive">
+                <table class="table table-bordered" id="alertasTable">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Fecha Programada</th>
+                            <th>Animal</th>
+                            <th>Estado</th>
+                            <th>Repetir</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alerta in alertas %}
+                        <tr id="alerta-{{ alerta.id }}">
+                            <td>
+                                <strong class="text-dark">{{ alerta.titulo }}</strong>
+                                {% if alerta.descripcion %}
+                                <br><small class="text-muted">{{ alerta.descripcion[:100] }}{% if alerta.descripcion|length > 100 %}...{% endif %}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if alerta.tipo_alerta == 'animal' %}primary{% elif alerta.tipo_alerta == 'vacuna' %}success{% elif alerta.tipo_alerta == 'produccion' %}warning{% elif alerta.tipo_alerta == 'empleado' %}info{% else %}secondary{% endif %}">
+                                    {{ alerta.tipo_alerta.title() }}
+                                </span>
+                            </td>
+                            <td>{{ alerta.fecha_programada.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if alerta.animal %}
+                                    <span class="badge bg-light text-dark">{{ alerta.animal.identificacion }}</span>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if alerta.estado == 'pendiente' %}warning{% elif alerta.estado == 'enviada' %}success{% else %}danger{% endif %}">
+                                    {{ alerta.estado.title() }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if alerta.repetir %}
+                                    <i class="fas fa-repeat text-success" title="Repetir {{ alerta.frecuencia }}"></i>
+                                    {{ alerta.frecuencia }}
+                                {% else %}
+                                    <span class="text-muted">No</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-info" onclick="verDetalles('{{ alerta.id }}')" title="Ver detalles">
+                                        <span style="font-size: 1rem;">👁️</span>
+                                    </button>
+                                    {% if alerta.estado != 'cancelada' and alerta.estado != 'enviada' %}
+                                    <button class="btn btn-outline-warning" onclick="editarAlerta('{{ alerta.id }}')" title="Editar">
+                                        <span style="font-size: 1rem;">✏️</span>
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="cancelarAlerta('{{ alerta.id }}')" title="Cancelar">
+                                        <span style="font-size: 1rem;">❌</span>
+                                    </button>
+                                    {% endif %}
+                                    <button class="btn btn-outline-danger" onclick="eliminarAlerta('{{ alerta.id }}')" title="Eliminar permanentemente">
+                                        <span style="font-size: 1rem;">🗑️</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No hay alertas programadas</h5>
+                <p class="text-muted">Crea tu primera alerta para recibir notificaciones importantes.</p>
+                <a href="{{ url_for('nueva_alerta') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Crear Primera Alerta
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver detalles -->
+<div class="modal fade" id="detallesModal" tabindex="-1" aria-labelledby="detallesModalLabel" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white py-2">
+                <h6 class="modal-title" id="detallesModalLabel">
+                    <span style="font-size: 0.9rem; margin-right: 6px;">📋</span>Detalles de la Alerta
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-2" id="detallesContent">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                    <span style="font-size: 0.9rem; margin-right: 4px;">✖️</span>Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtros
+    const filtroEstado = document.getElementById('filtroEstado');
+    const filtroTipo = document.getElementById('filtroTipo');
+    const fechaDesde = document.getElementById('fechaDesde');
+    const fechaHasta = document.getElementById('fechaHasta');
+    
+    function aplicarFiltros() {
+        const rows = document.querySelectorAll('#alertasTable tbody tr');
+        
+        rows.forEach(row => {
+            let mostrar = true;
+            
+            // Filtro por estado
+            if (filtroEstado.value) {
+                const estadoBadge = row.querySelector('td:nth-child(5) .badge');
+                if (estadoBadge && !estadoBadge.textContent.toLowerCase().includes(filtroEstado.value)) {
+                    mostrar = false;
+                }
+            }
+            
+            // Filtro por tipo
+            if (filtroTipo.value) {
+                const tipoBadge = row.querySelector('td:nth-child(2) .badge');
+                if (tipoBadge && !tipoBadge.textContent.toLowerCase().includes(filtroTipo.value)) {
+                    mostrar = false;
+                }
+            }
+            
+            row.style.display = mostrar ? '' : 'none';
+        });
+    }
+    
+    filtroEstado.addEventListener('change', aplicarFiltros);
+    filtroTipo.addEventListener('change', aplicarFiltros);
+    fechaDesde.addEventListener('change', aplicarFiltros);
+    fechaHasta.addEventListener('change', aplicarFiltros);
+});
+
+function verDetalles(alertaId) {
+    const modalElement = document.getElementById('detallesModal');
+    
+    // Limpiar cualquier modal existente
+    const existingModal = bootstrap.Modal.getInstance(modalElement);
+    if (existingModal) {
+        existingModal.hide();
+        existingModal.dispose();
+    }
+    
+    // Crear nuevo modal SIN backdrop
+    const modal = new bootstrap.Modal(modalElement, {
+        backdrop: false,
+        keyboard: true
+    });
+    
+    // Limpiar contenido
+    const contentDiv = document.getElementById('detallesContent');
+    contentDiv.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    `;
+    
+    // Mostrar modal
+    modal.show();
+    
+    // Cargar datos reales desde la API
+    fetch(`/api/alerta_detalle/${alertaId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('detallesContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <span style="font-size: 1rem; margin-right: 8px;">❌</span>Error: ${data.error}
+                    </div>
+                `;
+                return;
+            }
+            
+            // Obtener emoji según tipo de alerta
+            const tipoEmojis = {
+                'vacunacion': '💉',
+                'tratamiento': '💊',
+                'revision': '🔍',
+                'alimentacion': '🌾',
+                'reproduccion': '🐄',
+                'general': '📋'
+            };
+            
+            const estadoColors = {
+                'pendiente': 'warning',
+                'completada': 'success',
+                'cancelada': 'secondary'
+            };
+            
+            let animalInfo = '';
+            if (data.animal) {
+                animalInfo = `
+                    <div class="mb-2">
+                        <small class="text-info fw-bold">🐄 Animal:</small>
+                        <div class="d-flex align-items-center flex-wrap">
+                            <span class="badge bg-info badge-sm me-1">${data.animal.identificacion}</span>
+                            <small class="text-dark me-1">${data.animal.nombre}</small>
+                            <small class="text-muted">(${data.animal.tipo})</small>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            let repeticionInfo = '';
+            if (data.repetir) {
+                repeticionInfo = `
+                    <div class="mb-2">
+                        <small class="text-warning fw-bold">🔄 Repetición:</small>
+                        <span class="badge bg-warning text-dark badge-sm ms-1">${data.frecuencia.toUpperCase()}</span>
+                    </div>
+                `;
+            }
+            
+            const contenido = `
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h6 class="mb-0 text-truncate" style="max-width: 300px;">
+                            <span style="font-size: 1rem; margin-right: 4px;">${tipoEmojis[data.tipo_alerta] || '📋'}</span>
+                            ${data.titulo}
+                        </h6>
+                        <span class="badge bg-${estadoColors[data.estado] || 'secondary'} badge-sm">${data.estado.toUpperCase()}</span>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <small class="text-primary fw-bold">📝 Descripción:</small>
+                        <div class="text-muted small">${data.descripcion}</div>
+                    </div>
+                    
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <div class="p-1 bg-light rounded text-center">
+                                <small class="text-primary d-block">📅 Programada</small>
+                                <small class="text-dark fw-bold">${data.fecha_programada}</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-1 bg-light rounded text-center">
+                                <small class="text-secondary d-block">📝 Creada</small>
+                                <small class="text-muted">${data.fecha_creacion}</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${animalInfo}
+                    ${repeticionInfo}
+                </div>
+            `;
+            
+            document.getElementById('detallesContent').innerHTML = contenido;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const contentDiv = document.getElementById('detallesContent');
+            if (contentDiv) {
+                contentDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <span style="font-size: 1rem; margin-right: 8px;">❌</span>Error al cargar los detalles
+                    </div>
+                `;
+            }
+        });
+}
+
+// Función para cerrar modal manualmente si es necesario
+function cerrarModalDetalles() {
+    const modalElement = document.getElementById('detallesModal');
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    if (modal) {
+        modal.hide();
+    }
+}
+
+function editarAlerta(alertaId) {
+    if (confirm('¿Deseas editar esta alerta?')) {
+        window.location.href = `/editar_alerta/${alertaId}`;
+    }
+}
+
+function cancelarAlerta(alertaId) {
+    if (confirm('¿Estás seguro de que deseas cancelar esta alerta?')) {
+        fetch(`/cancelar_alerta/${alertaId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error al cancelar la alerta: ' + (data.error || 'Error desconocido'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al cancelar la alerta');
+        });
+    }
+}
+
+function eliminarAlerta(alertaId) {
+    if (confirm('¿Estás seguro de que deseas ELIMINAR PERMANENTEMENTE esta alerta?\n\nEsta acción no se puede deshacer.')) {
+        fetch(`/eliminar_alerta/${alertaId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remover la fila de la tabla inmediatamente
+                const fila = document.getElementById(`alerta-${alertaId}`);
+                if (fila) {
+                    fila.style.transition = 'opacity 0.3s';
+                    fila.style.opacity = '0';
+                    setTimeout(() => {
+                        fila.remove();
+                        // Verificar si quedan alertas
+                        const tbody = document.querySelector('#alertasTable tbody');
+                        if (tbody && tbody.children.length === 0) {
+                            location.reload(); // Recargar para mostrar mensaje "sin alertas"
+                        }
+                    }, 300);
+                }
+            } else {
+                alert('Error al eliminar la alerta: ' + (data.error || 'Error desconocido'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al eliminar la alerta');
+        });
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Animal - AgroGest{% endblock %}
+{% block page_title %}Editar Animal{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('animales') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-paw me-2"></i>Editar Datos del Animal
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <!-- Campo de imagen -->
+                    <div class="row mb-4">
+                        <div class="col-md-12 text-center">
+                            <label for="imagen" class="form-label fw-bold">Foto del Animal</label>
+                            {% if animal.imagen %}
+                                <img src="{{ url_for('static', filename=animal.imagen) }}" alt="Foto actual" class="img-thumbnail mb-2" style="max-width: 180px; max-height: 180px;">
+                            {% endif %}
+                            <input class="form-control" type="file" id="imagen" name="imagen" accept="image/*">
+                            <div class="form-text">Formatos permitidos: jpg, jpeg, png, gif</div>
+                            <div id="preview" class="mt-2"></div>
+                        </div>
+                    </div>
+                    <!-- Sección 1: Identificación y Datos Generales -->
+                    <h5 class="mb-3 text-primary"><i class="fas fa-info-circle me-2"></i>Identificación y Datos Generales</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="identificacion" name="identificacion" value="{{ animal.identificacion }}" required>
+                                <label for="identificacion">Identificador Único (Arete/Chip) *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ animal.nombre }}">
+                                <label for="nombre">Nombre (Opcional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="tipo" name="tipo" value="{{ animal.tipo }}" list="tipos-animales" required>
+                                <datalist id="tipos-animales">
+                                    <option value="Bovino">
+                                    <option value="Porcino">
+                                    <option value="Ovino">
+                                    <option value="Caprino">
+                                    <option value="Equino">
+                                    <option value="Aviar">
+                                    <option value="Cunícola">
+                                    <option value="Acuícola">
+                                    <option value="Apícola">
+                                </datalist>
+                                <label for="tipo">Tipo de Animal *</label>
+                                <div class="form-text">Ej: Bovino, Porcino, Ovino, Caprino, Equino, Aviar, etc.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="raza" name="raza" value="{{ animal.raza }}" required>
+                                <label for="raza">Raza *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="sexo" name="sexo" required>
+                                    <option value="">Seleccionar sexo...</option>
+                                    <option value="macho" {% if animal.sexo == 'macho' %}selected{% endif %}>Macho</option>
+                                    <option value="hembra" {% if animal.sexo == 'hembra' %}selected{% endif %}>Hembra</option>
+                                </select>
+                                <label for="sexo">Sexo *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ animal.fecha_nacimiento.strftime('%Y-%m-%d') if animal.fecha_nacimiento else '' }}" required>
+                                <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.1" class="form-control" id="peso_nacimiento" name="peso_nacimiento" value="{{ animal.peso_nacimiento }}">
+                                <label for="peso_nacimiento">Peso al Nacimiento (kg)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.1" class="form-control" id="peso" name="peso" value="{{ animal.peso }}" required>
+                                <label for="peso">Peso Actual (kg) *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="color_señas" name="color_señas" value="{{ animal.color_señas }}">
+                                <label for="color_señas">Color/Señas Particulares</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="estado" name="estado" required>
+                                    <option value="activo" {% if animal.estado == 'activo' %}selected{% endif %}>Activo</option>
+                                    <option value="en_produccion" {% if animal.estado == 'en_produccion' %}selected{% endif %}>En Producción</option>
+                                    <option value="gestante" {% if animal.estado == 'gestante' %}selected{% endif %}>Gestante</option>
+                                    <option value="en_engorde" {% if animal.estado == 'en_engorde' %}selected{% endif %}>En Engorde</option>
+                                    <option value="semental" {% if animal.estado == 'semental' %}selected{% endif %}>Semental</option>
+                                    <option value="reproductora" {% if animal.estado == 'reproductora' %}selected{% endif %}>Reproductora</option>
+                                    <option value="lechon" {% if animal.estado == 'lechon' %}selected{% endif %}>Lechón</option>
+                                    <option value="vendido" {% if animal.estado == 'vendido' %}selected{% endif %}>Vendido</option>
+                                    <option value="muerto" {% if animal.estado == 'muerto' %}selected{% endif %}>Fallecido</option>
+                                </select>
+                                <label for="estado">Estado Actual *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="ubicacion_id" name="ubicacion_id">
+                                    <option value="">Seleccionar ubicación...</option>
+                                    <optgroup label="Potreros">
+                                        {% for potrero in potreros %}
+                                        <option value="potrero_{{ potrero.id }}" 
+                                                {% if animal.potrero_id == potrero.id %}selected{% endif %}>
+                                            {{ potrero.nombre }} - {{ potrero.area }} ha
+                                        </option>
+                                        {% endfor %}
+                                    </optgroup>
+                                    <optgroup label="Otras Ubicaciones">
+                                        {% for ubicacion in ubicaciones %}
+                                        <option value="ubicacion_{{ ubicacion.id }}" 
+                                                {% if animal.ubicacion_id == ubicacion.id %}selected{% endif %}>
+                                            {{ ubicacion.nombre }} ({{ ubicacion.tipo }})
+                                        </option>
+                                        {% endfor %}
+                                    </optgroup>
+                                </select>
+                                <label for="ubicacion_id">Ubicación del Animal</label>
+                                <div class="form-text">Selecciona potrero para bovinos o ubicación específica para otros animales</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Aquí puedes agregar el resto de secciones igual que en nuevo_animal.html -->
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('animales') }}" class="btn btn-secondary me-2">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+/* Estilos específicos para mejorar la visibilidad de formularios */
+.section-header {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary);
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    color: #6c757d;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+.form-floating {
+    margin-bottom: 1rem;
+}
+
+.form-floating > .form-control,
+.form-floating > .form-select {
+    background-color: #fff;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem;
+    font-size: 1rem;
+    height: calc(3.5rem + 2px);
+    transition: all 0.3s ease;
+}
+
+.form-floating > .form-control:focus,
+.form-floating > .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.1);
+    background-color: #fff;
+}
+
+.form-floating > label {
+    padding: 1rem;
+    font-weight: 500;
+    color: #495057;
+    background-color: transparent;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.btn-group-custom {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.btn-custom {
+    min-width: 150px;
+    padding: 12px 24px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.image-upload-area {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.image-upload-area:hover {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
+}
+
+.required-field::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.row.g-4 > * {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Estilos para campos obligatorios */
+.form-floating > .form-control[required],
+.form-floating > .form-select[required] {
+    border-left: 4px solid #ffc107;
+}
+
+.form-floating > .form-control[required]:focus,
+.form-floating > .form-select[required]:focus {
+    border-left: 4px solid var(--success);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Previsualización de imagen
+    const inputImagen = document.getElementById('imagen');
+    const preview = document.getElementById('preview');
+    if (inputImagen) {
+        inputImagen.addEventListener('change', function(e) {
+            preview.innerHTML = '';
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'img-thumbnail mt-2';
+                    img.style.maxWidth = '180px';
+                    img.style.maxHeight = '180px';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

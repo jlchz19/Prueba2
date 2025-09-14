@@ -1,0 +1,701 @@
+{% extends "base.html" %}
+
+{% block title %}Genealogía y Genética - AgroGest{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-sitemap text-primary me-2"></i>Genealogía y Genética</h1>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cruzamientoModal">
+                        <i class="fas fa-plus me-2"></i>Nuevo Cruzamiento
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" onclick="generarReporteGenetico()">
+                        <i class="fas fa-file-alt me-2"></i>Reporte Genético
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros y Búsqueda -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Buscar Animal</label>
+                            <input type="text" class="form-control" id="buscarAnimal" placeholder="ID o nombre del animal">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Tipo</label>
+                            <select class="form-select" id="filtroTipo">
+                                <option value="">Todos</option>
+                                <option value="bovino">Bovino</option>
+                                <option value="porcino">Porcino</option>
+                                <option value="caprino">Caprino</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Sexo</label>
+                            <select class="form-select" id="filtroSexo">
+                                <option value="">Todos</option>
+                                <option value="macho">Macho</option>
+                                <option value="hembra">Hembra</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Generación</label>
+                            <select class="form-select" id="filtroGeneracion">
+                                <option value="">Todas</option>
+                                <option value="1">1ra Generación</option>
+                                <option value="2">2da Generación</option>
+                                <option value="3">3ra Generación</option>
+                                <option value="4+">4ta+ Generación</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-primary" onclick="aplicarFiltros()">
+                                    <i class="fas fa-search me-1"></i>Filtrar
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="limpiarFiltros()">
+                                    <i class="fas fa-times me-1"></i>Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Árbol Genealógico Interactivo -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-tree me-2"></i>Árbol Genealógico</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-primary active" onclick="cambiarVistaArbol(this, 'ascendente')">Ascendente</button>
+                        <button class="btn btn-outline-primary" onclick="cambiarVistaArbol(this, 'descendente')">Descendente</button>
+                        <button class="btn btn-outline-primary" onclick="cambiarVistaArbol(this, 'completo')">Completo</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <select class="form-select d-inline-block w-auto" id="animalSeleccionado" onchange="cargarArbolGenealogico()">
+                            <option value="">Seleccionar animal...</option>
+                            {% for animal in animales %}
+                            <option value="{{ animal.id }}">{{ animal.identificacion }} - {{ animal.nombre or 'Sin nombre' }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div id="arbolGenealogico" class="genealogy-tree">
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-tree fa-3x mb-3"></i>
+                            <p>Selecciona un animal para ver su árbol genealógico</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas Genéticas -->
+    <div class="row mb-4">
+        <div class="col-lg-4 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-dna me-2"></i>Coeficiente de Consanguinidad</h6>
+                </div>
+                <div class="card-body">
+                    <div class="progress mb-2" style="height: 20px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: {{ consanguinidad_promedio }}%">
+                            {{ consanguinidad_promedio|round(1) }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">Promedio de la población</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Diversidad Genética</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="diversidadGeneticaChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-trophy me-2"></i>Top Reproductores</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for reproductor in top_reproductores %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <strong>{{ reproductor.identificacion }}</strong><br>
+                                <small class="text-muted">{{ reproductor.nombre or 'Sin nombre' }}</small>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">{{ reproductor.descendencia }} crías</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Análisis de Cruzamientos -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-heart me-2"></i>Análisis de Cruzamientos Recomendados</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Hembra</th>
+                                    <th>Macho Recomendado</th>
+                                    <th>Compatibilidad Genética</th>
+                                    <th>Consanguinidad Estimada</th>
+                                    <th>Características Esperadas</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for recomendacion in cruzamientos_recomendados %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ recomendacion.hembra.identificacion }}</strong><br>
+                                        <small class="text-muted">{{ recomendacion.hembra.raza }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ recomendacion.macho.identificacion }}</strong><br>
+                                        <small class="text-muted">{{ recomendacion.macho.raza }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 15px;">
+                                            <div class="progress-bar bg-{{ 'success' if recomendacion.compatibilidad > 80 else 'warning' if recomendacion.compatibilidad > 60 else 'danger' }}" 
+                                                 style="width: {{ recomendacion.compatibilidad }}%">
+                                                {{ recomendacion.compatibilidad|round(0) }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if recomendacion.consanguinidad < 5 else 'warning' if recomendacion.consanguinidad < 10 else 'danger' }}">
+                                            {{ recomendacion.consanguinidad|round(1) }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small>{{ recomendacion.caracteristicas_esperadas }}</small>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="programarCruzamiento({{ recomendacion.hembra.id }}, {{ recomendacion.macho.id }})">
+                                            <i class="fas fa-calendar-plus me-1"></i>Programar
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial de Cruzamientos -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Historial de Cruzamientos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Hembra</th>
+                                    <th>Macho</th>
+                                    <th>Tipo</th>
+                                    <th>Estado</th>
+                                    <th>Resultado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for evento in historial_cruzamientos %}
+                                <tr>
+                                    <td>{{ evento.fecha_evento.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        <strong>{{ evento.animal.identificacion }}</strong><br>
+                                        <small class="text-muted">{{ evento.animal.nombre or 'Sin nombre' }}</small>
+                                    </td>
+                                    <td>
+                                        {% if evento.semental %}
+                                        <strong>{{ evento.semental.identificacion }}</strong><br>
+                                        <small class="text-muted">{{ evento.semental.nombre or 'Sin nombre' }}</small>
+                                        {% else %}
+                                        <span class="text-muted">No especificado</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ evento.tipo_evento|title }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if evento.resultado == 'exitoso' else 'warning' if evento.resultado == 'pendiente' else 'danger' }}">
+                                            {{ evento.resultado|title }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if evento.crias_nacidas %}
+                                        <i class="fas fa-baby text-success me-1"></i>{{ evento.crias_nacidas }} crías
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="verDetalleEvento({{ evento.id }})">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Nuevo Cruzamiento -->
+<div class="modal fade" id="cruzamientoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-heart me-2"></i>Programar Nuevo Cruzamiento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formCruzamiento">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Hembra *</label>
+                            <select class="form-select" name="hembra_id" required>
+                                <option value="">Seleccionar hembra...</option>
+                                {% for animal in hembras %}
+                                <option value="{{ animal.id }}">{{ animal.identificacion }} - {{ animal.nombre or 'Sin nombre' }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Macho *</label>
+                            <select class="form-select" name="macho_id" required>
+                                <option value="">Seleccionar macho...</option>
+                                {% for animal in machos %}
+                                <option value="{{ animal.id }}">{{ animal.identificacion }} - {{ animal.nombre or 'Sin nombre' }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha Programada *</label>
+                            <input type="date" class="form-control" name="fecha_evento" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Servicio *</label>
+                            <select class="form-select" name="tipo_evento" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="monta">Monta Natural</option>
+                                <option value="inseminacion">Inseminación Artificial</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Observaciones</label>
+                            <textarea class="form-control" name="observaciones" rows="3" placeholder="Notas adicionales sobre el cruzamiento..."></textarea>
+                        </div>
+                        
+                        <!-- Análisis de Compatibilidad -->
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-dna me-2"></i>Análisis de Compatibilidad</h6>
+                                    <div id="analisisCompatibilidad">
+                                        <p class="text-muted">Selecciona ambos animales para ver el análisis de compatibilidad genética.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Programar Cruzamiento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.genealogy-tree {
+    min-height: 400px;
+    overflow-x: auto;
+}
+
+.animal-node {
+    background: white;
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 5px;
+    text-align: center;
+    min-width: 120px;
+    position: relative;
+}
+
+.animal-node.male {
+    border-color: #06b6d4;
+    background: linear-gradient(135deg, #e0f7fa, #ffffff);
+}
+
+.animal-node.female {
+    border-color: #ec4899;
+    background: linear-gradient(135deg, #fce7f3, #ffffff);
+}
+
+.animal-node.selected {
+    border-width: 3px;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.tree-level {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.tree-connector {
+    border-left: 2px solid #d1d5db;
+    border-bottom: 2px solid #d1d5db;
+    width: 20px;
+    height: 20px;
+    margin: 0 10px;
+}
+</style>
+
+<script>
+// Variables globales
+let arbolActual = null;
+let vistaActual = 'ascendente';
+
+// Cargar árbol genealógico
+function cargarArbolGenealogico() {
+    const animalId = document.getElementById('animalSeleccionado').value;
+    if (!animalId) {
+        document.getElementById('arbolGenealogico').innerHTML = `
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-tree fa-3x mb-3"></i>
+                <p>Selecciona un animal para ver su árbol genealógico</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Simular carga de datos del árbol
+    fetch(`/api/genealogy/tree/${animalId}?vista=${vistaActual}`)
+        .then(response => response.json())
+        .then(data => {
+            renderizarArbol(data);
+        })
+        .catch(error => {
+            console.error('Error cargando árbol:', error);
+            document.getElementById('arbolGenealogico').innerHTML = `
+                <div class="text-center text-danger py-5">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                    <p>Error cargando el árbol genealógico</p>
+                </div>
+            `;
+        });
+}
+
+// Renderizar árbol genealógico
+function renderizarArbol(data) {
+    const container = document.getElementById('arbolGenealogico');
+    let html = '';
+
+    if (vistaActual === 'ascendente') {
+        html = renderizarArbolAscendente(data);
+    } else if (vistaActual === 'descendente') {
+        html = renderizarArbolDescendente(data);
+    } else {
+        html = renderizarArbolCompleto(data);
+    }
+
+    container.innerHTML = html;
+}
+
+// Renderizar árbol ascendente (padres)
+function renderizarArbolAscendente(data) {
+    let html = '<div class="tree-container">';
+    
+    // Animal principal
+    html += `<div class="tree-level">
+        <div class="animal-node selected ${data.sexo}">
+            <strong>${data.identificacion}</strong><br>
+            <small>${data.nombre || 'Sin nombre'}</small><br>
+            <small class="text-muted">${data.raza}</small>
+        </div>
+    </div>`;
+
+    // Padres
+    if (data.padre || data.madre) {
+        html += '<div class="tree-level">';
+        if (data.padre) {
+            html += `<div class="animal-node male">
+                <strong>${data.padre.identificacion}</strong><br>
+                <small>${data.padre.nombre || 'Sin nombre'}</small><br>
+                <small class="text-muted">Padre</small>
+            </div>`;
+        }
+        if (data.madre) {
+            html += `<div class="animal-node female">
+                <strong>${data.madre.identificacion}</strong><br>
+                <small>${data.madre.nombre || 'Sin nombre'}</small><br>
+                <small class="text-muted">Madre</small>
+            </div>`;
+        }
+        html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
+// Renderizar árbol descendente (hijos)
+function renderizarArbolDescendente(data) {
+    let html = '<div class="tree-container">';
+    
+    // Animal principal
+    html += `<div class="tree-level">
+        <div class="animal-node selected ${data.sexo}">
+            <strong>${data.identificacion}</strong><br>
+            <small>${data.nombre || 'Sin nombre'}</small><br>
+            <small class="text-muted">${data.raza}</small>
+        </div>
+    </div>`;
+
+    // Descendencia
+    if (data.hijos && data.hijos.length > 0) {
+        html += '<div class="tree-level">';
+        data.hijos.forEach(hijo => {
+            html += `<div class="animal-node ${hijo.sexo}">
+                <strong>${hijo.identificacion}</strong><br>
+                <small>${hijo.nombre || 'Sin nombre'}</small><br>
+                <small class="text-muted">Hijo/a</small>
+            </div>`;
+        });
+        html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
+// Renderizar árbol completo
+function renderizarArbolCompleto(data) {
+    let html = '<div class="tree-container">';
+    
+    // Abuelos
+    if (data.abuelos && data.abuelos.length > 0) {
+        html += '<div class="tree-level">';
+        data.abuelos.forEach(abuelo => {
+            html += `<div class="animal-node ${abuelo.sexo}">
+                <strong>${abuelo.identificacion}</strong><br>
+                <small>${abuelo.nombre || 'Sin nombre'}</small><br>
+                <small class="text-muted">Abuelo/a</small>
+            </div>`;
+        });
+        html += '</div>';
+    }
+    
+    // Padres
+    if (data.padre || data.madre) {
+        html += '<div class="tree-level">';
+        if (data.padre) {
+            html += `<div class="animal-node male">
+                <strong>${data.padre.identificacion}</strong><br>
+                <small>${data.padre.nombre || 'Sin nombre'}</small><br>
+                <small class="text-muted">Padre</small>
+            </div>`;
+        }
+        if (data.madre) {
+            html += `<div class="animal-node female">
+                <strong>${data.madre.identificacion}</strong><br>
+                <small>${data.madre.nombre || 'Sin nombre'}</small><br>
+                <small class="text-muted">Madre</small>
+            </div>`;
+        }
+        html += '</div>';
+    }
+    
+    // Animal principal
+    html += `<div class="tree-level">
+        <div class="animal-node selected ${data.sexo}">
+            <strong>${data.identificacion}</strong><br>
+            <small>${data.nombre || 'Sin nombre'}</small><br>
+            <small class="text-muted">${data.raza}</small>
+        </div>
+    </div>`;
+
+    // Descendencia
+    if (data.hijos && data.hijos.length > 0) {
+        html += '<div class="tree-level">';
+        data.hijos.forEach(hijo => {
+            html += `<div class="animal-node ${hijo.sexo}">
+                <strong>${hijo.identificacion}</strong><br>
+                <small>${hijo.nombre || 'Sin nombre'}</small><br>
+                <small class="text-muted">Hijo/a</small>
+            </div>`;
+        });
+        html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
+// Cambiar vista del árbol
+function cambiarVistaArbol(btn, vista) {
+    // Actualizar botones activos
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (btn) { btn.classList.add('active'); }
+    
+    vistaActual = vista;
+    cargarArbolGenealogico();
+}
+
+// Programar cruzamiento
+function programarCruzamiento(hembraId, machoId) {
+    document.querySelector('[name="hembra_id"]').value = hembraId;
+    document.querySelector('[name="macho_id"]').value = machoId;
+    
+    // Abrir modal
+    const modal = new bootstrap.Modal(document.getElementById('cruzamientoModal'));
+    modal.show();
+    
+    // Cargar análisis de compatibilidad
+    cargarAnalisisCompatibilidad(hembraId, machoId);
+}
+
+// Cargar análisis de compatibilidad
+function cargarAnalisisCompatibilidad(hembraId, machoId) {
+    if (!hembraId || !machoId) return;
+    
+    fetch(`/api/genealogy/compatibility/${hembraId}/${machoId}`)
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('analisisCompatibilidad');
+            container.innerHTML = `
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="progress mb-2" style="height: 20px;">
+                                <div class="progress-bar bg-${data.compatibilidad > 80 ? 'success' : data.compatibilidad > 60 ? 'warning' : 'danger'}" 
+                                     style="width: ${data.compatibilidad}%">
+                                    ${data.compatibilidad}%
+                                </div>
+                            </div>
+                            <small>Compatibilidad Genética</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h5 class="text-${data.consanguinidad < 5 ? 'success' : data.consanguinidad < 10 ? 'warning' : 'danger'}">${data.consanguinidad}%</h5>
+                            <small>Consanguinidad</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <h5 class="text-primary">${data.diversidad_genetica}%</h5>
+                            <small>Diversidad Genética</small>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <strong>Características Esperadas:</strong><br>
+                        <small class="text-muted">${data.caracteristicas_esperadas}</small>
+                    </div>
+                </div>
+            `;
+        })
+        .catch(error => {
+            console.error('Error cargando análisis:', error);
+        });
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Análisis de compatibilidad en tiempo real
+    const hembraSelect = document.querySelector('[name="hembra_id"]');
+    const machoSelect = document.querySelector('[name="macho_id"]');
+    
+    if (hembraSelect && machoSelect) {
+        [hembraSelect, machoSelect].forEach(select => {
+            select.addEventListener('change', function() {
+                const hembraId = hembraSelect.value;
+                const machoId = machoSelect.value;
+                if (hembraId && machoId) {
+                    cargarAnalisisCompatibilidad(hembraId, machoId);
+                }
+            });
+        });
+    }
+});
+
+// Funciones adicionales
+function aplicarFiltros() {
+    // Implementar filtrado de la tabla
+    console.log('Aplicando filtros...');
+}
+
+function limpiarFiltros() {
+    // Limpiar todos los filtros
+    document.getElementById('buscarAnimal').value = '';
+    document.getElementById('filtroTipo').value = '';
+    document.getElementById('filtroSexo').value = '';
+    document.getElementById('filtroGeneracion').value = '';
+}
+
+function generarReporteGenetico() {
+    window.open('/reports/genetic', '_blank');
+}
+
+function verDetalleEvento(eventoId) {
+    // Mostrar modal con detalles del evento reproductivo
+    console.log('Ver detalle evento:', eventoId);
+}
+</script>
+{% endblock %}

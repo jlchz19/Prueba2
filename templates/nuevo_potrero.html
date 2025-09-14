@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Potrero - AgroGest{% endblock %}
+{% block page_title %}Crear Nuevo Potrero{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('potreros') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-map-marked-alt me-2"></i>Información del Potrero
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate id="potrero-form">
+                    <input type="hidden" name="form_type" value="info_potrero">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre del Potrero" required>
+                                <label for="nombre">Nombre del Potrero *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.1" class="form-control" id="area" name="area" placeholder="Área (hectáreas)" required>
+                                <label for="area">Área (hectáreas) *</label>
+                                <div class="form-text">Ejemplo: 1 vaca/ha, 10 cerdos/ha. El sistema puede sugerir la capacidad.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="capacidad" name="capacidad" placeholder="Capacidad de Animales" required>
+                                <label for="capacidad">Capacidad de Animales *</label>
+                                <div class="form-text" id="capacidad-sugerida"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="funcion" name="funcion" required>
+                                    <option selected disabled value="">Seleccionar función...</option>
+                                    <option value="Cría de terneros">Cría de terneros</option>
+                                    <option value="Engorde de ganado">Engorde de ganado</option>
+                                    <option value="Pastoreo de vacas lecheras">Pastoreo de vacas lecheras</option>
+                                    <option value="Reproducción">Reproducción</option>
+                                    <option value="Aislamiento de animales enfermos">Aislamiento</option>
+                                    <option value="Descanso de pastos">Descanso de pastos</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                <label for="funcion">Función del Potrero *</label>
+                            </div>
+                        </div>
+                         <div class="col-12" id="otra-funcion-div" style="display: none;">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="otra_funcion" name="otra_funcion">
+                                <label for="otra_funcion">Especificar otra función</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('potreros') }}" class="btn btn-secondary me-2">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Guardar Potrero
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sección de Animales Disponibles -->
+    {% if animales_disponibles %}
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-cow me-2"></i>Agregar Animales al Potrero
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">Seleccione los animales que desea agregar al nuevo potrero:</p>
+                
+                <form method="POST" id="animales-form">
+                    <input type="hidden" name="form_type" value="agregar_animales">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">Agregar</th>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for animal in animales_disponibles %}
+                                <tr>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="animal_ids" value="{{ animal.id }}" id="animal-{{ animal.id }}">
+                                        </div>
+                                    </td>
+                                    <td>{{ animal.identificacion }}</td>
+                                    <td>{{ animal.nombre or '-' }}</td>
+                                    <td>{{ animal.tipo|title }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>Primero guarde la información del potrero y luego podrá agregar animales.
+                    </div>
+                    
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="button" class="btn btn-primary" id="btn-agregar-animales" disabled>
+                            <i class="fas fa-plus me-2"></i>Agregar Animales Seleccionados
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+        
+        <!-- Información adicional -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Información sobre Potreros
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Tipos de Potreros Comunes:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Cría:</strong> Para terneros y animales jóvenes</li>
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Engorde:</strong> Para ganado de carne</li>
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Lechería:</strong> Para vacas productoras de leche</li>
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Reproducción:</strong> Para toros y vacas reproductoras</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Consideraciones:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-info text-info me-2"></i>La capacidad depende del tipo de animal</li>
+                            <li><i class="fas fa-info text-info me-2"></i>Considere el acceso al agua</li>
+                            <li><i class="fas fa-info text-info me-2"></i>Planifique la rotación de pastos</li>
+                            <li><i class="fas fa-info text-info me-2"></i>Mantenga cercas en buen estado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Show/hide "other function" field
+    const funcionSelect = document.getElementById('funcion');
+    const otraFuncionDiv = document.getElementById('otra-funcion-div');
+    const otraFuncionInput = document.getElementById('otra_funcion');
+
+    funcionSelect.addEventListener('change', function() {
+        if (this.value === 'Otro') {
+            otraFuncionDiv.style.display = 'block';
+            otraFuncionInput.required = true;
+        } else {
+            otraFuncionDiv.style.display = 'none';
+            otraFuncionInput.required = false;
+            otraFuncionInput.value = '';
+        }
+    });
+
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        const funcion = funcionSelect.value;
+        if (funcion === 'Otro' && !otraFuncionInput.value.trim()) {
+            otraFuncionInput.classList.add('is-invalid');
+            event.preventDefault();
+            event.stopPropagation();
+        } else {
+            otraFuncionInput.classList.remove('is-invalid');
+        }
+
+        form.classList.add('was-validated');
+    }, false);
+
+    // Cálculo sugerido de capacidad
+    const areaInput = document.getElementById('area');
+    const capacidadInput = document.getElementById('capacidad');
+    const funcionInput = document.getElementById('funcion');
+    const sugeridaDiv = document.getElementById('capacidad-sugerida');
+
+    function sugerirCapacidad() {
+        const area = parseFloat(areaInput.value);
+        const funcion = funcionInput.value.toLowerCase();
+        let sugerida = 0;
+        let texto = '';
+        if (!isNaN(area)) {
+            if (funcion.includes('cerdo') || funcion.includes('lechon')) {
+                sugerida = Math.round(area * 10); // 10 cerdos/ha
+                texto = `Sugerido: ${sugerida} cerdos para ${area} ha (10 cerdos/ha)`;
+            } else {
+                sugerida = Math.round(area * 1); // 1 vaca/ha
+                texto = `Sugerido: ${sugerida} vacas para ${area} ha (1 vaca/ha)`;
+            }
+            sugeridaDiv.textContent = texto;
+            if (!capacidadInput.value || capacidadInput.value == '0') {
+                capacidadInput.value = sugerida;
+            }
+        } else {
+            sugeridaDiv.textContent = '';
+        }
+    }
+    areaInput.addEventListener('input', sugerirCapacidad);
+    funcionInput.addEventListener('input', sugerirCapacidad);
+    sugerirCapacidad();
+    
+    // Manejo de la sección de animales
+    const btnAgregarAnimales = document.getElementById('btn-agregar-animales');
+    const animalesForm = document.getElementById('animales-form');
+    const potreroForm = document.getElementById('potrero-form');
+    
+    // El botón de agregar animales está deshabilitado inicialmente
+    // Se habilitará cuando se cree el potrero y se redirija a la página de edición
+});
+</script>
+{% endblock %}

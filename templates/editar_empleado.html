@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Empleado - AgroGest{% endblock %}
+{% block page_title %}Editar Empleado{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('empleados') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-user-edit me-2"></i>Editar Información del Empleado
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ empleado.nombre }}" required>
+                                <label for="nombre">Nombre *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="apellido" name="apellido" value="{{ empleado.apellido }}" required>
+                                <label for="apellido">Apellido *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="cedula" name="cedula" value="{{ empleado.cedula }}" required>
+                                <label for="cedula">Cédula *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="tel" class="form-control" id="telefono" name="telefono" value="{{ empleado.telefono }}" required>
+                                <label for="telefono">Teléfono *</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ empleado.direccion }}" required>
+                                <label for="direccion">Dirección *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="cargo" name="cargo" required>
+                                    <option value="Veterinario" {% if empleado.cargo == 'Veterinario' %}selected{% endif %}>Veterinario</option>
+                                    <option value="Vaquero" {% if empleado.cargo == 'Vaquero' %}selected{% endif %}>Vaquero</option>
+                                    <option value="Porquero" {% if empleado.cargo == 'Porquero' %}selected{% endif %}>Porquero</option>
+                                    <option value="Técnico Agrícola" {% if empleado.cargo == 'Técnico Agrícola' %}selected{% endif %}>Técnico Agrícola</option>
+                                    <option value="Administrador" {% if empleado.cargo == 'Administrador' %}selected{% endif %}>Administrador</option>
+                                    <option value="Supervisor" {% if empleado.cargo == 'Supervisor' %}selected{% endif %}>Supervisor</option>
+                                    <option value="Operario" {% if empleado.cargo == 'Operario' %}selected{% endif %}>Operario</option>
+                                    <option value="Contador" {% if empleado.cargo == 'Contador' %}selected{% endif %}>Contador</option>
+                                    <option value="Secretario" {% if empleado.cargo == 'Secretario' %}selected{% endif %}>Secretario</option>
+                                    <option value="Mecánico" {% if empleado.cargo == 'Mecánico' %}selected{% endif %}>Mecánico</option>
+                                    <option value="Conductor" {% if empleado.cargo == 'Conductor' %}selected{% endif %}>Conductor</option>
+                                    <option value="Auxiliar" {% if empleado.cargo == 'Auxiliar' %}selected{% endif %}>Auxiliar</option>
+                                    <option value="Otro" {% if empleado.cargo == 'Otro' %}selected{% endif %}>Otro</option>
+                                </select>
+                                <label for="cargo">Cargo *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="otro_cargo_div" style="display: none;">
+                             <div class="form-floating">
+                                <input type="text" class="form-control" id="otro_cargo" name="otro_cargo">
+                                <label for="otro_cargo">Especificar otro cargo</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_contratacion" name="fecha_contratacion" value="{{ empleado.fecha_contratacion.strftime('%Y-%m-%d') if empleado.fecha_contratacion else '' }}" required>
+                                <label for="fecha_contratacion">Fecha de Contratación *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.01" class="form-control" id="salario" name="salario" value="{{ empleado.salario }}" required>
+                                <label for="salario">Salario *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="estado" name="estado" required>
+                                    <option value="activo" {% if empleado.estado == 'activo' %}selected{% endif %}>Activo</option>
+                                    <option value="inactivo" {% if empleado.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                                </select>
+                                <label for="estado">Estado *</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="descripcion" name="descripcion" placeholder="Descripción de funciones" style="height: 80px">{{ empleado.descripcion }}</textarea>
+                                <label for="descripcion">Descripción de lo que hace el empleado</label>
+                                <div class="form-text">Ejemplo: Responsable del manejo sanitario del ganado, aplicación de vacunas, supervisión de partos, etc.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

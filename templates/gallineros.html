@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Gallineros - AgroGest{% endblock %}
+{% block page_title %}Gestión de Gallineros{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('nueva_ubicacion') }}?tipo=gallinero" class="btn btn-primary">
+    <i class="fas fa-plus me-2"></i>Nuevo Gallinero
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-home me-2"></i>Gallineros Registrados
+                    <span class="badge bg-primary ms-2">{{ gallineros|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if gallineros %}
+                <div class="row">
+                    {% for gallinero in gallineros %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card border-left-warning">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="card-title mb-0">{{ gallinero.nombre }}</h6>
+                                    <span class="badge bg-{{ 'success' if gallinero.estado == 'disponible' else 'warning' if gallinero.estado == 'ocupado' else 'danger' }}">
+                                        {{ gallinero.estado|title }}
+                                    </span>
+                                </div>
+                                
+                                <div class="row text-center mb-3">
+                                    <div class="col-6">
+                                        <div class="border-end">
+                                            <h4 class="text-warning mb-0">{{ animales_por_gallinero.get(gallinero.id, 0) }}</h4>
+                                            <small class="text-muted">Aves</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h4 class="text-info mb-0">{{ gallinero.capacidad }}</h4>
+                                        <small class="text-muted">Capacidad</small>
+                                    </div>
+                                </div>
+
+                                {% if gallinero.area %}
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-ruler-combined me-1"></i>
+                                    Área: {{ gallinero.area }} m²
+                                </p>
+                                {% endif %}
+
+                                {% if gallinero.descripcion %}
+                                <p class="text-muted small mb-3">{{ gallinero.descripcion }}</p>
+                                {% endif %}
+
+                                <!-- Animales en este gallinero -->
+                                {% set aves_gallinero = animales|selectattr('ubicacion_id', 'equalto', gallinero.id)|list %}
+                                {% if aves_gallinero %}
+                                <div class="mb-3">
+                                    <h6 class="text-muted">Aves en este gallinero:</h6>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% for ave in aves_gallinero %}
+                                        <span class="badge bg-light text-dark">
+                                            {{ ave.identificacion }}
+                                            {% if ave.nombre %}- {{ ave.nombre }}{% endif %}
+                                        </span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <div class="d-flex gap-2">
+                                    <a href="{{ url_for('editar_ubicacion', id=gallinero.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                    <a href="{{ url_for('eliminar_ubicacion', id=gallinero.id) }}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-home fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No hay gallineros registrados</h5>
+                    <p class="text-muted">Comienza agregando tu primer gallinero para tus aves</p>
+                    <a href="{{ url_for('nueva_ubicacion') }}?tipo=gallinero" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Agregar Primer Gallinero
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumen de estadísticas -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ gallineros|length }}</h4>
+                        <span>Total Gallineros</span>
+                    </div>
+                    <i class="fas fa-home fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ animales|length }}</h4>
+                        <span>Total Aves</span>
+                    </div>
+                    <i class="fas fa-dove fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ gallineros|selectattr('estado', 'equalto', 'disponible')|list|length }}</h4>
+                        <span>Disponibles</span>
+                    </div>
+                    <i class="fas fa-check-circle fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ gallineros|sum(attribute='capacidad') or 0 }}</h4>
+                        <span>Capacidad Total</span>
+                    </div>
+                    <i class="fas fa-chart-bar fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

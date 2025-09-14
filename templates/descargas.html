@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Descargas | AgroGest</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+  <style>
+    body { background: #f5f9ff; }
+    .hero { padding: 3rem 0; }
+    .card-dl { border: 1px solid #e2e8f0; box-shadow: 0 6px 18px rgba(2,6,23,.06); border-radius: 16px; }
+    .badge-rec { background: linear-gradient(135deg,#0ea5e9,#06b6d4); }
+    .icon { font-size: 2rem; }
+  </style>
+</head>
+<body>
+  <div class="container hero">
+    <div class="text-center mb-4">
+      <h1 class="fw-bold">Descargar AgroGest</h1>
+      <p class="text-muted mb-1">Aplicación de escritorio para Windows y aplicación móvil para Android</p>
+      {% if recommended == 'pc' %}
+        <span class="badge badge-rec text-white">Recomendado para tu dispositivo: Windows (PC)</span>
+      {% elif recommended == 'android' %}
+        <span class="badge badge-rec text-white">Recomendado para tu dispositivo: Android</span>
+      {% else %}
+        <span class="badge bg-secondary">Elige tu plataforma</span>
+      {% endif %}
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-5">
+        <div class="card card-dl h-100">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center mb-3">
+              <i class="fas fa-desktop icon text-primary me-2"></i>
+              <h4 class="m-0">Windows (PC)</h4>
+            </div>
+            <p class="text-muted">Instala AgroGest como programa de escritorio en Windows. Incluye acceso rápido, ventana nativa y todas las funciones.</p>
+            {% if pc_exists %}
+              <a href="{{ pc_url }}" class="btn btn-primary w-100">
+                <i class="fas fa-download me-1"></i>
+                Descargar Instalador (.exe)
+              </a>
+              <div class="mt-2 small text-success"><i class="fas fa-check-circle me-1"></i>Disponible</div>
+            {% else %}
+              <button class="btn btn-secondary w-100" disabled>
+                <i class="fas fa-hourglass-half me-1"></i>
+                Instalador en preparación
+              </button>
+              <div class="mt-2 small text-muted">Vuelve más tarde o contacta al administrador.</div>
+            {% endif %}
+            <ul class="mt-3 small text-muted">
+              <li>Requisitos: Windows 10/11</li>
+              <li>Instalador firmado próximamente</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-5">
+        <div class="card card-dl h-100">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center mb-3">
+              <i class="fab fa-android icon text-success me-2"></i>
+              <h4 class="m-0">Android</h4>
+            </div>
+            <p class="text-muted">Instala AgroGest como app móvil Android. Experiencia nativa con todas las funcionalidades del sistema.</p>
+            <a href="{{ url_for('descargas') }}?target=android" class="btn btn-success w-100">
+              <i class="fas fa-download me-1"></i>
+              Descargar APK (Android)
+            </a>
+            {% if android_exists %}
+              <div class="mt-2 small text-success"><i class="fas fa-check-circle me-1"></i>Disponible</div>
+            {% else %}
+              <div class="mt-2 small text-muted"><i class="fas fa-hourglass-half me-1"></i> Si aún no inicia la descarga, estamos preparando el APK.</div>
+            {% endif %}
+            <ul class="mt-3 small text-muted">
+              <li>Requisitos: Android 8.0 o superior</li>
+              <li>Habilita “Instalar apps de orígenes desconocidos”</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5 text-center text-muted small">
+      <p>Si la descarga no inicia automáticamente, usa los botones de arriba. User-Agent: {{ ua }}</p>
+      <a class="text-decoration-none" href="{{ url_for('home') }}"><i class="fas fa-arrow-left me-1"></i>Volver a la presentación</a>
+    </div>
+  </div>
+</body>
+</html>

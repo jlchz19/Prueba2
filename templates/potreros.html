@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+
+{% block title %}Potreros - AgroGest{% endblock %}
+{% block page_title %}Gestión de Potreros{% endblock %}
+
+{% block content %}
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <div class="icon-circle me-3">
+                <span style="font-size: 1.2rem;">🗺️</span>
+            </div>
+            <h5 class="mb-0 fw-semibold">Gestión de Potreros</h5>
+        </div>
+        <a href="{{ url_for('nuevo_potrero') }}" class="btn btn-light btn-sm shadow-sm">
+            <span style="font-size: 1rem; margin-right: 4px;">➕</span> Nuevo Potrero
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    {% for potrero in potreros %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm hover-card">
+            <div class="card-header bg-light border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-semibold">{{ potrero.nombre }}</h5>
+                    <span class="badge rounded-pill {% if potrero.estado == 'disponible' %}bg-success{% elif potrero.estado == 'ocupado' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                        {{ potrero.estado|title }}
+                    </span>
+                </div>
+                <p class="text-muted small mb-0 mt-1">{{ potrero.funcion }}</p>
+            </div>
+            <div class="card-body">
+                <div class="row text-center g-3 mb-3">
+                    <div class="col-4">
+                        <div class="stat-item">
+                            <div class="fw-bold fs-5 text-primary">{{ potrero.area }}</div>
+                            <small class="text-muted">Hectáreas</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-item">
+                            <div class="fw-bold fs-5 text-info">{{ potrero.capacidad }}</div>
+                            <small class="text-muted">Capacidad</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-item">
+                            <div class="fw-bold fs-5 text-success">{{ animales_por_potrero.get(potrero.id, 0) }}</div>
+                            <small class="text-muted">Ocupado</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary btn-sm" onclick="showPotreroDetails('{{ potrero.id }}')" title="Ver detalles"
+                        data-potrero-id="{{ potrero.id }}"
+                        data-potrero-nombre="{{ potrero.nombre }}"
+                        data-potrero-area="{{ potrero.area }}"
+                        data-potrero-capacidad="{{ potrero.capacidad }}"
+                        data-potrero-estado="{{ potrero.estado }}"
+                        data-potrero-funcion="{{ potrero.funcion }}"
+                        data-potrero-ocupado="{{ animales_por_potrero.get(potrero.id, 0) }}">
+                        <i class="fas fa-eye me-1"></i> Ver Detalles
+                    </button>
+                    <a href="{{ url_for('editar_potrero', potrero_id=potrero.id) }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-edit me-1"></i> Editar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% endfor %}
+</div>
+
+{% if not potreros %}
+<div class="text-center py-5">
+    <i class="fas fa-map-signs fa-4x text-muted mb-3"></i>
+    <h5 class="text-muted mb-3">No hay potreros registrados</h5>
+    <p>Empieza a organizar tu finca creando tu primer potrero.</p>
+    <a href="{{ url_for('nuevo_potrero') }}" class="btn btn-primary mt-2">
+        <i class="fas fa-plus me-2"></i>Crear Primer Potrero
+    </a>
+</div>
+{% endif %}
+
+<!-- Modal personalizado para detalles del potrero -->
+<div id="potreroDetailsModal" class="custom-modal" style="display: none;">
+    <div class="modal-overlay" onclick="closePotreroModal()"></div>
+    <div class="modal-container">
+        <div class="modal-header">
+            <h5 id="modalPotreroTitle" class="modal-title"></h5>
+            <button type="button" class="modal-close" onclick="closePotreroModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h6 class="info-title">Información General</h6>
+                        <div class="info-item">
+                            <span class="info-label">Nombre:</span>
+                            <span id="modalPotreroNombre" class="info-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Función:</span>
+                            <span id="modalPotreroFuncion" class="info-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Estado:</span>
+                            <span id="modalPotreroEstado" class="info-value"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h6 class="info-title">Capacidad y Ocupación</h6>
+                        <div class="info-item">
+                            <span class="info-label">Área:</span>
+                            <span id="modalPotreroArea" class="info-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Capacidad:</span>
+                            <span id="modalPotreroCapacidad" class="info-value"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Ocupado:</span>
+                            <span id="modalPotreroOcupado" class="info-value"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lista de animales en el potrero -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="info-card">
+                        <h6 class="info-title">
+                            <i class="fas fa-cow me-2"></i>Animales en este Potrero
+                        </h6>
+                        <div id="modalAnimalesList" class="animals-list">
+                            <!-- Se llenará dinámicamente con JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closePotreroModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.custom-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+.modal-container {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.info-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #007bff;
+}
+
+.info-title {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 500;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #212529;
+    text-align: right;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: #f8f9fa;
+    border-radius: 0 0 12px 12px;
+}
+</style>
+
+<script>
+function showPotreroDetails(potreroId) {
+    const button = document.querySelector(`[data-potrero-id="${potreroId}"]`);
+    const data = button.dataset;
+    
+    document.getElementById('modalPotreroTitle').innerHTML = '<i class="fas fa-map-signs me-2"></i>Potrero: ' + data.potreroNombre;
+    document.getElementById('modalPotreroNombre').textContent = data.potreroNombre;
+    document.getElementById('modalPotreroFuncion').textContent = data.potreroFuncion;
+    document.getElementById('modalPotreroEstado').textContent = data.potreroEstado;
+    document.getElementById('modalPotreroArea').textContent = data.potreroArea + ' hectáreas';
+    document.getElementById('modalPotreroCapacidad').textContent = data.potreroCapacidad + ' animales';
+    document.getElementById('modalPotreroOcupado').textContent = data.potreroOcupado + ' animales';
+    
+    // Cargar lista de animales
+    loadAnimalsInLocation('potrero', potreroId);
+    
+    document.getElementById('potreroDetailsModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function loadAnimalsInLocation(locationType, locationId) {
+    const animalesList = document.getElementById('modalAnimalesList');
+    animalesList.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Cargando animales...</div>';
+    
+    fetch(`/api/animales_en_ubicacion?tipo=${locationType}&id=${locationId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.animales && data.animales.length > 0) {
+                let html = '';
+                data.animales.forEach(animal => {
+                    let animalEmoji = '🐄'; // Default cow
+                    if (animal.tipo === 'Cerdo') animalEmoji = '🐷';
+                    else if (animal.tipo === 'Cabra') animalEmoji = '🐐';
+                    else if (animal.tipo === 'Oveja') animalEmoji = '🐑';
+                    else if (animal.tipo === 'Caballo') animalEmoji = '🐴';
+                    else if (animal.tipo === 'Pollo') animalEmoji = '🐔';
+                    else if (animal.tipo === 'Pato') animalEmoji = '🦆';
+                    else if (animal.tipo === 'Conejo') animalEmoji = '🐰';
+                    
+                    html += `
+                        <div class="animal-item">
+                            <div class="animal-info">
+                                <div class="animal-icon">
+                                    <span class="animal-emoji">${animalEmoji}</span>
+                                </div>
+                                <div class="animal-details">
+                                    <h6>${animal.identificacion}</h6>
+                                    <small>${animal.nombre || 'Sin nombre'} - ${animal.tipo} ${animal.raza}</small>
+                                </div>
+                            </div>
+                            <div class="animal-stats">
+                                <small class="text-muted">${animal.peso} kg</small>
+                            </div>
+                        </div>
+                    `;
+                });
+                animalesList.innerHTML = html;
+            } else {
+                animalesList.innerHTML = `
+                    <div class="no-animals">
+                        <i class="fas fa-cow fa-2x mb-2"></i>
+                        <p>No hay animales en esta ubicación</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            animalesList.innerHTML = `
+                <div class="no-animals">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2 text-warning"></i>
+                    <p>Error al cargar los animales</p>
+                </div>
+            `;
+        });
+}
+
+function closePotreroModal() {
+    document.getElementById('potreroDetailsModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closePotreroModal();
+    }
+});
+</script>
+{% endblock %} 

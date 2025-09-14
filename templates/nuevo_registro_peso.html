@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Registro de Peso{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">
+                <i class="fas fa-plus-circle text-success me-2"></i>
+                Nuevo Registro de Peso
+            </h2>
+            <p class="text-muted mb-0">Registra el peso y condición corporal del animal</p>
+        </div>
+        <a href="{{ url_for('seguimiento_peso') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Formulario -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit text-muted me-2"></i>
+                        Información del Registro
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="pesoForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="animal_id" class="form-label fw-semibold">
+                                    <i class="fas fa-cow text-primary me-1"></i>
+                                    Animal *
+                                </label>
+                                <select class="form-select" id="animal_id" name="animal_id" required>
+                                    <option value="">Seleccionar animal...</option>
+                                    {% for animal in animales %}
+                                    <option value="{{ animal.id }}">
+                                        {{ animal.identificacion }} - {% if animal.nombre %}{{ animal.nombre }}{% else %}Sin nombre{% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="fecha" class="form-label fw-semibold">
+                                    <i class="fas fa-calendar text-primary me-1"></i>
+                                    Fecha *
+                                </label>
+                                <input type="date" class="form-control" id="fecha" name="fecha" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="peso" class="form-label fw-semibold">
+                                    <i class="fas fa-weight text-primary me-1"></i>
+                                    Peso (kg) *
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="peso" name="peso" 
+                                           step="0.1" min="0" max="2000" required>
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="condicion_corporal" class="form-label fw-semibold">
+                                    <i class="fas fa-chart-bar text-primary me-1"></i>
+                                    Condición Corporal (1-9)
+                                </label>
+                                <div class="d-flex align-items-center gap-2">
+                                  <select class="form-select" id="condicion_corporal" name="condicion_corporal">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="1">1 - Muy delgado</option>
+                                    <option value="2">2 - Delgado</option>
+                                    <option value="3">3 - Moderadamente delgado</option>
+                                    <option value="4">4 - Ligeramente delgado</option>
+                                    <option value="5">5 - Condición ideal</option>
+                                    <option value="6">6 - Ligeramente gordo</option>
+                                    <option value="7">7 - Moderadamente gordo</option>
+                                    <option value="8">8 - Gordo</option>
+                                    <option value="9">9 - Muy gordo</option>
+                                  </select>
+                                  <span id="ccSugerido" class="badge bg-secondary" title="Condición corporal sugerida">Sugerido: -/9</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="observaciones" class="form-label fw-semibold">
+                                <i class="fas fa-sticky-note text-primary me-1"></i>
+                                Observaciones
+                            </label>
+                            <textarea class="form-control" id="observaciones" name="observaciones" 
+                                      rows="3" placeholder="Observaciones adicionales sobre el peso o condición del animal..."></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Guardar Registro
+                            </button>
+                            <a href="{{ url_for('seguimiento_peso') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Ayuda -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Guía de Condición Corporal
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-success">Condición Ideal (5)</h6>
+                        <p class="small text-muted mb-2">
+                            Costillas palpables con presión ligera, cobertura grasa mínima.
+                        </p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="text-warning">Delgado (1-3)</h6>
+                        <p class="small text-muted mb-2">
+                            Costillas visibles, poca cobertura muscular y grasa.
+                        </p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="text-info">Sobrepeso (7-9)</h6>
+                        <p class="small text-muted mb-2">
+                            Costillas difíciles de palpar, exceso de grasa corporal.
+                        </p>
+                    </div>
+
+                    <hr>
+                    
+                    <h6 class="text-primary">Consejos</h6>
+                    <ul class="small text-muted">
+                        <li>Pesa siempre a la misma hora</li>
+                        <li>Registra el peso semanalmente</li>
+                        <li>Anota cambios en la alimentación</li>
+                        <li>Considera factores ambientales</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Estadísticas Rápidas -->
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Estadísticas Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small">Total Animales:</span>
+                        <span class="fw-semibold">{{ animales|length }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small">Peso Promedio:</span>
+                        <span class="fw-semibold">450 kg</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="small">Último Registro:</span>
+                        <span class="fw-semibold">Hoy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Establecer fecha actual
+    const fechaInput = document.getElementById('fecha');
+    const today = new Date().toISOString().split('T')[0];
+    fechaInput.value = today;
+    
+    // Validación del formulario
+    const form = document.getElementById('pesoForm');
+    form.addEventListener('submit', function(e) {
+        const peso = document.getElementById('peso').value;
+        const animalId = document.getElementById('animal_id').value;
+        
+        if (!animalId) {
+            e.preventDefault();
+            alert('Por favor selecciona un animal');
+            return;
+        }
+        
+        if (!peso || peso <= 0) {
+            e.preventDefault();
+            alert('Por favor ingresa un peso válido');
+            return;
+        }
+        
+        if (peso > 2000) {
+            e.preventDefault();
+            alert('El peso parece muy alto. Verifica el valor ingresado.');
+            return;
+        }
+    });
+    
+    // Sugerir Condición Corporal (1-9) a partir del peso
+    const pesoInput = document.getElementById('peso');
+    const condicionSelect = document.getElementById('condicion_corporal');
+    const ccSugerido = document.getElementById('ccSugerido');
+    let userChangedCC = false;
+
+    condicionSelect.addEventListener('change', function(){
+      // El usuario cambió manualmente, respetar su elección
+      if (this.value) userChangedCC = true;
+    });
+
+    function computeBCS(weightKg){
+      if (!weightKg || weightKg <= 0) return null;
+      // Curva simple para bovinos (ajustable):
+      // <150 -> 2, 150-250 -> 3, 250-350 -> 4, 350-450 -> 5, 450-550 -> 6, 550-650 -> 7, 650-800 -> 8, >800 -> 9
+      let bcs = 5;
+      if (weightKg < 150) bcs = 2;
+      else if (weightKg < 250) bcs = 3;
+      else if (weightKg < 350) bcs = 4;
+      else if (weightKg < 450) bcs = 5;
+      else if (weightKg < 550) bcs = 6;
+      else if (weightKg < 650) bcs = 7;
+      else if (weightKg < 800) bcs = 8;
+      else bcs = 9;
+      // Asegurar 1-9
+      if (bcs < 1) bcs = 1; if (bcs > 9) bcs = 9;
+      return bcs;
+    }
+
+    function updateSuggestedBCS(){
+      const weightKg = parseFloat(pesoInput.value);
+      const bcs = computeBCS(weightKg);
+      // Actualizar badge
+      if (bcs){
+        ccSugerido.textContent = `Sugerido: ${bcs}/9`;
+        ccSugerido.classList.remove('bg-secondary','bg-success','bg-warning','bg-danger');
+        // Colores por rango
+        if (bcs === 5){
+          ccSugerido.classList.add('bg-success');
+        } else if (bcs <= 2 || bcs >= 8){
+          ccSugerido.classList.add('bg-danger');
+        } else {
+          ccSugerido.classList.add('bg-warning');
+        }
+        // Si usuario no cambió manualmente, autocompletar select
+        if (!userChangedCC){
+          condicionSelect.value = String(bcs);
+        }
+      } else {
+        ccSugerido.textContent = 'Sugerido: -/9';
+        ccSugerido.classList.remove('bg-success','bg-warning','bg-danger');
+        ccSugerido.classList.add('bg-secondary');
+        if (!userChangedCC){
+          condicionSelect.value = '';
+        }
+      }
+    }
+
+    // Actualizar sugerencia en tiempo real y al salir del campo
+    pesoInput.addEventListener('input', updateSuggestedBCS);
+    pesoInput.addEventListener('blur', updateSuggestedBCS);
+    // Inicializar si ya hay un valor
+    updateSuggestedBCS();
+});
+</script>
+
+<style>
+.card {
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Actualizar Reproductivo - {{ animal.identificacion }} - AgroGest{% endblock %}
+{% block page_title %}Actualizar Información Reproductiva{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('historial_animal', animal_id=animal.id) }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver al Historial
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-baby me-2"></i>Actualizar Información Reproductiva de {{ animal.identificacion }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <strong>Sexo:</strong> {{ animal.sexo }} | 
+                    <strong>Estado:</strong> {{ animal.estado|title }}
+                </div>
+                
+                <form method="POST" class="needs-validation" novalidate>
+                    {% if animal.sexo == 'Hembra' %}
+                        <!-- Información para hembras -->
+                        <h6 class="text-primary mb-3"><i class="fas fa-venus me-2"></i>Información de Hembra</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="fecha_servicio" name="fecha_servicio" placeholder="Fecha de servicio">
+                                    <label for="fecha_servicio">Fecha de Servicio/Inseminación</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="semental_utilizado" name="semental_utilizado" placeholder="Semental utilizado">
+                                    <label for="semental_utilizado">Semental Utilizado (ID)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="fecha_estimada_parto" name="fecha_estimada_parto" placeholder="Fecha estimada parto">
+                                    <label for="fecha_estimada_parto">Fecha Estimada de Parto</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="fecha_real_parto" name="fecha_real_parto" placeholder="Fecha real parto">
+                                    <label for="fecha_real_parto">Fecha Real de Parto</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="lechones_nacidos_vivos" name="lechones_nacidos_vivos" placeholder="Lechones vivos">
+                                    <label for="lechones_nacidos_vivos">Lechones Nacidos Vivos</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="lechones_nacidos_muertos" name="lechones_nacidos_muertos" placeholder="Lechones muertos">
+                                    <label for="lechones_nacidos_muertos">Lechones Nacidos Muertos</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="number" step="0.1" class="form-control" id="peso_promedio_lechones" name="peso_promedio_lechones" placeholder="Peso promedio">
+                                    <label for="peso_promedio_lechones">Peso Promedio de Lechones (kg)</label>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Información para machos -->
+                        <h6 class="text-primary mb-3"><i class="fas fa-mars me-2"></i>Información de Semental</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="fecha_inicio_semental" name="fecha_inicio_semental" placeholder="Fecha inicio semental">
+                                    <label for="fecha_inicio_semental">Fecha de Inicio como Semental</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="numero_servicios_exitosos" name="numero_servicios_exitosos" placeholder="Número servicios">
+                                    <label for="numero_servicios_exitosos">Número de Servicios Exitosos</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" step="0.1" class="form-control" id="promedio_lechones_por_camada" name="promedio_lechones_por_camada" placeholder="Promedio lechones">
+                                    <label for="promedio_lechones_por_camada">Promedio de Lechones por Camada</label>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('historial_animal', animal_id=animal.id) }}" class="btn btn-secondary me-2">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Actualizar Información
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock %} 

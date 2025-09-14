@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Producción - AgroGest{% endblock %}
+{% block page_title %}Registrar Nueva Producción{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('produccion') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line me-2"></i>Información de Producción
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="animal_id" name="animal_id" required>
+                                    <option selected disabled value="">Seleccionar animal...</option>
+                                    {% for animal in animales %}
+                                    <option value="{{ animal.id }}">{{ animal.identificacion }} - {{ animal.tipo|title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="animal_id">Animal *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="tipo_produccion" name="tipo_produccion" required>
+                                    <option selected disabled value="">Seleccionar tipo...</option>
+                                    <option value="leche">Leche</option>
+                                    <option value="carne">Carne</option>
+                                    <option value="huevos">Huevos</option>
+                                    <option value="lana">Lana</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                                <label for="tipo_produccion">Tipo de Producción *</label>
+                            </div>
+                        </div>
+                        <div class="col-12" id="otra_produccion_div" style="display: none;">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="otra_produccion" name="otra_produccion">
+                                <label for="otra_produccion">Especificar otro tipo</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.01" class="form-control" id="cantidad" name="cantidad" placeholder="Cantidad" required>
+                                <label for="cantidad">Cantidad *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="unidad" name="unidad" required>
+                                    <option selected disabled value="">Seleccionar unidad...</option>
+                                </select>
+                                <label for="unidad">Unidad *</label>
+                            </div>
+                        </div>
+                        <div class="col-12" id="otra_unidad_div" style="display: none;">
+                             <div class="form-floating">
+                                <input type="text" class="form-control" id="otra_unidad" name="otra_unidad">
+                                <label for="otra_unidad">Especificar otra unidad</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha" name="fecha" required>
+                                <label for="fecha">Fecha de Producción *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="calidad" name="calidad" required>
+                                    <option selected disabled value="">Seleccionar calidad...</option>
+                                    <option value="excelente">Excelente</option>
+                                    <option value="buena">Buena</option>
+                                    <option value="regular">Regular</option>
+                                    <option value="mala">Mala</option>
+                                </select>
+                                <label for="calidad">Calidad *</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('produccion') }}" class="btn btn-secondary me-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Registrar Producción</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Información sobre tipos de producción -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Tipos de Producción Ganadera
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Producción Animal:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-milk text-info me-2"></i><strong>Leche:</strong> Producción láctea de vacas</li>
+                            <li><i class="fas fa-drumstick-bite text-warning me-2"></i><strong>Carne:</strong> Ganado de engorde</li>
+                            <li><i class="fas fa-egg text-success me-2"></i><strong>Huevos:</strong> Aves ponedoras</li>
+                            <li><i class="fas fa-wool text-secondary me-2"></i><strong>Lana:</strong> Ovejas y cabras</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Otras Producciones:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-honey text-warning me-2"></i><strong>Miel:</strong> Apicultura</li>
+                            <li><i class="fas fa-seedling text-success me-2"></i><strong>Forraje:</strong> Cultivos para alimentación</li>
+                            <li><i class="fas fa-leaf text-primary me-2"></i><strong>Pasto:</strong> Pastoreo y rotación</li>
+                            <li><i class="fas fa-recycle text-info me-2"></i><strong>Abono:</strong> Estiércol y compost</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoProduccionSelect = document.getElementById('tipo_produccion');
+    const otraProduccionDiv = document.getElementById('otra_produccion_div');
+    const otraProduccionInput = document.getElementById('otra_produccion');
+    const unidadSelect = document.getElementById('unidad');
+    const otraUnidadDiv = document.getElementById('otra_unidad_div');
+    const otraUnidadInput = document.getElementById('otra_unidad');
+
+    const unidadesPorTipo = {
+        'leche': ['litros'],
+        'carne': ['kg'],
+        'huevos': ['unidades'],
+        'lana': ['kg'],
+        'otro': ['kg', 'litros', 'unidades', 'otro']
+    };
+
+    tipoProduccionSelect.addEventListener('change', function() {
+        // Handle "other production" field
+        if (this.value === 'otro') {
+            otraProduccionDiv.style.display = 'block';
+            otraProduccionInput.required = true;
+        } else {
+            otraProduccionDiv.style.display = 'none';
+            otraProduccionInput.required = false;
+        }
+
+        // Update units dropdown
+        while (unidadSelect.options.length > 1) {
+            unidadSelect.remove(1);
+        }
+        const unidades = unidadesPorTipo[this.value] || [];
+        unidades.forEach(unidad => {
+            const option = new Option(unidad.charAt(0).toUpperCase() + unidad.slice(1), unidad);
+            unidadSelect.add(option);
+        });
+        unidadSelect.value = '';
+        unidadSelect.dispatchEvent(new Event('change'));
+    });
+
+    unidadSelect.addEventListener('change', function() {
+        if (this.value === 'otro') {
+            otraUnidadDiv.style.display = 'block';
+            otraUnidadInput.required = true;
+        } else {
+            otraUnidadDiv.style.display = 'none';
+            otraUnidadInput.required = false;
+        }
+    });
+    
+    document.getElementById('fecha').valueAsDate = new Date();
+
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        if (tipoProduccionSelect.value === 'otro' && !otraProduccionInput.value.trim()) {
+            otraProduccionInput.classList.add('is-invalid');
+            event.preventDefault();
+            event.stopPropagation();
+        } else {
+            otraProduccionInput.classList.remove('is-invalid');
+        }
+
+        if (unidadSelect.value === 'otro' && !otraUnidadInput.value.trim()) {
+            otraUnidadInput.classList.add('is-invalid');
+            event.preventDefault();
+            event.stopPropagation();
+        } else {
+            otraUnidadInput.classList.remove('is-invalid');
+        }
+
+        form.classList.add('was-validated');
+    }, false);
+});
+</script>
+{% endblock %} 

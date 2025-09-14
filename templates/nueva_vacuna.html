@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Vacuna - AgroGest{% endblock %}
+{% block page_title %}Registrar Nueva Vacuna{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('vacunas') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-syringe me-2"></i>Información de la Vacuna
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="animal_id" name="animal_id" required>
+                                    <option selected disabled value="">Seleccionar animal...</option>
+                                    {% for animal in animales %}
+                                    <option value="{{ animal.id }}">{{ animal.identificacion }} - {{ animal.tipo|title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="animal_id">Animal *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="tipo_vacuna" name="tipo_vacuna" required>
+                                    <option selected disabled value="">Seleccionar tipo...</option>
+                                    <option value="Triple Viral">Triple Viral</option>
+                                    <option value="Fiebre Aftosa">Fiebre Aftosa</option>
+                                    <option value="Brucelosis">Brucelosis</option>
+                                    <option value="Carbunco">Carbunco</option>
+                                    <option value="Rabia">Rabia</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                                <label for="tipo_vacuna">Tipo de Vacuna *</label>
+                            </div>
+                        </div>
+                        <div class="col-12" id="otra_vacuna_div" style="display: none;">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="otra_vacuna" name="otra_vacuna">
+                                <label for="otra_vacuna">Especificar otra vacuna</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="empleado_id" name="empleado_id" required>
+                                    <option value="">Seleccionar veterinario...</option>
+                                    {% for vet in veterinarios %}
+                                    <option value="{{ vet.id }}">{{ vet.nombre }} {{ vet.apellido }} ({{ vet.cargo|title }})</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="empleado_id">Veterinario que aplica la vacuna *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_aplicacion" name="fecha_aplicacion" required>
+                                <label for="fecha_aplicacion">Fecha de Aplicación *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_proxima" name="fecha_proxima" required>
+                                <label for="fecha_proxima">Próxima Dosis *</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="observaciones" name="observaciones" style="height: 100px" placeholder="Observaciones"></textarea>
+                                <label for="observaciones">Observaciones</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('vacunas') }}" class="btn btn-secondary me-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Registrar Vacuna</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Información sobre vacunas -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Información sobre Vacunas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Vacunas Comunes para Ganado:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Triple Viral:</strong> Protege contra múltiples enfermedades</li>
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Fiebre Aftosa:</strong> Obligatoria en muchas regiones</li>
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Brucelosis:</strong> Importante para reproducción</li>
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Carbunco:</strong> Enfermedad bacteriana grave</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Vacunas para Porcinos:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Peste Porcina:</strong> Enfermedad viral grave</li>
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Aujeszky:</strong> Enfermedad respiratoria</li>
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Parvovirus:</strong> Afecta la reproducción</li>
+                            <li><i class="fas fa-check text-success me-2"></i><strong>Erisipela:</strong> Enfermedad bacteriana</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Show/hide "other vaccine" field
+    const tipoVacunaSelect = document.getElementById('tipo_vacuna');
+    const otraVacunaDiv = document.getElementById('otra_vacuna_div');
+    const otraVacunaInput = document.getElementById('otra_vacuna');
+
+    tipoVacunaSelect.addEventListener('change', function() {
+        if (this.value === 'Otro') {
+            otraVacunaDiv.style.display = 'block';
+            otraVacunaInput.required = true;
+        } else {
+            otraVacunaDiv.style.display = 'none';
+            otraVacunaInput.required = false;
+            otraVacunaInput.value = '';
+        }
+    });
+
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        if (tipoVacunaSelect.value === 'Otro' && !otraVacunaInput.value.trim()) {
+            otraVacunaInput.classList.add('is-invalid');
+            event.preventDefault();
+            event.stopPropagation();
+        } else {
+            otraVacunaInput.classList.remove('is-invalid');
+        }
+
+        form.classList.add('was-validated');
+    }, false);
+});
+</script>
+{% endblock %}

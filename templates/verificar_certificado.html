@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Verificación de Certificado{% endblock %}
+{% block page_title %}Verificación de Certificado{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h5>Animal: {{ animal.identificacion }}{% if animal.nombre %} - {{ animal.nombre }}{% endif %}</h5>
+    <p>Finca: {{ animal.finca.nombre if animal.finca else '-' }}</p>
+    <p>Fecha de nacimiento: {{ animal.fecha_nacimiento.strftime('%d/%m/%Y') }}</p>
+    <p class="text-muted">Este certificado fue generado en {{ date.today().strftime('%d/%m/%Y') }} por AgroGest.</p>
+  </div>
+{% endblock %}
+
+

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Fincas - AgroGest{% endblock %}
+{% block page_title %}Gestión de Fincas{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Listado de Fincas -->
+    <div class="col-lg-7 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <span style="font-size: 1rem; margin-right: 8px;">🚜</span>Mis Fincas
+            </div>
+            <div class="card-body">
+                {% if fincas %}
+                    <div class="list-group">
+                        {% for finca in fincas %}
+                        <div class="list-group-item list-group-item-action mb-2 border rounded shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1"><span style="font-size: 1rem; margin-right: 8px;">🏠</span>{{ finca.nombre }}</h5>
+                                    <p class="mb-1"><span style="font-size: 1rem; margin-right: 4px;">📍</span><b>Dirección:</b> {{ finca.direccion }}</p>
+                                    {% if finca.extension %}<p class="mb-1"><span style="font-size: 1rem; margin-right: 4px;">📏</span><b>Extensión:</b> {{ finca.extension }} ha</p>{% endif %}
+                                    {% if finca.tipo_produccion %}<p class="mb-1"><span style="font-size: 1rem; margin-right: 4px;">🐄</span><b>Producción:</b> {{ finca.tipo_produccion }}</p>{% endif %}
+                                    {% if finca.propietario %}<p class="mb-1"><span style="font-size: 1rem; margin-right: 4px;">👔</span><b>Propietario:</b> {{ finca.propietario }}</p>{% endif %}
+                                    {% if finca.telefono %}<p class="mb-1"><span style="font-size: 1rem; margin-right: 4px;">📞</span><b>Teléfono:</b> {{ finca.telefono }}</p>{% endif %}
+                                    {% if finca.email %}<p class="mb-1"><span style="font-size: 1rem; margin-right: 4px;">✉️</span><b>Email:</b> {{ finca.email }}</p>{% endif %}
+                                    {% if finca.fecha_fundacion %}<p class="mb-1"><span style="font-size: 1rem; margin-right: 4px;">📅</span><b>Fundación:</b> {{ finca.fecha_fundacion.strftime('%d/%m/%Y') }}</p>{% endif %}
+                                    {% if finca.ubicacion %}<p class="mb-1"><span style="font-size: 1rem; margin-right: 4px;">🌎</span><b>Ubicación:</b> {{ finca.ubicacion }}</p>{% endif %}
+                                    {% if finca.descripcion %}<p class="mb-1"><span style="font-size: 1rem; margin-right: 4px;">ℹ️</span><b>Notas:</b> {{ finca.descripcion }}</p>{% endif %}
+                                </div>
+                                <a href="{{ url_for('seleccionar_finca', finca_id=finca.id) }}" class="btn btn-outline-primary ms-3" title="Seleccionar esta finca"><span style="font-size: 1rem;">▶️</span></a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center p-4">
+                        <span style="font-size: 3rem; margin-bottom: 1rem; display: block;">ℹ️</span>
+                        <h5 class="text-muted">No tienes fincas registradas.</h5>
+                        <p>Agrega tu primera finca para empezar a gestionar.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Agregar Nueva Finca -->
+    <div class="col-lg-5 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-plus-circle me-2"></i>Agregar Nueva Finca
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre de la finca" required>
+                        <label for="nombre">Nombre de la Finca *</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección" required>
+                        <label for="direccion">Dirección *</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="number" step="0.01" class="form-control" id="extension" name="extension" placeholder="Extensión en hectáreas">
+                        <label for="extension">Extensión (ha)</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="tipo_produccion" name="tipo_produccion">
+                            <option value="">Seleccionar...</option>
+                            <option value="Leche">Leche</option>
+                            <option value="Carne">Carne</option>
+                            <option value="Doble propósito">Doble propósito</option>
+                            <option value="Porcino">Porcino</option>
+                            <option value="Avícola">Avícola</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                        <label for="tipo_produccion">Tipo de Producción</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="propietario" name="propietario" placeholder="Propietario de la finca">
+                        <label for="propietario">Propietario</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Teléfono de contacto">
+                        <label for="telefono">Teléfono</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Correo electrónico">
+                        <label for="email">Correo electrónico</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="date" class="form-control" id="fecha_fundacion" name="fecha_fundacion" placeholder="Fecha de fundación">
+                        <label for="fecha_fundacion">Fecha de Fundación</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="ubicacion" name="ubicacion" placeholder="Ubicación geográfica">
+                        <label for="ubicacion">Ubicación (municipio, departamento, país)</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="descripcion" name="descripcion" style="height: 80px" placeholder="Notas o descripción"></textarea>
+                        <label for="descripcion">Notas o Descripción</label>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Agregar Finca
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

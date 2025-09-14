@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    .header { text-align: center; margin-bottom: 16px; }
+    .box { border: 1px solid #ccc; padding: 16px; border-radius: 8px; }
+    .qr { float: right; }
+    .muted { color: #666; font-size: 12px; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="header">
+    <h2>Certificado de Identidad Animal</h2>
+    <div class="muted">Emitido por AgroGest - {{ date.today().strftime('%d/%m/%Y') }}</div>
+  </div>
+  <div class="box">
+    <div id="qr" class="qr"></div>
+    <p><strong>Identificación:</strong> {{ animal.identificacion }}</p>
+    <p><strong>Nombre:</strong> {{ animal.nombre or '-' }}</p>
+    <p><strong>Tipo:</strong> {{ animal.tipo|title }} | <strong>Raza:</strong> {{ animal.raza }}</p>
+    <p><strong>Sexo:</strong> {{ animal.sexo or '-' }} | <strong>Nacimiento:</strong> {{ animal.fecha_nacimiento.strftime('%d/%m/%Y') }}</p>
+    <p><strong>Finca:</strong> {{ animal.finca.nombre if animal.finca else '-' }}</p>
+    <p class="muted">Verificación: {{ verification_url }}</p>
+  </div>
+  <script>
+    QRCode.toCanvas(document.getElementById('qr'), '{{ verification_url }}', { width: 120 })
+  </script>
+</body>
+</html>
+
+

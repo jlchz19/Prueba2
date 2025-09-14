@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Parto{% endblock %}
+{% block page_title %}Registrar Parto{% endblock %}
+
+{% block extra_head %}
+<style>
+    .form-card {
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-radius: 15px;
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    
+    .birth-stats {
+        background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .difficulty-level {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        margin: 0.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .difficulty-normal { background: #d4edda; color: #155724; }
+    .difficulty-minor { background: #fff3cd; color: #856404; }
+    .difficulty-major { background: #f8d7da; color: #721c24; }
+    
+    .difficulty-level:hover {
+        transform: scale(1.05);
+    }
+    
+    .difficulty-level.selected {
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card form-card">
+                <div class="form-header">
+                    <h4 class="mb-0"><i class="fas fa-baby me-2"></i>Registrar Parto</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" id="partoForm">
+                        <div class="row g-3">
+                            <!-- Selección de Animal -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-cow me-2"></i>Seleccionar Hembra
+                                </label>
+                                <select name="animal_id" class="form-select" required>
+                                    <option value="">Seleccione la hembra que parió...</option>
+                                    {% for hembra in hembras %}
+                                    <option value="{{ hembra.id }}">
+                                        {{ hembra.nombre or hembra.identificacion }} - {{ hembra.raza }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <!-- Fecha del Parto -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-calendar me-2"></i>Fecha del Parto
+                                </label>
+                                <input type="date" class="form-control" name="fecha" value="{{ date.today() }}" required>
+                            </div>
+                            
+                            <!-- Estadísticas del Parto -->
+                            <div class="col-12">
+                                <h6 class="text-success mt-3 mb-3">
+                                    <i class="fas fa-chart-bar me-2"></i>Estadísticas del Parto
+                                </h6>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-heart me-2 text-success"></i>Crías Vivas
+                                </label>
+                                <input type="number" class="form-control" name="crias_vivas" min="0" max="5" value="1">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-heart-broken me-2 text-danger"></i>Crías Muertas
+                                </label>
+                                <input type="number" class="form-control" name="crias_muertas" min="0" max="5" value="0">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-weight me-2"></i>Peso Promedio (kg)
+                                </label>
+                                <input type="number" step="0.1" class="form-control" name="peso_promedio_crias" 
+                                       min="0" max="100" placeholder="Ej: 35.5">
+                            </div>
+                            
+                            <!-- Nivel de Dificultad -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Nivel de Dificultad
+                                </label>
+                                <div class="d-flex flex-wrap">
+                                    <div class="difficulty-level difficulty-normal" data-value="normal">
+                                        <i class="fas fa-check-circle me-1"></i>Normal
+                                    </div>
+                                    <div class="difficulty-level difficulty-minor" data-value="menor">
+                                        <i class="fas fa-exclamation-circle me-1"></i>Dificultad Menor
+                                    </div>
+                                    <div class="difficulty-level difficulty-major" data-value="mayor">
+                                        <i class="fas fa-times-circle me-1"></i>Dificultad Mayor
+                                    </div>
+                                </div>
+                                <input type="hidden" name="dificultades" id="dificultades-input">
+                            </div>
+                            
+                            <!-- Detalles de Dificultades -->
+                            <div class="col-12" id="dificultades-detalle" style="display: none;">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-clipboard-list me-2"></i>Detalles de las Dificultades
+                                </label>
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="distocia" id="distocia">
+                                            <label class="form-check-label" for="distocia">Distocia</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="cesarea" id="cesarea">
+                                            <label class="form-check-label" for="cesarea">Cesárea</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="retencion_placenta" id="retencion">
+                                            <label class="form-check-label" for="retencion">Retención Placenta</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Observaciones -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-notes-medical me-2"></i>Observaciones
+                                </label>
+                                <textarea class="form-control" name="observaciones" rows="4" 
+                                          placeholder="Estado de la madre, condición de las crías, tratamientos aplicados..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex gap-2 justify-content-end">
+                            <a class="btn btn-outline-secondary" href="{{ url_for('calendario_reproductivo') }}">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button class="btn btn-success" type="submit">
+                                <i class="fas fa-save me-2"></i>Registrar Parto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel de Información -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información del Parto</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Datos Importantes:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Peso normal:</strong> 30-45 kg</li>
+                        <li><strong>Duración normal:</strong> 2-6 horas</li>
+                        <li><strong>Gemelos:</strong> 2-5% de casos</li>
+                    </ul>
+                    
+                    <h6 class="mt-3">Cuidados Post-Parto:</h6>
+                    <ul class="list-unstyled">
+                        <li>• Verificar expulsión de placenta (6-12h)</li>
+                        <li>• Desinfectar ombligo del ternero</li>
+                        <li>• Asegurar consumo de calostro</li>
+                        <li>• Monitorear madre por 48h</li>
+                    </ul>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <small><strong>Alerta:</strong> Si hay complicaciones, contacte al veterinario inmediatamente.</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resumen Estadístico -->
+            <div class="card mt-3">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Resumen</h6>
+                </div>
+                <div class="card-body" id="resumen-stats">
+                    <div class="text-center">
+                        <p class="text-muted">Complete el formulario para ver el resumen</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const difficultyLevels = document.querySelectorAll('.difficulty-level');
+    const difficultyInput = document.getElementById('dificultades-input');
+    const difficultyDetail = document.getElementById('dificultades-detalle');
+    const criasVivas = document.querySelector('input[name="crias_vivas"]');
+    const criasMuertas = document.querySelector('input[name="crias_muertas"]');
+    const pesoPromedio = document.querySelector('input[name="peso_promedio_crias"]');
+    const resumenStats = document.getElementById('resumen-stats');
+    
+    // Manejar selección de dificultad
+    difficultyLevels.forEach(level => {
+        level.addEventListener('click', function() {
+            difficultyLevels.forEach(l => l.classList.remove('selected'));
+            this.classList.add('selected');
+            difficultyInput.value = this.dataset.value;
+            
+            if (this.dataset.value !== 'normal') {
+                difficultyDetail.style.display = 'block';
+            } else {
+                difficultyDetail.style.display = 'none';
+            }
+        });
+    });
+    
+    // Actualizar resumen en tiempo real
+    function updateResumen() {
+        const vivas = parseInt(criasVivas.value) || 0;
+        const muertas = parseInt(criasMuertas.value) || 0;
+        const peso = parseFloat(pesoPromedio.value) || 0;
+        const total = vivas + muertas;
+        
+        let html = '<div class="row g-2 text-center">';
+        html += `<div class="col-6"><div class="bg-success text-white p-2 rounded"><strong>${vivas}</strong><br><small>Vivas</small></div></div>`;
+        html += `<div class="col-6"><div class="bg-danger text-white p-2 rounded"><strong>${muertas}</strong><br><small>Muertas</small></div></div>`;
+        html += `<div class="col-6"><div class="bg-info text-white p-2 rounded"><strong>${total}</strong><br><small>Total</small></div></div>`;
+        html += `<div class="col-6"><div class="bg-warning text-dark p-2 rounded"><strong>${peso}kg</strong><br><small>Peso Prom.</small></div></div>`;
+        html += '</div>';
+        
+        if (total > 0) {
+            const supervivencia = ((vivas / total) * 100).toFixed(1);
+            html += `<div class="mt-2 text-center"><span class="badge bg-primary">Supervivencia: ${supervivencia}%</span></div>`;
+        }
+        
+        resumenStats.innerHTML = html;
+    }
+    
+    criasVivas.addEventListener('input', updateResumen);
+    criasMuertas.addEventListener('input', updateResumen);
+    pesoPromedio.addEventListener('input', updateResumen);
+    
+    // Validación del formulario
+    document.getElementById('partoForm').addEventListener('submit', function(e) {
+        const vivas = parseInt(criasVivas.value) || 0;
+        const muertas = parseInt(criasMuertas.value) || 0;
+        
+        if (vivas === 0 && muertas === 0) {
+            e.preventDefault();
+            alert('Debe registrar al menos una cría (viva o muerta)');
+            return false;
+        }
+        
+        if (!difficultyInput.value) {
+            e.preventDefault();
+            alert('Debe seleccionar el nivel de dificultad del parto');
+            return false;
+        }
+    });
+    
+    // Seleccionar "Normal" por defecto
+    document.querySelector('.difficulty-level[data-value="normal"]').click();
+});
+</script>
+{% endblock %}
+
+

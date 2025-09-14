@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AgroGest{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #007bff;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+
+        /* Mejoras para formularios y campos de entrada */
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+            background-color: #fff;
+        }
+
+        .form-floating > .form-control, .form-floating > .form-select {
+            height: calc(3.5rem + 2px);
+            line-height: 1.25;
+        }
+
+        .form-floating > label {
+            padding: 1rem 1rem;
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label,
+        .form-floating > .form-select ~ label {
+            opacity: 0.85;
+            transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+            color: var(--primary);
+        }
+
+        .form-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        /* Mejoras para botones */
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        /* Mejoras para cards */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 1.25rem;
+        }
+
+        /* Mejoras para inputs de archivo */
+        .form-control[type="file"] {
+            padding: 8px 12px;
+        }
+
+        /* Mejoras para checkboxes y radios */
+        .form-check-input {
+            width: 1.25em;
+            height: 1.25em;
+            margin-top: 0.125em;
+            border: 2px solid #dee2e6;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Mejoras para textarea */
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Mejoras para badges */
+        .badge {
+            padding: 0.5em 0.75em;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        /* Mejoras para alertas */
+        .alert {
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Mejoras para tablas */
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        :root {
+            --primary-color: #0ea5e9;
+            --primary-dark: #0284c7;
+            --secondary-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+            --sidebar-bg: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+            --content-bg: rgba(255, 255, 255, 0.95);
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px rgba(0,0,0,0.1);
+            
+            --font-family-sans-serif: 'Inter', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family-sans-serif);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+            color: var(--text-color);
+            font-size: 15px;
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        #sidebar {
+            min-width: 280px;
+            max-width: 280px;
+            background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+            color: #fff;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 999;
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Personalizar scrollbar para la sidebar */
+        #sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            transition: background 0.3s ease;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Para Firefox */
+        #sidebar {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
+        }
+
+        #sidebar.active {
+            margin-left: -280px;
+        }
+
+        /* Mobile Responsive Sidebar */
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: -280px;
+                min-width: 260px;
+                max-width: 260px;
+            }
+            
+            #sidebar.active {
+                margin-left: 0;
+            }
+            
+            #sidebar.show-mobile {
+                margin-left: 0;
+            }
+        }
+
+        #sidebar .sidebar-header {
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #sidebar .sidebar-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        }
+
+        #sidebar .sidebar-header h3 {
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        #sidebar ul.components {
+            padding: 20px 0;
+        }
+
+        #sidebar ul li a {
+            padding: 15px 25px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: block;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-left: 4px solid transparent;
+            border-radius: 0 25px 25px 0;
+            margin: 4px 0;
+            position: relative;
+        }
+
+        #sidebar ul li a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 0 25px 25px 0;
+        }
+
+        #sidebar ul li a:hover::before {
+            opacity: 1;
+        }
+
+        #sidebar ul li a:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.15);
+            transform: translateX(5px);
+            border-left: 4px solid var(--info);
+        }
+        
+        #sidebar ul li.active > a, a[aria-expanded="true"] {
+            color: #fff;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.2));
+            border-left: 4px solid var(--info);
+            transform: translateX(5px);
+        }
+
+        #sidebar ul li a i {
+            margin-right: 12px;
+            width: 20px;
+        }
+
+
+        .content {
+            width: 100%;
+            padding: 20px;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+
+        /* User Avatar Dropdown Styles */
+        .dropdown {
+            position: relative;
+            z-index: 9999;
+        }
+
+        .user-avatar-btn {
+            background: transparent;
+            border: none;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 9999;
+        }
+
+        .user-avatar-btn:hover {
+            background: rgba(14, 165, 233, 0.1);
+            border-radius: 8px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-avatar-large {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .user-dropdown {
+            min-width: 280px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            padding: 0.5rem 0;
+            z-index: 10000 !important;
+            position: absolute !important;
+        }
+
+        .navbar-main {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #e9ecef;
+            z-index: 1000;
+            position: relative;
+        }
+
+        .user-dropdown .dropdown-header {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 12px 12px 0 0;
+            margin: -0.5rem -0rem 0 -0rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-dropdown .dropdown-item {
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .user-dropdown .dropdown-item:hover {
+            background: var(--bg-secondary);
+            color: var(--secondary);
+        }
+
+        .user-dropdown .dropdown-item.text-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* Dark Theme Styles */
+        body.dark-theme {
+            --primary: #f8fafc;
+            --primary-light: #e2e8f0;
+            --secondary: #0ea5e9;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-dark: #0f172a;
+            --border: #334155;
+            --surface-color: #1e293b;
+            --sidebar-bg: #0f172a;
+            --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+            --gradient-secondary: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        body.dark-theme .navbar-main {
+            background: var(--bg-secondary);
+            border-bottom-color: var(--border);
+        }
+
+        body.dark-theme .card {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        body.dark-theme .form-control {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        body.dark-theme .form-control:focus {
+            background: var(--bg-secondary);
+            border-color: var(--secondary);
+            color: var(--text-primary);
+        }
+
+        body.dark-theme .btn-outline-secondary {
+            color: var(--text-secondary);
+            border-color: var(--border);
+        }
+
+        body.dark-theme .btn-outline-secondary:hover {
+            background: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        body.dark-theme .modal-content {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        body.dark-theme .dropdown-menu {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        body.dark-theme .dropdown-item {
+            color: var(--text-primary);
+        }
+
+        body.dark-theme .dropdown-item:hover {
+            background: var(--bg-primary);
+        }
+
+        /* Compact View Styles */
+        body.compact-view .card {
+            margin-bottom: 1rem;
+        }
+
+        body.compact-view .card-body {
+            padding: 1rem;
+        }
+
+        body.compact-view .content {
+            padding: 15px;
+        }
+
+        body.compact-view .navbar-main {
+            padding: 0.5rem 1rem;
+        }
+
+        body.compact-view #sidebar {
+            min-width: 240px;
+            max-width: 240px;
+        }
+
+        body.compact-view #sidebar ul li a {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        body.compact-view .dashboard-stats .col-md-3 {
+            margin-bottom: 1rem;
+        }
+
+        body.compact-view h1, body.compact-view h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        body.compact-view h3, body.compact-view h4 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Responsive Cards and Tables */
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.9rem;
+            }
+            
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .btn-sm {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 0.75rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+            
+            .btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            
+            .btn-sm {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.75rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            h3 {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Modal Responsive */
+        @media (max-width: 768px) {
+            .modal-dialog {
+                margin: 1rem;
+                max-width: calc(100% - 2rem);
+            }
+            
+            .modal-lg {
+                max-width: calc(100% - 2rem);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .modal-dialog {
+                margin: 0.5rem;
+                max-width: calc(100% - 1rem);
+            }
+            
+            .modal-body {
+                padding: 1rem;
+            }
+            
+            .modal-header {
+                padding: 1rem;
+            }
+            
+            .modal-footer {
+                padding: 1rem;
+            }
+        }
+
+        /* Form Responsive */
+        @media (max-width: 576px) {
+            .form-control {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .input-group .btn {
+                border-radius: 0.375rem;
+                margin-top: 0.5rem;
+            }
+        }
+
+        /* Dashboard Stats Responsive */
+        @media (max-width: 992px) {
+            .dashboard-stats .col-lg-3 {
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-stats .col-md-6 {
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dashboard-stats .col-sm-12 {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Auto Theme - System Preference Detection */
+        @media (prefers-color-scheme: dark) {
+            body.auto-theme {
+                --primary: #f8fafc;
+                --primary-light: #e2e8f0;
+                --secondary: #0ea5e9;
+                --text-primary: #f8fafc;
+                --text-secondary: #cbd5e1;
+                --text-muted: #64748b;
+                --bg-primary: #0f172a;
+                --bg-secondary: #1e293b;
+                --bg-dark: #0f172a;
+                --border: #334155;
+                --surface-color: #1e293b;
+                --sidebar-bg: #0f172a;
+                background-color: var(--bg-primary);
+                color: var(--text-primary);
+            }
+        }
+
+        #content {
+            width: calc(100% - 280px);
+            padding: 2rem;
+            min-height: 100vh;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        #content.active {
+            width: 100%;
+        }
+
+        /* Responsive Content Area */
+        @media (max-width: 768px) {
+            #content {
+                width: 100%;
+                padding: 1rem;
+                position: relative;
+                margin-left: 0;
+            }
+            
+            #content.active {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            #content {
+                padding: 0.75rem;
+            }
+        }
+
+        #content.active {
+            width: 100%;
+        }
+
+        .navbar-main {
+            padding: 1.5rem 2rem;
+            background: rgba(255,255,255,0.95);
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Responsive Navbar */
+        @media (max-width: 768px) {
+            .navbar-main {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+            }
+            
+            .user-name {
+                display: none !important;
+            }
+            
+            .navbar-text {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-main {
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .navbar-text {
+                font-size: 0.8rem;
+            }
+            
+            .navbar-text span {
+                display: none;
+            }
+        }
+
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            border-bottom: none;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            padding: 1.25rem;
+        }
+
+        .btn {
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn:focus {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .table {
+            background: rgba(255,255,255,0.9);
+            border-radius: var(--border-radius);
+        }
+
+        .table th {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            color: var(--text-color);
+            font-weight: 600;
+            border: none;
+            padding: 1rem;
+        }
+
+        .table td {
+            border: none;
+            padding: 0.875rem 1rem;
+            vertical-align: middle;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+            transform: scale(1.01);
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .alert {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--shadow);
+        }
+
+        /* Mobile Overlay for Sidebar */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        /* Touch-friendly buttons */
+        @media (max-width: 768px) {
+            .btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .user-avatar-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            #sidebarCollapse {
+                display: none;
+            }
+            
+            #mobileMenuToggle {
+                display: block !important;
+            }
+        }
+
+        @media (min-width: 769px) {
+            #mobileMenuToggle {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <div class="wrapper">
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3><span style="font-size: 1.5rem;">🌾</span> AgroGest</h3>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="{% if request.endpoint == 'index' %}active{% endif %}">
+                    <a href="{{ url_for('index') }}"><span style="font-size: 1.2rem;">📊</span> <span data-translate="Dashboard">Dashboard</span></a>
+                </li>
+                <li>
+                    <a href="#animalesSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><span style="font-size: 1.2rem;">🐄</span> <span data-translate="Animals">Animales</span></a>
+                    <ul class="collapse list-unstyled ps-4" id="animalesSubmenu">
+                        <li><a href="{{ url_for('animales') }}"><span data-translate="View Animals">Ver Animales</span></a></li>
+                        <li><a href="{{ url_for('nuevo_animal') }}"><span data-translate="New Animal">Nuevo Animal</span></a></li>
+                    </ul>
+                </li>
+                 <li>
+                    <a href="#ubicacionesSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><span style="font-size: 1.2rem;">🏡</span> <span data-translate="Locations">Ubicaciones</span></a>
+                    <ul class="collapse list-unstyled ps-4" id="ubicacionesSubmenu">
+                        <li><a href="{{ url_for('potreros') }}"><span style="font-size: 1rem; margin-right: 8px;">🌿</span><span data-translate="Paddocks">Potreros (Bovinos)</span></a></li>
+                        <li><a href="{{ url_for('cochiqueras') }}"><span style="font-size: 1rem; margin-right: 8px;">🏠</span><span data-translate="Pig Pens">Cochiqueras</span></a></li>
+                        <li><a href="{{ url_for('gallineros') }}"><span style="font-size: 1rem; margin-right: 8px;">🐔</span><span data-translate="Chicken Coops">Gallineros</span></a></li>
+                        <li><a href="{{ url_for('establos') }}"><span style="font-size: 1rem; margin-right: 8px;">🐴</span><span data-translate="Stables">Establos/Corrales</span></a></li>
+                        <li class="dropdown-divider"></li>
+                        <li><a href="{{ url_for('nuevo_potrero') }}"><span style="font-size: 1rem; margin-right: 8px;">➕</span><span data-translate="New Paddock">Nuevo Potrero</span></a></li>
+                        <li><a href="{{ url_for('nueva_ubicacion') }}"><span style="font-size: 1rem; margin-right: 8px;">➕</span><span data-translate="New Location">Nueva Ubicación</span></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#vacunasSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><span style="font-size: 1.2rem;">💉</span> <span data-translate="Vaccines">Vacunas</span></a>
+                    <ul class="collapse list-unstyled ps-4" id="vacunasSubmenu">
+                        <li><a href="{{ url_for('vacunas') }}"><span data-translate="View Vaccines">Ver Vacunas</span></a></li>
+                        <li><a href="{{ url_for('nueva_vacuna') }}"><span data-translate="New Vaccine">Nueva Vacuna</span></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#saludSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><span style="font-size: 1.2rem;">❤️</span> <span data-translate="Health">Salud</span></a>
+                    <ul class="collapse list-unstyled ps-4" id="saludSubmenu">
+                        <li><a href="{{ url_for('gestion_salud') }}"><span data-translate="Health Management">Gestión de Salud</span></a></li>
+                        <li><a href="{{ url_for('registrar_evento_salud') }}"><span data-translate="New Health Event">Nuevo Evento</span></a></li>
+                        <li><a href="{{ url_for('nueva_vacunacion') }}"><span data-translate="New Vaccination">Nueva Vacunación</span></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#pesoSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><span style="font-size: 1.2rem;">⚖️</span> <span data-translate="Weight">Peso</span></a>
+                    <ul class="collapse list-unstyled ps-4" id="pesoSubmenu">
+                        <li><a href="{{ url_for('seguimiento_peso') }}"><span data-translate="Weight Tracking">Seguimiento de Peso</span></a></li>
+                        <li><a href="{{ url_for('nuevo_registro_peso') }}"><span data-translate="New Weight Record">Nuevo Registro</span></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#produccionSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><span style="font-size: 1.2rem;">🥛</span> <span data-translate="Production">Producción</span></a>
+                    <ul class="collapse list-unstyled ps-4" id="produccionSubmenu">
+                        <li><a href="{{ url_for('produccion') }}"><span data-translate="View Production">Ver Producción</span></a></li>
+                        <li><a href="{{ url_for('nueva_produccion') }}"><span data-translate="New Production">Nueva Producción</span></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#alertasSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><span style="font-size: 1.2rem;">🔔</span> <span data-translate="Alerts">Alertas</span></a>
+                    <ul class="collapse list-unstyled ps-4" id="alertasSubmenu">
+                        <li><a href="{{ url_for('alertas') }}"><span data-translate="View Alerts">Ver Alertas</span></a></li>
+                        <li><a href="{{ url_for('nueva_alerta') }}"><span data-translate="New Alert">Nueva Alerta</span></a></li>
+                    </ul>
+                </li>
+                <li class="{% if 'fincas' in request.endpoint %}active{% endif %}">
+                    <a href="{{ url_for('fincas') }}"><span style="font-size: 1.2rem;">🚜</span> <span data-translate="Farms">Fincas</span></a>
+                </li>
+                {% if current_user.rol == 'admin' %}
+                <li class="{% if 'usuarios' in request.endpoint %}active{% endif %}">
+                    <a href="{{ url_for('usuarios') }}"><span style="font-size: 1.2rem;">👥</span> <span data-translate="Users">Usuarios</span></a>
+                </li>
+                {% endif %}
+                <li class="{% if 'empleados' in request.endpoint %}active{% endif %}">
+                    <a href="{{ url_for('empleados') }}"><span style="font-size: 1.2rem;">👷</span> <span data-translate="Employees">Empleados</span></a>
+                </li>
+                <li class="{% if 'reportes' in request.endpoint %}active{% endif %}">
+                    <a href="{{ url_for('reportes') }}"><span style="font-size: 1.2rem;">📈</span> <span data-translate="Reports">Reportes</span></a>
+                </li>
+                <li>
+                    <a href="#inventarioSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><span style="font-size: 1.2rem;">📦</span> <span data-translate="Inventory">Inventario</span></a>
+                    <ul class="collapse list-unstyled ps-4" id="inventarioSubmenu">
+                        <li><a href="{{ url_for('inventario') }}"><span data-translate="View Inventory">Ver Inventario</span></a></li>
+                        <li><a href="{{ url_for('nuevo_inventario') }}"><span data-translate="New Item">Nuevo Item</span></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#camaraSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><span style="font-size: 1.2rem;">🎥</span> <span>Cámara</span></a>
+                    <ul class="collapse list-unstyled ps-4" id="camaraSubmenu">
+                        <li><a href="{{ url_for('camara') }}"><span>Ver Cámara</span></a></li>
+                        <li><a href="{{ url_for('grabaciones') }}"><span>Grabaciones</span></a></li>
+                    </ul>
+                </li>
+                <li class="{% if 'configuracion_finca' in request.endpoint %}active{% endif %}">
+                    <a href="{{ url_for('configuracion_finca') }}"><span style="font-size: 1.2rem;">⚙️</span> <span data-translate="Farm Settings">Configuración</span></a>
+                </li>
+            </ul>
+        </nav>
+
+        <div id="content">
+            <nav class="navbar navbar-main navbar-expand-lg navbar-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-light me-3">
+                        <i class="fas fa-align-left"></i>
+                    </button>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button type="button" id="mobileMenuToggle" class="btn btn-outline-primary d-md-none me-3">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="ms-auto d-flex align-items-center">
+                        {% if 'finca_id' in session %}
+                            {% set finca = Finca.query.get(session['finca_id']) %}
+                            {% if finca %}
+                            <span class="navbar-text me-3">
+                                Finca Activa: <strong class="text-primary">{{ finca.nombre }}</strong>
+                            </span>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <!-- User Avatar Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn user-avatar-btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="user-avatar">
+                                    {{ session['username'][0].upper() }}
+                                </div>
+                                <span class="user-name d-none d-md-inline">{{ session['username'] }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="userDropdown">
+                                <li class="dropdown-header">
+                                    <div class="user-info">
+                                        <div class="user-avatar-large">{{ session['username'][0].upper() }}</div>
+                                        <div>
+                                            <div class="fw-semibold">{{ session['username'] }}</div>
+                                            <small class="text-muted">{{ current_user.rol|title if current_user.rol else 'Usuario' }}</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="openProfileModal()">
+                                        <span style="font-size: 1rem; margin-right: 8px;">👤</span><span data-translate="Profile">Ver Perfil</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="openSettingsModal()">
+                                        <i class="fas fa-cog me-2"></i><span data-translate="Settings">Ajustes</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                                        <i class="fas fa-sign-out-alt me-2"></i><span data-translate="Logout">Cerrar Sesión</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="container mt-3">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <main>
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) {
+            const sidebarCollapse = document.getElementById('sidebarCollapse');
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+
+            sidebarCollapse.addEventListener('click', function () {
+                sidebar.classList.toggle('active');
+                content.classList.toggle('active');
+            });
+
+            // Load and apply global settings
+            loadGlobalSettings();
+        });
+
+        // Global Settings Management
+        function loadGlobalSettings() {
+            // Load theme setting
+            const theme = localStorage.getItem('appTheme') || 'claro';
+            applyTheme(theme);
+
+            // Load compact view setting
+            const compactView = localStorage.getItem('compactView') === 'true';
+            if (compactView) {
+                document.body.classList.add('compact-view');
+            }
+
+            // Load show charts setting
+            const showCharts = localStorage.getItem('showCharts') !== 'false';
+            toggleCharts(showCharts);
+
+            // Load language setting
+            const language = localStorage.getItem('appLanguage') || 'es';
+            applyLanguage(language);
+
+            // Load notifications setting
+            const notifications = localStorage.getItem('notifications') !== 'false';
+            window.notificationsEnabled = notifications;
+
+            // Load auto-save setting
+            const autoSave = localStorage.getItem('autoSave') !== 'false';
+            window.autoSaveEnabled = autoSave;
+
+            // Listen for system theme changes when auto theme is selected
+            if (window.matchMedia) {
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                mediaQuery.addListener(function(e) {
+                    const currentTheme = localStorage.getItem('appTheme');
+                    if (currentTheme === 'automatico') {
+                        applyTheme('automatico');
+                    }
+                });
+            }
+
+            // Setup auto-save if enabled
+            if (autoSave) {
+                setupAutoSave();
+            }
+        }
+
+        // Global function to refresh settings (called when navigating between pages)
+        function refreshGlobalSettings() {
+            loadGlobalSettings();
+        }
+
+        // Override showToast to respect notification settings
+        const originalShowToast = showToast;
+        window.showToast = function(message, type = 'success') {
+            const notifications = localStorage.getItem('notifications') !== 'false';
+            if (notifications) {
+                originalShowToast(message, type);
+            }
+        }
+
+        function applyTheme(theme) {
+            document.body.classList.remove('dark-theme', 'light-theme', 'auto-theme');
+            
+            if (theme === 'oscuro') {
+                document.body.classList.add('dark-theme');
+            } else if (theme === 'claro') {
+                document.body.classList.add('light-theme');
+            } else if (theme === 'automatico') {
+                document.body.classList.add('auto-theme');
+                // Apply system preference
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.body.classList.add('dark-theme');
+                } else {
+                    document.body.classList.add('light-theme');
+                }
+            }
+        }
+
+        function toggleCharts(show) {
+            const charts = document.querySelectorAll('.chart-container, .dashboard-chart, [id*="chart"], [class*="chart"], canvas');
+            charts.forEach(chart => {
+                if (show) {
+                    chart.style.display = '';
+                    chart.classList.remove('d-none');
+                    if (chart.parentElement) {
+                        chart.parentElement.classList.remove('d-none');
+                    }
+                } else {
+                    chart.style.display = 'none';
+                    chart.classList.add('d-none');
+                    if (chart.parentElement) {
+                        chart.parentElement.classList.add('d-none');
+                    }
+                }
+            });
+
+            // Also hide chart sections and statistics cards if needed
+            const chartSections = document.querySelectorAll('.chart-section, .statistics-section, .dashboard-stats');
+            chartSections.forEach(section => {
+                if (show) {
+                    section.style.display = '';
+                    section.classList.remove('d-none');
+                } else {
+                    section.style.display = 'none';
+                    section.classList.add('d-none');
+                }
+            });
+        }
+
+        // Language Management
+        const translations = {
+            es: {
+                'Dashboard': 'Dashboard',
+                'Animals': 'Animales',
+                'Paddocks': 'Potreros',
+                'Farms': 'Fincas',
+                'Users': 'Usuarios',
+                'Employees': 'Empleados',
+                'Reports': 'Reportes',
+                'Settings': 'Ajustes',
+                'Profile': 'Ver Perfil',
+                'Logout': 'Cerrar Sesión',
+                'Welcome': 'Bienvenido',
+                'Total Animals': 'Total Animales',
+                'Active Paddocks': 'Potreros Activos',
+                'Monthly Reports': 'Reportes Mensuales',
+                'Notifications': 'Notificaciones',
+                'Save Changes': 'Guardar Cambios',
+                'Cancel': 'Cancelar',
+                'Close': 'Cerrar',
+                'Edit': 'Editar',
+                'Delete': 'Eliminar',
+                'Add': 'Agregar',
+                'Search': 'Buscar',
+                'Filter': 'Filtrar',
+                'Export': 'Exportar',
+                'Print': 'Imprimir',
+                'View Animals': 'Ver Animales',
+                'New Animal': 'Nuevo Animal',
+                'View Paddocks': 'Ver Potreros',
+                'New Paddock': 'Nuevo Potrero',
+                'Vaccines': 'Vacunas',
+                'View Vaccines': 'Ver Vacunas',
+                'New Vaccine': 'Nueva Vacuna',
+                'Production': 'Producción',
+                'View Production': 'Ver Producción',
+                'New Production': 'Nueva Producción'
+            },
+            en: {
+                'Dashboard': 'Dashboard',
+                'Animals': 'Animals',
+                'Paddocks': 'Paddocks',
+                'Farms': 'Farms',
+                'Users': 'Users',
+                'Employees': 'Employees',
+                'Reports': 'Reports',
+                'Settings': 'Settings',
+                'Profile': 'View Profile',
+                'Logout': 'Logout',
+                'Welcome': 'Welcome',
+                'Total Animals': 'Total Animals',
+                'Active Paddocks': 'Active Paddocks',
+                'Monthly Reports': 'Monthly Reports',
+                'Notifications': 'Notifications',
+                'Save Changes': 'Save Changes',
+                'Cancel': 'Cancel',
+                'Close': 'Close',
+                'Edit': 'Edit',
+                'Delete': 'Delete',
+                'Add': 'Add',
+                'Search': 'Search',
+                'Filter': 'Filter',
+                'Export': 'Export',
+                'Print': 'Print',
+                'View Animals': 'View Animals',
+                'New Animal': 'New Animal',
+                'View Paddocks': 'View Paddocks',
+                'New Paddock': 'New Paddock',
+                'Vaccines': 'Vaccines',
+                'View Vaccines': 'View Vaccines',
+                'New Vaccine': 'New Vaccine',
+                'Production': 'Production',
+                'View Production': 'View Production',
+                'New Production': 'New Production'
+            }
+        };
+
+        function applyLanguage(lang) {
+            const currentTranslations = translations[lang] || translations['es'];
+            
+            // Update text content for elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (currentTranslations[key]) {
+                    element.textContent = currentTranslations[key];
+                }
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-translate-placeholder');
+                if (currentTranslations[key]) {
+                    element.placeholder = currentTranslations[key];
+                }
+            });
+
+            // Update modal content if modals are open
+            updateModalTranslations(currentTranslations);
+
+            // Store current language
+            document.documentElement.lang = lang;
+            
+            // Show confirmation message
+            if (window.notificationsEnabled) {
+                const langName = lang === 'es' ? 'Español' : 'English';
+                showToast(`Idioma cambiado a ${langName}`, 'success');
+            }
+        }
+
+        function updateModalTranslations(translations) {
+            // Update profile modal if open
+            const profileModal = document.getElementById('profileModal');
+            if (profileModal) {
+                const profileTitle = profileModal.querySelector('.modal-title');
+                if (profileTitle) {
+                    profileTitle.innerHTML = `<i class="fas fa-user me-2"></i>${translations['Profile'] || 'Ver Perfil'}`;
+                }
+            }
+
+            // Update settings modal if open
+            const settingsModal = document.getElementById('settingsModal');
+            if (settingsModal) {
+                const settingsTitle = settingsModal.querySelector('.modal-title');
+                if (settingsTitle) {
+                    settingsTitle.innerHTML = `<i class="fas fa-cog me-2"></i>${translations['Settings'] || 'Ajustes'}`;
+                }
+            }
+        }
+
+        // Test function to verify language change works
+        function testLanguageChange() {
+            console.log('Testing language change functionality...');
+            
+            // Test Spanish
+            applyLanguage('es');
+            setTimeout(() => {
+                console.log('Spanish applied. Dashboard text:', document.querySelector('[data-translate="Dashboard"]')?.textContent);
+                
+                // Test English
+                applyLanguage('en');
+                setTimeout(() => {
+                    console.log('English applied. Dashboard text:', document.querySelector('[data-translate="Dashboard"]')?.textContent);
+                    console.log('Language change test completed!');
+                }, 500);
+            }, 500);
+        }
+
+        // Make test function available globally for debugging
+        window.testLanguageChange = testLanguageChange;
+
+        // Auto-save functionality
+        function setupAutoSave() {
+            let autoSaveInterval;
+            
+            // Setup auto-save for forms
+            const forms = document.querySelectorAll('form[data-autosave]');
+            forms.forEach(form => {
+                const inputs = form.querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    input.addEventListener('input', function() {
+                        clearTimeout(autoSaveInterval);
+                        autoSaveInterval = setTimeout(() => {
+                            saveFormData(form);
+                        }, 2000); // Auto-save after 2 seconds of inactivity
+                    });
+                });
+            });
+        }
+
+        function saveFormData(form) {
+            if (!window.autoSaveEnabled) return;
+            
+            const formData = new FormData(form);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            // Save to localStorage with form ID
+            const formId = form.id || 'default-form';
+            localStorage.setItem(`autosave_${formId}`, JSON.stringify(data));
+            
+            if (window.notificationsEnabled) {
+                showToast('Datos guardados automáticamente', 'success');
+            }
+        }
+
+        // Enhanced notification system
+        function showNotification(message, type = 'info', duration = 5000) {
+            if (!window.notificationsEnabled) return;
+            
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = `
+                top: 20px;
+                right: 20px;
+                z-index: 10001;
+                min-width: 300px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            
+            notification.innerHTML = `
+                <strong>${type === 'success' ? '✓' : type === 'warning' ? '⚠' : type === 'danger' ? '✗' : 'ℹ'}</strong>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, duration);
+        }
+
+        // User Profile and Settings Functions
+        function openProfileModal() {
+            const username = '{{ session["username"] }}';
+            const userRole = '{{ current_user.rol|title if current_user.rol else "Usuario" }}';
+            const userInitial = username.charAt(0).toUpperCase();
+            
+            // Create and show profile modal
+            const modalHtml = `
+                <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title" id="profileModalLabel">
+                                    <span style="font-size: 1rem; margin-right: 8px;">👤</span>Mi Perfil
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="profileForm">
+                                    <div class="row">
+                                        <div class="col-md-4 text-center">
+                                            <div class="user-avatar-large mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                                ${userInitial}
+                                            </div>
+                                            <h5>${username}</h5>
+                                            <p class="text-muted">${userRole}</p>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <h6>Información del Usuario</h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">Nombre de Usuario</label>
+                                                <input type="text" class="form-control" id="profileUsername" value="${username}" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Nombre</label>
+                                                <input type="text" class="form-control" id="profileNombre" placeholder="Tu nombre">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Apellido</label>
+                                                <input type="text" class="form-control" id="profileApellido" placeholder="Tu apellido">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="profileEmail" placeholder="usuario@ejemplo.com">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Teléfono</label>
+                                                <input type="tel" class="form-control" id="profilePhone" placeholder="+57 300 123 4567">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Rol</label>
+                                                <input type="text" class="form-control" value="${userRole}" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-primary" onclick="saveProfile()">Guardar Cambios</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('profileModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to body and show
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+            
+            // Load user data from API
+            fetch('/api/perfil_usuario')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error loading profile:', data.error);
+                        return;
+                    }
+                    // Fill form with user data
+                    document.getElementById('profileNombre').value = data.nombre || '';
+                    document.getElementById('profileApellido').value = data.apellido || '';
+                    document.getElementById('profileEmail').value = data.email || '';
+                    document.getElementById('profilePhone').value = data.telefono || '';
+                })
+                .catch(error => {
+                    console.error('Error loading profile:', error);
+                });
+            
+            modal.show();
+        }
+
+        function openSettingsModal() {
+            // Get current settings from localStorage or set defaults
+            const currentTheme = localStorage.getItem('appTheme') || 'claro';
+            const currentLang = localStorage.getItem('appLanguage') || 'es';
+            const notifications = localStorage.getItem('notifications') !== 'false';
+            const autoSave = localStorage.getItem('autoSave') !== 'false';
+            
+            // Create and show settings modal
+            const modalHtml = `
+                <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="settingsModalLabel">
+                                    <i class="fas fa-cog me-2"></i>Ajustes
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="settingsForm">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h6>Preferencias de la Aplicación</h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">Tema</label>
+                                                <select class="form-select" id="themeSelect">
+                                                    <option value="claro" ${currentTheme === 'claro' ? 'selected' : ''}>Claro</option>
+                                                    <option value="oscuro" ${currentTheme === 'oscuro' ? 'selected' : ''}>Oscuro</option>
+                                                    <option value="automatico" ${currentTheme === 'automatico' ? 'selected' : ''}>Automático</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Idioma</label>
+                                                <select class="form-select" id="languageSelect">
+                                                    <option value="es" ${currentLang === 'es' ? 'selected' : ''}>Español</option>
+                                                    <option value="en" ${currentLang === 'en' ? 'selected' : ''}>English</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="notificationsCheck" ${notifications ? 'checked' : ''}>
+                                                    <label class="form-check-label" for="notificationsCheck">
+                                                        Recibir notificaciones
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="autoSaveCheck" ${autoSave ? 'checked' : ''}>
+                                                    <label class="form-check-label" for="autoSaveCheck">
+                                                        Guardado automático
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <h6>Configuración de Dashboard</h6>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="showChartsCheck" checked>
+                                                    <label class="form-check-label" for="showChartsCheck">
+                                                        Mostrar gráficos en dashboard
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="compactViewCheck">
+                                                    <label class="form-check-label" for="compactViewCheck">
+                                                        Vista compacta
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-primary" onclick="saveSettings()">Guardar Cambios</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('settingsModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to body and show
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('settingsModal'));
+            modal.show();
+        }
+
+        function saveProfile() {
+            // Get form values
+            const nombre = document.getElementById('profileNombre').value;
+            const apellido = document.getElementById('profileApellido').value;
+            const email = document.getElementById('profileEmail').value;
+            const telefono = document.getElementById('profilePhone').value;
+            
+            // Send data to server
+            fetch('/api/actualizar_perfil', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nombre: nombre,
+                    apellido: apellido,
+                    email: email,
+                    telefono: telefono
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showToast('Error al actualizar perfil: ' + data.error, 'error');
+                } else {
+                    showToast('Perfil actualizado correctamente', 'success');
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
+                    modal.hide();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error al actualizar perfil', 'error');
+            });
+        }
+
+        function saveSettings() {
+            // Get form values
+            const theme = document.getElementById('themeSelect').value;
+            const language = document.getElementById('languageSelect').value;
+            const notifications = document.getElementById('notificationsCheck').checked;
+            const autoSave = document.getElementById('autoSaveCheck').checked;
+            const showCharts = document.getElementById('showChartsCheck').checked;
+            const compactView = document.getElementById('compactViewCheck').checked;
+            
+            // Save to localStorage
+            localStorage.setItem('appTheme', theme);
+            localStorage.setItem('appLanguage', language);
+            localStorage.setItem('notifications', notifications);
+            localStorage.setItem('autoSave', autoSave);
+            localStorage.setItem('showCharts', showCharts);
+            localStorage.setItem('compactView', compactView);
+            
+            // Apply all settings immediately
+            applyTheme(theme);
+            applyLanguage(language);
+            
+            // Apply compact view
+            if (compactView) {
+                document.body.classList.add('compact-view');
+            } else {
+                document.body.classList.remove('compact-view');
+            }
+            
+            // Apply chart visibility
+            toggleCharts(showCharts);
+            
+            // Update global notification and auto-save settings
+            window.notificationsEnabled = notifications;
+            window.autoSaveEnabled = autoSave;
+            
+            // Setup auto-save if enabled
+            if (autoSave) {
+                setupAutoSave();
+            }
+            
+            // Trigger a global settings update event
+            window.dispatchEvent(new CustomEvent('settingsUpdated', {
+                detail: {
+                    theme,
+                    language,
+                    notifications,
+                    autoSave,
+                    showCharts,
+                    compactView
+                }
+            }));
+            
+            showToast('Ajustes guardados correctamente', 'success');
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
+            modal.hide();
+        }
+
+        function showToast(message, type = 'success') {
+            const bgClass = type === 'success' ? 'bg-success' : 'bg-danger';
+            const icon = type === 'success' ? 'fas fa-check' : 'fas fa-exclamation-triangle';
+            
+            const toast = `
+                <div class="toast align-items-center text-white ${bgClass} border-0 position-fixed top-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true" style="z-index: 10001;">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <i class="${icon} me-2"></i>${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing toasts
+            document.querySelectorAll('.toast').forEach(t => t.remove());
+            
+            document.body.insertAdjacentHTML('beforeend', toast);
+            const toastElement = document.querySelector('.toast');
+            const bsToast = new bootstrap.Toast(toastElement, { delay: 3000 });
+            bsToast.show();
+            
+            // Auto remove after showing
+            setTimeout(() => {
+                if (toastElement && toastElement.parentNode) {
+                    toastElement.remove();
+                }
+            }, 4000);
+        }
+        // Mobile Menu Functionality
+        function initializeMobileMenu() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('show-mobile');
+                    sidebarOverlay.classList.toggle('show');
+                    document.body.style.overflow = sidebar.classList.contains('show-mobile') ? 'hidden' : '';
+                });
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function() {
+                    sidebar.classList.remove('show-mobile');
+                    sidebarOverlay.classList.remove('show');
+                    document.body.style.overflow = '';
+                });
+            }
+
+            // Close mobile menu when clicking on sidebar links
+            const sidebarLinks = sidebar.querySelectorAll('a:not(.dropdown-toggle)');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('show-mobile');
+                        sidebarOverlay.classList.remove('show');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.remove('show-mobile');
+                    sidebarOverlay.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        // Initialize mobile functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMobileMenu();
+        });
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/static/service-worker.js');
+        });
+      }
+    </script>
+
+    <!-- Floating Web Chat: Agro Assistant -->
+    {% if current_user.is_authenticated %}
+    <style>
+      .webchat-btn {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0ea5e9, #0284c7);
+        color: #fff;
+        border: none;
+        box-shadow: 0 12px 24px rgba(2,132,199,0.35);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 1100;
+      }
+      .webchat-panel {
+        position: fixed;
+        right: 22px;
+        bottom: 90px;
+        width: min(420px, calc(100% - 44px));
+        max-height: 70vh;
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 20px 35px rgba(0,0,0,0.15);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1100;
+      }
+      .webchat-header { background: linear-gradient(135deg, #0ea5e9, #06b6d4); color: #fff; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; }
+      .webchat-title { display:flex; align-items:center; gap:8px; font-weight:600; }
+      .webchat-body { background:#f8fafc; padding:12px; overflow-y:auto; }
+      .webchat-input { border-top:1px solid #e5e7eb; background:#fff; padding:8px; }
+      .webchat-input .form-control { border-radius: 999px; }
+      .webchat-tools { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+      .msg { display:flex; margin-bottom:10px; }
+      .msg.user { justify-content: flex-end; }
+      .bubble { max-width:80%; padding:8px 12px; border-radius:14px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); font-size:0.95rem; line-height:1.35rem; }
+      .msg.user .bubble { background:#e0f2fe; color:#0c4a6e; border-bottom-right-radius:6px; }
+      .msg.bot .bubble { background:#fff; color:#111827; border-bottom-left-radius:6px; }
+      .img-preview { max-width: 120px; max-height: 120px; border-radius: 8px; border: 1px solid #e5e7eb; }
+      .note { font-size:0.8rem; color:#64748b; }
+    </style>
+
+    <button class="webchat-btn" id="webChatToggle" title="Asistente Agro (web)"><i class="fas fa-comments"></i></button>
+    <div class="webchat-panel" id="webChatPanel" aria-live="polite">
+      <div class="webchat-header">
+        <div class="webchat-title"><i class="fas fa-seedling"></i> <span>Asistente Agro</span></div>
+        <div class="d-flex align-items-center gap-2">
+          <span id="geminiStatus" class="badge bg-secondary" title="Estado de IA">Gemini: Desactivado</span>
+          <button class="btn btn-sm btn-light" id="webChatClose" style="border-radius:20px"><i class="fas fa-times"></i></button>
+        </div>
+      </div>
+      <div class="webchat-body" id="webChatBody">
+        <div class="msg bot"><div class="bubble">Hola, soy tu asistente. Puedo ayudarte con preguntas generales y también sobre esta página (uso la URL y el título como contexto). Además, puedes subir una imagen para análisis visual. Si tu consulta es agropecuaria, incluiré buenas prácticas y recomendaciones.
+          <div class="note mt-1">Ej.: "¿Qué muestra esta página?", "Plan básico de vacunación bovina", "¿Cómo organizar pastoreo rotacional?"</div>
+        </div></div>
+      </div>
+      <div class="webchat-input">
+        <div class="webchat-tools">
+          <label class="btn btn-outline-secondary btn-sm mb-0">
+            <i class="fas fa-image me-1"></i> Imagen
+            <input type="file" id="webChatImage" accept="image/*" hidden>
+          </label>
+          <img id="webChatPreview" class="img-preview d-none" alt="preview"/>
+          <span class="note">Opcional: adjunta una imagen</span>
+        </div>
+        <div class="input-group">
+          <input class="form-control" id="webChatInput" placeholder="Escribe tu pregunta..." />
+          <button class="btn btn-primary" id="webChatSend"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function(){
+        const toggle = document.getElementById('webChatToggle');
+        const panel = document.getElementById('webChatPanel');
+        const closeBtn = document.getElementById('webChatClose');
+        const bodyEl = document.getElementById('webChatBody');
+        const inputEl = document.getElementById('webChatInput');
+        const sendBtn = document.getElementById('webChatSend');
+        const imgEl = document.getElementById('webChatImage');
+        const previewEl = document.getElementById('webChatPreview');
+        const geminiBadge = document.getElementById('geminiStatus');
+        let statusTimer = null;
+
+        async function refreshGeminiStatus(){
+          try{
+            const r = await fetch('/api/chat_status');
+            const j = await r.json();
+            const on = !!j?.gemini;
+            if (on){
+              geminiBadge.textContent = 'Gemini: Activado';
+              geminiBadge.classList.remove('bg-secondary');
+              geminiBadge.classList.add('bg-success');
+            } else {
+              geminiBadge.textContent = 'Gemini: Desactivado';
+              geminiBadge.classList.remove('bg-success');
+              geminiBadge.classList.add('bg-secondary');
+            }
+          }catch(e){
+            geminiBadge.textContent = 'Gemini: Desconocido';
+            geminiBadge.classList.remove('bg-success');
+            geminiBadge.classList.add('bg-secondary');
+          }
+        }
+
+        function appendMsg(sender, text){
+          const wrap = document.createElement('div');
+          wrap.className = 'msg ' + sender;
+          const bubble = document.createElement('div');
+          bubble.className = 'bubble';
+          bubble.textContent = text;
+          wrap.appendChild(bubble);
+          bodyEl.appendChild(wrap);
+          bodyEl.scrollTop = bodyEl.scrollHeight;
+        }
+        function typing(){
+          const wrap = document.createElement('div');
+          wrap.className = 'msg bot';
+          wrap.id = 'webTyping';
+          const bubble = document.createElement('div');
+          bubble.className = 'bubble';
+          bubble.innerHTML = '<span class="spinner-border spinner-border-sm text-primary"></span> Pensando...';
+          wrap.appendChild(bubble);
+          bodyEl.appendChild(wrap);
+          bodyEl.scrollTop = bodyEl.scrollHeight;
+        }
+        function stopTyping(){ const t = document.getElementById('webTyping'); if(t) t.remove(); }
+
+        toggle?.addEventListener('click', ()=>{
+          const show = panel.style.display !== 'flex';
+          panel.style.display = show ? 'flex' : 'none';
+          if (show) setTimeout(()=>inputEl?.focus(), 100);
+          if (show){
+            refreshGeminiStatus();
+            if (!statusTimer){ statusTimer = setInterval(refreshGeminiStatus, 60000); }
+          } else {
+            if (statusTimer){ clearInterval(statusTimer); statusTimer = null; }
+          }
+        });
+        closeBtn?.addEventListener('click', ()=> panel.style.display = 'none');
+        imgEl?.addEventListener('change', ()=>{
+          const f = imgEl.files?.[0];
+          if (f){
+            const reader = new FileReader();
+            reader.onload = (e)=>{ previewEl.src = e.target.result; previewEl.classList.remove('d-none'); };
+            reader.readAsDataURL(f);
+          } else {
+            previewEl.src = '';
+            previewEl.classList.add('d-none');
+          }
+        });
+
+        async function send(){
+          const text = (inputEl.value || '').trim();
+          const file = imgEl.files?.[0] || null;
+          if (!text && !file) return;
+          appendMsg('user', text || '[Imagen adjunta]');
+          inputEl.value = '';
+          typing();
+          try{
+            let res;
+            const context = `URL: ${location.href}\nTítulo: ${document.title}`;
+            if (file){
+              const form = new FormData();
+              if (text) form.append('message', text);
+              form.append('context', context);
+              form.append('image', file);
+              res = await fetch('/api/chat_agro', { method: 'POST', body: form });
+            } else {
+              res = await fetch('/api/chat_agro', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, context }) });
+            }
+            const data = await res.json();
+            stopTyping();
+            if (data?.answer){
+              appendMsg('bot', data.answer);
+            } else if (data?.error){
+              appendMsg('bot', data.error);
+            } else {
+              appendMsg('bot', 'No pude procesar tu consulta en este momento.');
+            }
+          }catch(err){
+            stopTyping();
+            appendMsg('bot', 'Error de conexión.');
+          }
+        }
+        sendBtn?.addEventListener('click', send);
+        inputEl?.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') send(); });
+      })();
+    </script>
+    {% endif %}
+    {% endblock %}
+  </body>
+</html>

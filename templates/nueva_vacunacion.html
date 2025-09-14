@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Vacunación{% endblock %}
+{% block page_title %}Registrar Vacunación{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('gestion_salud') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver a Salud
+</a>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .vaccine-form {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .section-header {
+        border-bottom: 2px solid #28a745;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-panel {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .vaccine-types {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .vaccine-card {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    
+    .vaccine-card:hover {
+        border-color: #28a745;
+        background: #e8f5e8;
+    }
+    
+    .vaccine-card.selected {
+        border-color: #28a745;
+        background: #d4edda;
+    }
+    
+    .btn-save {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+    
+    .guidance-panel {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="vaccine-form">
+            <!-- Panel Informativo -->
+            <div class="info-panel">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="mb-1"><i class="fas fa-syringe me-2"></i>Registro de Vacunación</h5>
+                        <p class="mb-0">Registre las vacunas aplicadas para mantener un control sanitario efectivo</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <i class="fas fa-shield-alt fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <form method="POST" class="needs-validation" novalidate>
+                <!-- Selección de Animal -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h5 class="text-success mb-0"><i class="fas fa-paw me-2"></i>Selección de Animal</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <select class="form-select" id="animal_id" name="animal_id" required>
+                                    <option value="">Seleccionar animal...</option>
+                                    {% for animal in animales %}
+                                    <option value="{{ animal.id }}">
+                                        {{ animal.nombre or animal.identificacion }} - {{ animal.raza }} ({{ animal.sexo|title }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <label for="animal_id">Animal *</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de la Vacuna -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h5 class="text-success mb-0"><i class="fas fa-syringe me-2"></i>Información de la Vacuna</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha" name="fecha" required>
+                                <label for="fecha">Fecha de Aplicación *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="tipo_vacuna" name="tipo_vacuna" required>
+                                    <option value="">Seleccionar vacuna...</option>
+                                    <option value="aftosa">Fiebre Aftosa</option>
+                                    <option value="brucelosis">Brucelosis</option>
+                                    <option value="carbunco">Carbunco Bacteridiano</option>
+                                    <option value="clostridiosis">Clostridiosis</option>
+                                    <option value="rinotraqueitis">Rinotraqueítis Infecciosa</option>
+                                    <option value="diarrea_viral">Diarrea Viral Bovina</option>
+                                    <option value="parainfluenza">Parainfluenza</option>
+                                    <option value="respiratoria_sincicial">Respiratoria Sincicial</option>
+                                    <option value="leptospirosis">Leptospirosis</option>
+                                    <option value="rabia">Rabia</option>
+                                    <option value="triple">Triple (Aftosa, Carbunco, Clostridiosis)</option>
+                                    <option value="otra">Otra</option>
+                                </select>
+                                <label for="tipo_vacuna">Tipo de Vacuna *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="otra_vacuna_div" style="display: none;">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="otra_vacuna" name="otra_vacuna" placeholder="Especificar vacuna">
+                                <label for="otra_vacuna">Especificar Vacuna</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="dosis" name="dosis" placeholder="Dosis aplicada">
+                                <label for="dosis">Dosis</label>
+                                <div class="form-text">Ej: 2ml, 5ml, 1 dosis</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="lote" name="lote" placeholder="Número de lote">
+                                <label for="lote">Número de Lote</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="laboratorio" name="laboratorio" placeholder="Laboratorio fabricante">
+                                <label for="laboratorio">Laboratorio</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento">
+                                <label for="fecha_vencimiento">Fecha de Vencimiento</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="aplicado_por" name="aplicado_por" placeholder="Aplicado por">
+                                <label for="aplicado_por">Aplicado por</label>
+                                <div class="form-text">Ej: Dr. García, Técnico Juan</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Próxima Aplicación -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h5 class="text-success mb-0"><i class="fas fa-calendar-plus me-2"></i>Próxima Aplicación</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="proxima_fecha" name="proxima_fecha">
+                                <label for="proxima_fecha">Fecha Próxima Aplicación</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="frecuencia" name="frecuencia">
+                                    <option value="">Seleccionar frecuencia...</option>
+                                    <option value="anual">Anual</option>
+                                    <option value="semestral">Semestral</option>
+                                    <option value="trimestral">Trimestral</option>
+                                    <option value="unica">Única vez</option>
+                                    <option value="segun_necesidad">Según necesidad</option>
+                                </select>
+                                <label for="frecuencia">Frecuencia de Aplicación</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h5 class="text-success mb-0"><i class="fas fa-sticky-note me-2"></i>Observaciones</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="observaciones" name="observaciones" placeholder="Observaciones" style="height: 100px"></textarea>
+                                <label for="observaciones">Observaciones</label>
+                                <div class="form-text">Reacciones, condiciones especiales, recordatorios, etc.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('gestion_salud') }}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-save text-white">
+                        <i class="fas fa-syringe me-2"></i>Registrar Vacunación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Panel de Orientación -->
+    <div class="col-lg-4">
+        <div class="guidance-panel">
+            <h5><i class="fas fa-info-circle me-2"></i>Guía de Vacunación</h5>
+            
+            <div class="mb-3">
+                <h6><i class="fas fa-calendar-alt me-2"></i>Calendario Sugerido</h6>
+                <ul class="list-unstyled small">
+                    <li><strong>Aftosa:</strong> Cada 6 meses</li>
+                    <li><strong>Brucelosis:</strong> Hembras 3-8 meses</li>
+                    <li><strong>Carbunco:</strong> Anual</li>
+                    <li><strong>Clostridiosis:</strong> Anual</li>
+                    <li><strong>Rabia:</strong> Anual</li>
+                </ul>
+            </div>
+            
+            <div class="mb-3">
+                <h6><i class="fas fa-exclamation-triangle me-2"></i>Recordatorios</h6>
+                <ul class="list-unstyled small">
+                    <li>• Verificar fecha de vencimiento</li>
+                    <li>• Mantener cadena de frío</li>
+                    <li>• Registrar número de lote</li>
+                    <li>• Observar reacciones post-vacunación</li>
+                    <li>• Programar próxima aplicación</li>
+                </ul>
+            </div>
+            
+            <div class="alert alert-light">
+                <small>
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>Tip:</strong> Mantenga un registro detallado de todas las vacunaciones para cumplir con los requisitos sanitarios y de trazabilidad.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mostrar/ocultar campo "Otra vacuna"
+    const tipoVacuna = document.getElementById('tipo_vacuna');
+    const otraVacunaDiv = document.getElementById('otra_vacuna_div');
+    const otraVacunaInput = document.getElementById('otra_vacuna');
+    
+    tipoVacuna.addEventListener('change', function() {
+        if (this.value === 'otra') {
+            otraVacunaDiv.style.display = 'block';
+            otraVacunaInput.required = true;
+        } else {
+            otraVacunaDiv.style.display = 'none';
+            otraVacunaInput.required = false;
+            otraVacunaInput.value = '';
+        }
+    });
+    
+    // Calcular próxima fecha basada en frecuencia
+    const fecha = document.getElementById('fecha');
+    const frecuencia = document.getElementById('frecuencia');
+    const proximaFecha = document.getElementById('proxima_fecha');
+    
+    function calcularProximaFecha() {
+        if (fecha.value && frecuencia.value) {
+            const fechaActual = new Date(fecha.value);
+            let proximaDate = new Date(fechaActual);
+            
+            switch (frecuencia.value) {
+                case 'anual':
+                    proximaDate.setFullYear(proximaDate.getFullYear() + 1);
+                    break;
+                case 'semestral':
+                    proximaDate.setMonth(proximaDate.getMonth() + 6);
+                    break;
+                case 'trimestral':
+                    proximaDate.setMonth(proximaDate.getMonth() + 3);
+                    break;
+                default:
+                    return;
+            }
+            
+            proximaFecha.value = proximaDate.toISOString().split('T')[0];
+        }
+    }
+    
+    fecha.addEventListener('change', calcularProximaFecha);
+    frecuencia.addEventListener('change', calcularProximaFecha);
+    
+    // Validación del formulario
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+    
+    // Establecer fecha actual por defecto
+    const today = new Date().toISOString().split('T')[0];
+    fecha.value = today;
+});
+</script>
+{% endblock %}

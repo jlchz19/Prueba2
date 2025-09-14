@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Producción - AgroGest{% endblock %}
+{% block page_title %}Editar Producción{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('produccion') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line me-2"></i>Editar Información de Producción
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="animal_id" name="animal_id" required>
+                                    <option disabled value="">Seleccionar animal...</option>
+                                    {% for animal in animales %}
+                                    <option value="{{ animal.id }}" {% if produccion.animal_id == animal.id %}selected{% endif %}>{{ animal.identificacion }} - {{ animal.tipo|title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="animal_id">Animal *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="tipo_produccion" name="tipo_produccion" required>
+                                    <option disabled value="">Seleccionar tipo...</option>
+                                    <option value="leche" {% if produccion.tipo_produccion == 'leche' %}selected{% endif %}>Leche</option>
+                                    <option value="carne" {% if produccion.tipo_produccion == 'carne' %}selected{% endif %}>Carne</option>
+                                    <option value="huevos" {% if produccion.tipo_produccion == 'huevos' %}selected{% endif %}>Huevos</option>
+                                    <option value="lana" {% if produccion.tipo_produccion == 'lana' %}selected{% endif %}>Lana</option>
+                                    <option value="otro" {% if produccion.tipo_produccion == 'otro' %}selected{% endif %}>Otro</option>
+                                </select>
+                                <label for="tipo_produccion">Tipo de Producción *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.01" class="form-control" id="cantidad" name="cantidad" value="{{ produccion.cantidad }}" required>
+                                <label for="cantidad">Cantidad *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="unidad" name="unidad" value="{{ produccion.unidad }}" required>
+                                <label for="unidad">Unidad *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha" name="fecha" value="{{ produccion.fecha.strftime('%Y-%m-%d') }}" required>
+                                <label for="fecha">Fecha de Producción *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="calidad" name="calidad" required>
+                                    <option value="excelente" {% if produccion.calidad == 'excelente' %}selected{% endif %}>Excelente</option>
+                                    <option value="buena" {% if produccion.calidad == 'buena' %}selected{% endif %}>Buena</option>
+                                    <option value="regular" {% if produccion.calidad == 'regular' %}selected{% endif %}>Regular</option>
+                                    <option value="mala" {% if produccion.calidad == 'mala' %}selected{% endif %}>Mala</option>
+                                </select>
+                                <label for="calidad">Calidad *</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroGest | Plataforma Integral de Gestión de Granjas</title>
+    <meta name="description" content="AgroGest es la plataforma líder para la gestión inteligente de granjas: animales, inventario, salud, producción, reportes y más.">
+    <meta name="theme-color" content="#0ea5e9">
+    <meta property="og:title" content="AgroGest | Gestión Inteligente de Granjas">
+    <meta property="og:description" content="Optimiza tu granja con analítica, IA y notificaciones. Prueba gratis.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'><defs><linearGradient id='g' x1='0' x2='1'><stop stop-color='%230ea5e9'/><stop offset='1' stop-color='%2306b6d4'/></linearGradient></defs><rect width='1200' height='630' fill='url(%23g)'/></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f1e3a; /* Dark navy for header */
+            --primary-light: #1d2b4c;
+            --secondary: #0ea5e9; /* Cyan accents */
+            --accent: #10b981;  /* Emerald CTA */
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-dark: #1e293b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+            --gradient-secondary: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: radial-gradient(1200px 600px at 10% -10%, rgba(14,165,233,.15), transparent 60%),
+                        radial-gradient(1200px 600px at 110% 10%, rgba(16,185,129,.12), transparent 60%),
+                        linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+            overflow-x: hidden;
+        }
+        html { scroll-behavior: smooth; }
+
+        /* Navbar Profesional */
+        .navbar-pro {
+            background: var(--primary);
+            color: #e5e7eb;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: .75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .navbar-pro.scrolled {
+            padding: .5rem 0;
+            box-shadow: 0 6px 20px rgba(0,0,0,.25);
+            background: #0c1730;
+        }
+
+        /* Estilo para el icono del toggler en Bootstrap sin dependencias extra */
+        .navbar-toggler {
+            border: 1px solid #cbd5e1;
+        }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(30,41,59, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.75rem;
+            color: #ffffff !important;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .navbar-brand .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .nav-link {
+            font-weight: 600;
+            color: rgba(255,255,255,0.78) !important;
+            padding: 0.75rem 1rem !important;
+            border-radius: 8px;
+            transition: color 0.2s ease, background 0.2s ease;
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff !important;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .btn-primary-pro {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.75rem 1.2rem;
+            border-radius: 999px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary-pro:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+        }
+
+        /* Hero Section Profesional */
+        .hero-pro {
+            padding: 8rem 0 6rem 0;
+            background: transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-pro::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(2.2rem, 3.8vw, 3.6rem);
+            font-weight: 900;
+            line-height: 1.08;
+            margin-bottom: 1.25rem;
+            color: #0b1220;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+            background: rgba(16,185,129,0.08);
+            padding: .4rem .9rem;
+            border-radius: 999px;
+            font-size: .85rem;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            color: #4b5563;
+            margin-bottom: 1.6rem;
+            line-height: 1.8;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--secondary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* Footer moderno */
+        .footer-pro {
+            background: linear-gradient(135deg, #021b16 0%, #072a22 60%, #0e3b2f 100%);
+            color: #cbd5e1;
+            padding: 3rem 0 2rem;
+            position: relative;
+        }
+        .footer-pro::before {
+            content: '';
+            position: absolute; left:0; right:0; top:0; height:4px;
+            background: linear-gradient(90deg, #10b981, #06b6d4, #0ea5e9);
+        }
+        .footer-pro a { color: #93c5fd; text-decoration: none; }
+        .footer-pro a:hover { text-decoration: underline; }
+
+        /* Trust badges */
+        .trust-row { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; margin-top:1.25rem; }
+        .trust-badge { background:#e2f2ff; color:#075985; border:1px solid #bfdbfe; padding:.35rem .6rem; border-radius:999px; font-size:.8rem; font-weight:600; }
+
+        /* Secciones de Contenido */
+        .section-pro {
+            padding: 6rem 0;
+            position: relative;
+        }
+
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Cards Profesionales */
+        .features-grid-pro {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card-pro {
+            background: rgba(255,255,255,0.7);
+            padding: 2.2rem;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(2,6,23,0.06);
+            transition: transform .3s ease, box-shadow .3s ease;
+            border: 1px solid rgba(226,232,240,0.8);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: saturate(160%) blur(8px);
+        }
+
+        .feature-card-pro::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .feature-card-pro:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-icon-pro {
+            width: 64px;
+            height: 64px;
+            background: var(--gradient-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .feature-card-pro h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .feature-card-pro p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .feature-list li i {
+            color: var(--accent);
+            font-size: 0.875rem;
+        }
+
+        /* Pasos Profesionales */
+        .steps-grid-pro {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step-card-pro {
+            background: rgba(255,255,255,0.7);
+            padding: 2rem;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(2,6,23,0.06);
+            text-align: center;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow .3s ease;
+            border: 1px solid rgba(226,232,240,0.8);
+            backdrop-filter: saturate(160%) blur(8px);
+        }
+
+        .step-card-pro:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .step-number-pro {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .step-card-pro h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .step-card-pro p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Testimonios Profesionales */
+        .testimonials-grid-pro {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-card-pro {
+            background: rgba(255,255,255,0.7);
+            padding: 2.5rem;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(2,6,23,0.06);
+            position: relative;
+            border: 1px solid rgba(226,232,240,0.8);
+            backdrop-filter: saturate(160%) blur(8px);
+        }
+
+        .testimonial-card-pro::before {
+            content: '"';
+            font-size: 4rem;
+            color: var(--secondary);
+            position: absolute;
+            top: 1rem;
+            left: 2rem;
+            opacity: 0.1;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar-pro {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .author-info h5 {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .author-info p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .features-grid-pro {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-grid-pro {
+                grid-template-columns: 1fr;
+            }
+
+            .testimonials-grid-pro {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animaciones */
+        @keyframes fadeInUp {
+            from {
+            opacity: 0;
+                transform: translateY(30px);
+        }
+            to {
+            opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Navegación de secciones */
+        .section-nav-pro {
+            display: none;
+        }
+
+        .section-nav-pro.active {
+            display: block;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .cta-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--secondary);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: var(--secondary);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+</head>
+<body>
+    <!-- Navbar Profesional -->
+    <nav class="navbar navbar-expand-lg navbar-pro navbar-light">
+        <div class="container">
+        <a class="navbar-brand" href="#" onclick="showSection('inicio')">
+                <div class="logo-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+          AgroGest
+        </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Abrir menú">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="showSection('inicio', this)">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('quienes', this)">Quiénes Somos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('funcionalidades', this)">Funcionalidades</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('como-usar', this)">Cómo Usar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('beneficios', this)">Beneficios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('contacto', this)">Contacto</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn-primary-pro" href="{{ url_for('login') }}">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Ingresar
+                        </a>
+                    </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section Profesional -->
+    <div id="inicio" class="section-nav-pro active">
+        <div class="hero-pro">
+            <div class="hero-content">
+                <div class="hero-grid">
+                <div class="hero-text">
+                        <div class="hero-badge">
+                            <i class="fas fa-star"></i>
+                            Plataforma Líder en Gestión Agropecuaria
+                    </div>
+                        <h1>Transforma tu granja con tecnología de vanguardia</h1>
+                        <p class="hero-description">
+                            AgroGest es la solución integral que revoluciona la gestión de granjas. 
+                            Combina inteligencia artificial, análisis de datos y experiencia 
+                            agropecuaria para maximizar tu productividad.
+                        </p>
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">500+</span>
+                                <span class="stat-label">Granjas Activas</span>
+                    </div>
+                            <div class="stat-item">
+                                <span class="stat-number">98%</span>
+                                <span class="stat-label">Satisfacción</span>
+                </div>
+                            <div class="stat-item">
+                                <span class="stat-number">24/7</span>
+                                <span class="stat-label">Soporte</span>
+                    </div>
+                </div>
+                        <a href="{{ url_for('login') }}" class="btn-primary-pro">
+                            <i class="fas fa-rocket"></i>
+                            Comenzar Gratis
+                        </a>
+                        <!-- Se removieron botones de descarga (PC/Android) y menciones a app móvil para dejar solo la versión web -->
+                        <div class="trust-row">
+                            <span class="trust-badge"><i class="fas fa-shield-alt me-1"></i>Seguridad de nivel bancario</span>
+                            <span class="trust-badge"><i class="fas fa-cloud me-1"></i>Respaldos automáticos</span>
+                            <span class="trust-badge"><i class="fas fa-desktop me-1"></i>Optimizado para escritorio</span>
+                        </div>
+            </div>
+                    <div class="hero-image">
+                        <!-- Ilustración SVG embebida para asegurar disponibilidad y carga rápida -->
+                        <img alt="AgroGest - Gestión Inteligente de Granjas" src="data:image/svg+xml;utf8,
+                        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 600'>
+                          <defs>
+                            <linearGradient id='g1' x1='0' x2='1'>
+                              <stop stop-color='%230ea5e9'/>
+                              <stop offset='1' stop-color='%2306b6d4'/>
+                            </linearGradient>
+                            <linearGradient id='g2' x1='0' x2='1'>
+                              <stop stop-color='%2310b981'/>
+                              <stop offset='1' stop-color='%23059d83'/>
+                            </linearGradient>
+                          </defs>
+                          <rect width='900' height='600' rx='16' fill='url(%23g1)'/>
+                          <g transform='translate(60,60)'>
+                            <rect width='360' height='220' rx='14' fill='white' opacity='0.95'/>
+                            <text x='24' y='44' font-family='Segoe UI, Arial' font-size='26' fill='%231e293b' font-weight='700'>Panel de Producción</text>
+                            <g transform='translate(24,70)'>
+                              <rect width='120' height='22' rx='6' fill='%23e2e8f0'/>
+                              <rect x='0' y='40' width='180' height='12' rx='6' fill='url(%23g2)'/>
+                              <rect x='0' y='60' width='220' height='12' rx='6' fill='%2394a3b8'/>
+                              <rect x='0' y='80' width='140' height='12' rx='6' fill='%23cbd5e1'/>
+                            </g>
+                          </g>
+                          <g transform='translate(460,120)'>
+                            <rect width='360' height='300' rx='14' fill='white' opacity='0.95'/>
+                            <text x='24' y='44' font-family='Segoe UI, Arial' font-size='26' fill='%231e293b' font-weight='700'>Salud del Ganado</text>
+                            <g transform='translate(24,70)'>
+                              <circle cx='80' cy='80' r='70' fill='none' stroke='%23e2e8f0' stroke-width='16'/>
+                              <path d='M80 150 A70 70 0 1 1 79.9 150' fill='none' stroke='url(%23g2)' stroke-width='16' stroke-linecap='round'/>
+                              <text x='80' y='89' text-anchor='middle' font-family='Segoe UI, Arial' font-size='24' fill='%2310b981' font-weight='700'>92%</text>
+                            </g>
+                          </g>
+                        </svg>"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiénes Somos -->
+    <div id="quienes" class="section-nav-pro">
+        <div class="section-pro">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2 class="section-title">Quiénes Somos</h2>
+                    <p class="section-subtitle">
+                        Somos un equipo de expertos apasionados por la innovación tecnológica 
+                        y el desarrollo sostenible del sector agropecuario.
+                    </p>
+                </div>
+                
+                <div class="features-grid-pro">
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Equipo Multidisciplinario</h3>
+                        <p>
+                            Contamos con más de 15 años de experiencia combinando expertise 
+                            en desarrollo de software, inteligencia artificial y conocimiento 
+                            profundo del sector agropecuario.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Ingenieros de Software</li>
+                            <li><i class="fas fa-check"></i> Especialistas en IA</li>
+                            <li><i class="fas fa-check"></i> Consultores Agropecuarios</li>
+            </ul>
+        </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-lightbulb"></i>
+                </div>
+                        <h3>Innovación Constante</h3>
+                        <p>
+                            Nos mantenemos a la vanguardia de las tecnologías emergentes, 
+                            implementando soluciones inteligentes que optimizan procesos 
+                            y mejoran la productividad.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Machine Learning</li>
+                            <li><i class="fas fa-check"></i> IoT y Sensores</li>
+                            <li><i class="fas fa-check"></i> Análisis Predictivo</li>
+                        </ul>
+                </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-heart"></i>
+            </div>
+                        <h3>Compromiso Social</h3>
+                        <p>
+                            Creemos en el poder transformador de la tecnología para mejorar 
+                            la calidad de vida de los productores y contribuir al desarrollo 
+                            sostenible del sector.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Desarrollo Sostenible</li>
+                            <li><i class="fas fa-check"></i> Inclusión Digital</li>
+                            <li><i class="fas fa-check"></i> Impacto Social</li>
+                        </ul>
+        </div>
+                </div>
+
+                <div class="testimonials-grid-pro">
+                    <div class="testimonial-card-pro">
+                        <p class="testimonial-text">
+                            "AgroGest ha revolucionado completamente nuestra operación. 
+                            La eficiencia que hemos logrado es increíble y los reportes 
+                            nos ayudan a tomar mejores decisiones."
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar-pro">MG</div>
+                            <div class="author-info">
+                                <h5>María González</h5>
+                                <p>Directora de Operaciones, Finca El Paraíso</p>
+                </div>
+                </div>
+                </div>
+                    
+                    <div class="testimonial-card-pro">
+                        <p class="testimonial-text">
+                            "La plataforma es intuitiva y nos ha permitido optimizar 
+                            nuestros procesos. El soporte técnico es excepcional y 
+                            siempre están disponibles para ayudarnos."
+                        </p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar-pro">CR</div>
+                            <div class="author-info">
+                                <h5>Carlos Rodríguez</h5>
+                                <p>Administrador General, AgroVentas S.A.</p>
+                </div>
+            </div>
+        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Funcionalidades -->
+    <div id="funcionalidades" class="section-nav-pro">
+        <div class="section-pro">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2 class="section-title">Funcionalidades Avanzadas</h2>
+                    <p class="section-subtitle">
+                        Descubre todas las herramientas inteligentes que AgroGest pone 
+                        a tu disposición para optimizar la gestión de tu granja
+                    </p>
+                </div>
+                
+                <div class="features-grid-pro">
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-cow"></i>
+                        </div>
+                        <h3>Gestión Inteligente de Animales</h3>
+                        <p>
+                            Sistema completo de gestión animal con IA integrada para 
+                            optimización de producción y salud.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Registro detallado con genealogía</li>
+                            <li><i class="fas fa-check"></i> Historial médico completo</li>
+                            <li><i class="fas fa-check"></i> Control reproductivo avanzado</li>
+                            <li><i class="fas fa-check"></i> Alertas inteligentes de salud</li>
+            </ul>
+            </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-warehouse"></i>
+        </div>
+                        <h3>Inventario Predictivo</h3>
+                        <p>
+                            Control inteligente de inventario con predicciones de demanda 
+                            y optimización automática de stock.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Predicción de demanda</li>
+                            <li><i class="fas fa-check"></i> Alertas automáticas de stock</li>
+                            <li><i class="fas fa-check"></i> Trazabilidad completa</li>
+                            <li><i class="fas fa-check"></i> Optimización de compras</li>
+                        </ul>
+    </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Gestión de Talento</h3>
+                        <p>
+                            Administración completa del personal con asignación inteligente 
+                            de tareas y seguimiento de productividad.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Perfiles de empleados</li>
+                            <li><i class="fas fa-check"></i> Asignación automática de tareas</li>
+                            <li><i class="fas fa-check"></i> Control de acceso granular</li>
+                            <li><i class="fas fa-check"></i> Evaluación de desempeño</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Analytics Avanzado</h3>
+                        <p>
+                            Dashboard interactivo con análisis predictivo y reportes 
+                            personalizados para toma de decisiones estratégicas.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Dashboard en tiempo real</li>
+                            <li><i class="fas fa-check"></i> Análisis predictivo</li>
+                            <li><i class="fas fa-check"></i> Reportes personalizados</li>
+                            <li><i class="fas fa-check"></i> Exportación avanzada</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h3>Gestión de Terrenos</h3>
+                        <p>
+                            Mapeo inteligente de potreros con optimización automática 
+                            de rotación y gestión de recursos.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Mapeo digital de terrenos</li>
+                            <li><i class="fas fa-check"></i> Rotación optimizada</li>
+                            <li><i class="fas fa-check"></i> Gestión de recursos</li>
+                            <li><i class="fas fa-check"></i> Planificación estratégica</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h3>Notificaciones Inteligentes</h3>
+                        <p>
+                            Sistema de alertas proactivo con notificaciones personalizadas 
+                            y comunicación automática de eventos críticos.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Alertas proactivas</li>
+                            <li><i class="fas fa-check"></i> Notificaciones personalizadas</li>
+                            <li><i class="fas fa-check"></i> Comunicación automática</li>
+                            <li><i class="fas fa-check"></i> Integración móvil</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cómo Usar -->
+    <div id="como-usar" class="section-nav-pro">
+        <div class="section-pro">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2 class="section-title">Implementación Rápida</h2>
+                    <p class="section-subtitle">
+                        Sigue estos pasos simples para comenzar a optimizar la gestión 
+                        de tu granja en menos de 30 minutos
+                    </p>
+                </div>
+                
+                <div class="steps-grid-pro">
+                    <div class="step-card-pro">
+                        <div class="step-number-pro">1</div>
+                        <h4>Configuración Inicial</h4>
+                        <p>
+                            Crea tu cuenta y configura el perfil de tu granja. 
+                            Define ubicación, tipo de producción y datos básicos 
+                            en menos de 5 minutos.
+                        </p>
+                    </div>
+                    
+                    <div class="step-card-pro">
+                        <div class="step-number-pro">2</div>
+                        <h4>Registro de Personal</h4>
+                        <p>
+                            Agrega a tu equipo incluyendo veterinarios, vaqueros 
+                            y administradores. Asigna roles y permisos específicos 
+                            según responsabilidades.
+                        </p>
+                    </div>
+                    
+                    <div class="step-card-pro">
+                        <div class="step-number-pro">3</div>
+                        <h4>Inventario Base</h4>
+                        <p>
+                            Registra tu inventario actual: alimentos, medicinas, 
+                            equipos y suministros. Establece niveles mínimos para 
+                            alertas automáticas.
+                        </p>
+                    </div>
+                    
+                    <div class="step-card-pro">
+                        <div class="step-number-pro">4</div>
+                        <h4>Registro de Animales</h4>
+                        <p>
+                            Comienza con tus animales existentes. Incluye raza, 
+                            peso, edad, historial médico y datos reproductivos 
+                            para un control completo.
+                        </p>
+                    </div>
+                    
+                    <div class="step-card-pro">
+                        <div class="step-number-pro">5</div>
+                        <h4>Configuración de Terrenos</h4>
+                        <p>
+                            Define tus potreros con capacidad, ubicación y 
+                            características. Optimiza la rotación de animales 
+                            y gestión de recursos.
+                        </p>
+                    </div>
+                    
+                    <div class="step-card-pro">
+                        <div class="step-number-pro">6</div>
+                        <h4>Uso Diario</h4>
+                        <p>
+                            Utiliza la plataforma diariamente para registrar 
+                            eventos, actualizar inventario y monitorear el 
+                            estado de tus animales en tiempo real.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5">
+                    <h3 class="mb-4">Mejores Prácticas</h3>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="feature-item">
+                                <i class="fas fa-clock text-primary"></i>
+                                <span>Actualización diaria de datos</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item">
+                                <i class="fas fa-chart-bar text-primary"></i>
+                                <span>Revisión semanal de reportes</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-item">
+                                <i class="fas fa-users text-primary"></i>
+                                <span>Capacitación del equipo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beneficios -->
+    <div id="beneficios" class="section-nav-pro">
+        <div class="section-pro">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2 class="section-title">Beneficios Medibles</h2>
+                    <p class="section-subtitle">
+                        Descubre cómo AgroGest puede transformar la gestión de tu granja 
+                        con resultados tangibles y medibles
+                    </p>
+                </div>
+                
+                <div class="features-grid-pro">
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h3>Eficiencia Operativa</h3>
+                        <p>
+                            Reduce el tiempo administrativo en un 70% y optimiza 
+                            procesos operativos con automatización inteligente.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> 70% menos tiempo administrativo</li>
+                            <li><i class="fas fa-check"></i> Automatización de procesos</li>
+                            <li><i class="fas fa-check"></i> Optimización de recursos</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <h3>Reducción de Costos</h3>
+                        <p>
+                            Minimiza pérdidas por inventario desactualizado y optimiza 
+                            compras con predicciones inteligentes.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> 50% reducción en pérdidas</li>
+                            <li><i class="fas fa-check"></i> Optimización de compras</li>
+                            <li><i class="fas fa-check"></i> Control de gastos</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Salud Animal Mejorada</h3>
+                        <p>
+                            Mantén un control sanitario completo con alertas 
+                            proactivas y seguimiento médico detallado.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> 90% menos enfermedades</li>
+                            <li><i class="fas fa-check"></i> Alertas proactivas</li>
+                            <li><i class="fas fa-check"></i> Historial médico completo</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Decisiones Inteligentes</h3>
+                        <p>
+                            Accede a datos en tiempo real y análisis predictivo 
+                            para tomar decisiones estratégicas informadas.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Datos en tiempo real</li>
+                            <li><i class="fas fa-check"></i> Análisis predictivo</li>
+                            <li><i class="fas fa-check"></i> Reportes estratégicos</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3>Acceso Móvil</h3>
+                        <p>
+                            Gestiona tu granja desde cualquier lugar con acceso 
+                            móvil optimizado y sincronización en tiempo real.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Acceso desde cualquier lugar</li>
+                            <li><i class="fas fa-check"></i> Sincronización en tiempo real</li>
+                            <li><i class="fas fa-check"></i> Interfaz móvil optimizada</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-card-pro">
+                        <div class="feature-icon-pro">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <h3>Seguridad Avanzada</h3>
+                        <p>
+                            Tus datos están protegidos con tecnología de encriptación 
+                            de nivel bancario y respaldos automáticos.
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Encriptación bancaria</li>
+                            <li><i class="fas fa-check"></i> Respaldos automáticos</li>
+                            <li><i class="fas fa-check"></i> Cumplimiento GDPR</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5">
+                    <h3 class="mb-4">Resultados Comprobados</h3>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h2 class="text-primary">70%</h2>
+                                <p>Reducción tiempo administrativo</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h2 class="text-primary">50%</h2>
+                                <p>Reducción en pérdidas</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h2 class="text-primary">35%</h2>
+                                <p>Incremento en productividad</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h2 class="text-primary">98%</h2>
+                                <p>Satisfacción de usuarios</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contacto -->
+    <div id="contacto" class="section-nav-pro">
+        <div class="section-pro">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2 class="section-title">Contáctanos</h2>
+                    <p class="section-subtitle">
+                        ¿Tienes preguntas o quieres una demostración personalizada? 
+                        Nuestro equipo está listo para ayudarte
+                    </p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="feature-card-pro">
+                            <h3><i class="fas fa-envelope text-primary"></i> Información de Contacto</h3>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>Email:</strong> 
+                                    <a href="mailto:info@agrogest.com">info@agrogest.com</a>
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Teléfono:</strong> +58 123-456-7890
+                                </li>
+                                <li class="mb-2">
+                                    <strong>WhatsApp:</strong> +58 123-456-7890
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Dirección:</strong> Calle Principal, Edif. AgroTech, 
+                                    Caracas, Venezuela
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="feature-card-pro">
+                            <h3><i class="fas fa-clock text-primary"></i> Horarios de Atención</h3>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <strong>Lunes a Viernes:</strong> 8:00 AM - 6:00 PM
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Sábados:</strong> 9:00 AM - 2:00 PM
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Soporte Técnico:</strong> 24/7
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Consultas:</strong> Respuesta en 2 horas
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5">
+                    <a href="mailto:info@agrogest.com" class="btn-primary-pro">
+                        <i class="fas fa-envelope"></i>
+                        Solicitar Información
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn-primary-pro ms-3">
+                        <i class="fas fa-rocket"></i>
+                        Probar Gratis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta-section">
+        <div class="section-container">
+            <h2 class="cta-title">¿Listo para transformar tu granja?</h2>
+            <p class="cta-subtitle">
+                Únete a más de 500 granjas que ya confían en AgroGest para optimizar 
+                sus operaciones y aumentar su productividad
+            </p>
+            <a href="{{ url_for('login') }}" class="btn-white">
+                <i class="fas fa-rocket"></i>
+                Comenzar Gratis Ahora
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showSection(sectionId, linkEl) {
+            // Ocultar todas las secciones
+            const sections = document.querySelectorAll('.section-nav-pro');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Mostrar la sección seleccionada
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.classList.add('active');
+                // Desplazar suavemente al inicio del contenido
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Actualizar navegación
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            if (linkEl) linkEl.classList.add('active');
+        }
+
+        // Navbar on-scroll comportamiento
+        const nav = document.querySelector('.navbar-pro');
+        document.addEventListener('scroll', () => {
+            if (window.scrollY > 10) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        });
+
+        // Animación al hacer scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observar elementos para animación
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.feature-card-pro, .step-card-pro, .testimonial-card-pro');
+            elements.forEach(el => observer.observe(el));
+        });
+    </script>
+
+    <!-- Footer moderno -->
+    <footer class="footer-pro">
+        <div class="section-container">
+            <div class="row g-4 align-items-start">
+                <div class="col-md-5">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="logo-icon me-2" style="background: var(--gradient-primary); color: white;">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h5 class="m-0" style="color:#e2e8f0; font-weight:700;">AgroGest</h5>
+                    </div>
+                    <p class="mb-2">Gestión inteligente de granjas con analítica, IA y notificaciones.</p>
+                    <small class="text-muted">© <span id="yearSpan"></span> AgroGest. Todos los derechos reservados.</small>
+                </div>
+                <div class="col-md-3">
+                    <h6 style="color:#e2e8f0;">Producto</h6>
+                    <ul class="list-unstyled m-0">
+                        <li><a href="#" onclick="showSection('funcionalidades', document.querySelector('[onclick*=funcionalidades]'))">Funcionalidades</a></li>
+                        <li><a href="#" onclick="showSection('beneficios', document.querySelector('[onclick*=beneficios]'))">Beneficios</a></li>
+                        <li><a href="#" onclick="showSection('como-usar', document.querySelector('[onclick*=como-usar]'))">Cómo usar</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 style="color:#e2e8f0;">Comienza ahora</h6>
+                    <a class="btn-primary-pro" href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Ingresar</a>
+                </div>
+            </div>
+        </div>
+        <script>document.getElementById('yearSpan').textContent = new Date().getFullYear();</script>
+    </footer>
+</body>
+</html> 

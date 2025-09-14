@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Inventario - AgroGest{% endblock %}
+{% block page_title %}Gestión de Inventario{% endblock %}
+
+{% block content %}
+<!-- Resumen del inventario -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-4">
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title text-muted">Total Productos</h5>
+                    <i class="fas fa-boxes fa-2x text-primary"></i>
+                </div>
+                <h2 class="display-6 fw-bold">{{ inventarios|length }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title text-muted">Valor Total</h5>
+                    <i class="fas fa-dollar-sign fa-2x text-success"></i>
+                </div>
+                <h2 class="display-6 fw-bold">${{ "{:,.0f}".format(total_valor_inventario) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                 <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title text-muted">Por Vencer</h5>
+                    <i class="fas fa-clock fa-2x text-warning"></i>
+                </div>
+                <h2 class="display-6 fw-bold">{{ productos_por_vencer_count }}</h2>
+            </div>
+        </div>
+    </div>
+     <div class="col">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title text-muted">Vencidos</h5>
+                    <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                </div>
+                <h2 class="display-6 fw-bold">{{ productos_vencidos_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <h5 class="card-title mb-2 mb-md-0">
+                <i class="fas fa-boxes me-2"></i>Listado de Inventario
+            </h5>
+            <div class="d-flex flex-wrap align-items-center">
+                <!-- Filtros y Búsqueda -->
+                <div class="input-group input-group-sm me-2" style="width: 200px;">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Buscar producto...">
+                </div>
+                <div class="input-group input-group-sm me-2" style="width: 150px;">
+                    <select id="categoryFilter" class="form-select">
+                        <option value="">Todas las categorías</option>
+                        {% set categorias = inventarios|map(attribute='categoria')|unique|list %}
+                        {% for cat in categorias %}
+                            <option value="{{ cat }}">{{ cat|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <a href="{{ url_for('nuevo_inventario') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus me-2"></i>Nuevo Producto
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle" id="inventarioTable">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Valor Total</th>
+                        <th>Vencimiento</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in inventarios %}
+                    <tr>
+                        <td><strong>{{ item.producto }}</strong></td>
+                        <td>
+                            {% set icons = {'alimento': 'fa-wheat-awn', 'medicina': 'fa-pills', 'equipos': 'fa-tools', 'semillas': 'fa-seedling'} %}
+                            {% set colors = {'alimento': 'success', 'medicina': 'danger', 'equipos': 'primary', 'semillas': 'info'} %}
+                            <span class="badge bg-{{ colors.get(item.categoria, 'secondary') }}">
+                                <i class="fas {{ icons.get(item.categoria, 'fa-box') }} me-1"></i>
+                                {{ item.categoria|title }}
+                            </span>
+                        </td>
+                        <td>{{ item.cantidad }} {{ item.unidad }}</td>
+                        <td>${{ "{:,.2f}".format(item.precio_unitario) }}</td>
+                        <td>${{ "{:,.2f}".format(item.cantidad * item.precio_unitario) }}</td>
+                        <td>
+                            {% if item.fecha_vencimiento %}
+                                {{ item.fecha_vencimiento.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.fecha_vencimiento %}
+                                {% set dias = (item.fecha_vencimiento - today).days %}
+                                {% if dias < 0 %}
+                                    <span class="badge rounded-pill bg-danger">Vencido</span>
+                                {% elif dias <= 30 %}
+                                    <span class="badge rounded-pill bg-warning text-dark">Por vencer</span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-success">Vigente</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge rounded-pill bg-success">Vigente</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{{ url_for('editar_inventario', id=item.id) }}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('eliminar_inventario', id=item.id) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Seguro que deseas eliminar este producto?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+             <div id="noResults" class="text-center py-5" style="display: none;">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No se encontraron productos</h5>
+                <p class="text-muted">Intenta con otros filtros o términos de búsqueda.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const tableBody = document.querySelector('#inventarioTable tbody');
+    const tableRows = tableBody.getElementsByTagName('tr');
+    const noResults = document.getElementById('noResults');
+
+    function filterTable() {
+        const searchText = searchInput.value.toLowerCase();
+        const categoryValue = categoryFilter.value.toLowerCase();
+        let visibleRows = 0;
+
+        for (let row of tableRows) {
+            const product = row.cells[0].textContent.toLowerCase();
+            const category = row.cells[1].textContent.trim().toLowerCase();
+
+            const categoryMatch = categoryValue === '' || category.includes(categoryValue);
+            const searchMatch = searchText === '' || product.includes(searchText);
+
+            if (categoryMatch && searchMatch) {
+                row.style.display = '';
+                visibleRows++;
+            } else {
+                row.style.display = 'none';
+            }
+        }
+        noResults.style.display = visibleRows > 0 ? 'none' : '';
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    categoryFilter.addEventListener('change', filterTable);
+});
+</script>
+{% endblock %} 

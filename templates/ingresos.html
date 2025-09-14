@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Ingresos{% endblock %}
+{% block page_title %}Ingresos{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header">Registrar ingreso</div>
+      <div class="card-body">
+        <form method="post">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Fecha</label>
+              <input type="date" name="fecha" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Monto ($)</label>
+              <input type="number" step="0.01" name="monto" class="form-control" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Concepto</label>
+              <input type="text" class="form-control" name="concepto" placeholder="Venta leche, animal..." required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Descripción</label>
+              <textarea class="form-control" name="descripcion" rows="2"></textarea>
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-primary" type="submit">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header">Listado</div>
+      <div class="card-body">
+        {% if ingresos %}
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr><th>Fecha</th><th>Concepto</th><th>Monto</th></tr>
+            </thead>
+            <tbody>
+              {% for i in ingresos %}
+              <tr>
+                <td>{{ i.fecha.strftime('%d/%m/%Y') }}</td>
+                <td>{{ i.concepto|title }}</td>
+                <td>${{ '%.2f'|format(i.monto) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted">Sin ingresos registrados.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

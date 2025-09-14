@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Diagnóstico de Preñez{% endblock %}
+{% block page_title %}Nuevo Diagnóstico de Preñez{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body">
+        <form method="post">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Fecha</label>
+              <input type="date" class="form-control" name="fecha" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Resultado</label>
+              <select name="resultado" class="form-select" required>
+                <option value="preñada">Preñada</option>
+                <option value="vacia">Vacía</option>
+                <option value="dudoso">Dudoso</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Método</label>
+              <input type="text" class="form-control" name="metodo" placeholder="palpación, eco, ...">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Semanas de gestación</label>
+              <input type="number" class="form-control" name="semanas_gestacion" min="0">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Observaciones</label>
+              <textarea class="form-control" name="observaciones" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-primary" type="submit">Guardar</button>
+            <a class="btn btn-secondary" href="{{ url_for('historial_animal', animal_id=animal.id) }}">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="alert alert-info">Diagnóstico para <strong>{{ animal.identificacion }}</strong>.</div>
+  </div>
+{% endblock %}
+
+

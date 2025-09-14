@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Inventario - Sistema de Gestión Ganadera{% endblock %}
+{% block page_title %}Agregar Producto al Inventario{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('inventario') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver al Inventario
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-box me-2"></i>Información del Producto
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="producto" name="producto" placeholder="Nombre del producto" value="{{ inventario.producto if editar else '' }}" required>
+                                <label for="producto">Nombre del Producto *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="categoria" name="categoria" required>
+                                    <option selected disabled value="">Seleccionar categoría...</option>
+                                    <option value="alimento">Alimento</option>
+                                    <option value="medicina">Medicina</option>
+                                    <option value="equipos">Equipos</option>
+                                    <option value="semillas">Semillas</option>
+                                    <option value="fertilizantes">Fertilizantes</option>
+                                    <option value="herramientas">Herramientas</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                                <label for="categoria">Categoría *</label>
+                            </div>
+                        </div>
+                        <div class="col-12" id="otra_categoria_div" style="display: none;">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="otra_categoria" name="otra_categoria">
+                                <label for="otra_categoria">Especificar otra categoría</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.01" class="form-control" id="cantidad" name="cantidad" placeholder="Cantidad" value="{{ inventario.cantidad if editar else '' }}" required>
+                                <label for="cantidad">Cantidad *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="unidad" name="unidad" required>
+                                     <option selected disabled value="">Seleccionar unidad...</option>
+                                     <option value="kg">Kg</option>
+                                     <option value="litros">Litros</option>
+                                     <option value="unidades">Unidades</option>
+                                     <option value="gramos">Gramos</option>
+                                     <option value="ml">Mililitros</option>
+                                     <option value="otro">Otro</option>
+                                </select>
+                                <label for="unidad">Unidad *</label>
+                            </div>
+                        </div>
+                        <div class="col-12" id="otra_unidad_div" style="display: none;">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="otra_unidad" name="otra_unidad">
+                                <label for="otra_unidad">Especificar otra unidad</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.01" class="form-control" id="precio_unitario" name="precio_unitario" placeholder="Precio Unitario" value="{{ inventario.precio_unitario if editar else '' }}" required>
+                                <label for="precio_unitario">Precio Unitario *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" value="{{ inventario.fecha_vencimiento.strftime('%Y-%m-%d') if editar and inventario.fecha_vencimiento else '' }}">
+                                <label for="fecha_vencimiento">Fecha de Vencimiento</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="animal_id" name="animal_id">
+                                    <option value="">No entregar a animal específico</option>
+                                    {% for animal in animales %}
+                                    <option value="{{ animal.id }}" {% if inventario.animal_id == animal.id %}selected{% endif %}>{{ animal.identificacion }} - {{ animal.tipo|title }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="animal_id">Entregar a Animal (opcional)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" step="0.01" class="form-control" id="cantidad_entregada" name="cantidad_entregada" placeholder="Cantidad entregada" value="{{ inventario.cantidad_entregada if editar else '' }}">
+                                <label for="cantidad_entregada">Cantidad Entregada (opcional)</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="observaciones_entrega" name="observaciones_entrega" placeholder="Observaciones de la entrega" value="{{ inventario.observaciones_entrega if editar else '' }}">
+                                <label for="observaciones_entrega">Observaciones de la entrega (opcional)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ url_for('inventario') }}" class="btn btn-secondary me-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">{{ 'Actualizar' if editar else 'Agregar al Inventario' }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Información sobre categorías -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Categorías de Inventario
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-3">Productos Básicos:</h6>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-wheat-awn text-success me-3 fa-lg"></i>
+                                <div>
+                                    <strong>Alimento:</strong>
+                                    <small class="text-muted d-block">Concentrados, forrajes, suplementos</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-pills text-danger me-3 fa-lg"></i>
+                                <div>
+                                    <strong>Medicina:</strong>
+                                    <small class="text-muted d-block">Vacunas, antibióticos, vitaminas</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-tools text-primary me-3 fa-lg"></i>
+                                <div>
+                                    <strong>Equipos:</strong>
+                                    <small class="text-muted d-block">Maquinaria, herramientas, repuestos</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-seedling text-info me-3 fa-lg"></i>
+                                <div>
+                                    <strong>Semillas:</strong>
+                                    <small class="text-muted d-block">Pastos, cultivos, forrajes</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-3">Productos Especializados:</h6>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-leaf text-success me-3 fa-lg"></i>
+                                <div>
+                                    <strong>Fertilizantes:</strong>
+                                    <small class="text-muted d-block">Abonos, nutrientes para suelos</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-wrench text-warning me-3 fa-lg"></i>
+                                <div>
+                                    <strong>Herramientas:</strong>
+                                    <small class="text-muted d-block">Instrumentos de trabajo</small>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center">
+                                <i class="fas fa-boxes text-secondary me-3 fa-lg"></i>
+                                <div>
+                                    <strong>Otros:</strong>
+                                    <small class="text-muted d-block">Productos diversos</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle "other category"
+    const categoriaSelect = document.getElementById('categoria');
+    const otraCategoriaDiv = document.getElementById('otra_categoria_div');
+    const otraCategoriaInput = document.getElementById('otra_categoria');
+
+    categoriaSelect.addEventListener('change', function() {
+        if (this.value === 'otro') {
+            otraCategoriaDiv.style.display = 'block';
+            otraCategoriaInput.required = true;
+        } else {
+            otraCategoriaDiv.style.display = 'none';
+            otraCategoriaInput.required = false;
+        }
+    });
+
+    // Handle "other unit"
+    const unidadSelect = document.getElementById('unidad');
+    const otraUnidadDiv = document.getElementById('otra_unidad_div');
+    const otraUnidadInput = document.getElementById('otra_unidad');
+
+    unidadSelect.addEventListener('change', function() {
+        if (this.value === 'otro') {
+            otraUnidadDiv.style.display = 'block';
+            otraUnidadInput.required = true;
+        } else {
+            otraUnidadDiv.style.display = 'none';
+            otraUnidadInput.required = false;
+        }
+    });
+
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        if (categoriaSelect.value === 'otro' && !otraCategoriaInput.value.trim()) {
+            otraCategoriaInput.classList.add('is-invalid');
+            event.preventDefault();
+            event.stopPropagation();
+        } else {
+            otraCategoriaInput.classList.remove('is-invalid');
+        }
+
+        if (unidadSelect.value === 'otro' && !otraUnidadInput.value.trim()) {
+            otraUnidadInput.classList.add('is-invalid');
+            event.preventDefault();
+            event.stopPropagation();
+        } else {
+            otraUnidadInput.classList.remove('is-invalid');
+        }
+
+        form.classList.add('was-validated');
+    }, false);
+});
+</script>
+
+<!-- SweetAlert2 para mejores alertas -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock %} 

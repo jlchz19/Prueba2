@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Diagnóstico de Preñez{% endblock %}
+{% block page_title %}Nuevo Diagnóstico de Preñez{% endblock %}
+
+{% block extra_head %}
+<style>
+    .form-card {
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-radius: 15px;
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 1.5rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #17a2b8;
+        box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+    }
+    
+    .result-positive {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        border: 2px solid #28a745;
+    }
+    
+    .result-negative {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        border: 2px solid #dc3545;
+    }
+    
+    .result-doubtful {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        border: 2px solid #ffc107;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card form-card">
+                <div class="form-header">
+                    <h4 class="mb-0"><i class="fas fa-stethoscope me-2"></i>Registrar Diagnóstico de Preñez</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" id="diagnosticoForm">
+                        <div class="row g-3">
+                            <!-- Selección de Animal -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-cow me-2"></i>Seleccionar Hembra
+                                </label>
+                                <select name="animal_id" class="form-select" required>
+                                    <option value="">Seleccione una hembra...</option>
+                                    {% for hembra in hembras %}
+                                    <option value="{{ hembra.id }}">
+                                        {{ hembra.nombre or hembra.identificacion }} - {{ hembra.raza }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <!-- Fecha del Diagnóstico -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-calendar me-2"></i>Fecha del Diagnóstico
+                                </label>
+                                <input type="date" class="form-control" name="fecha" value="{{ date.today() }}" required>
+                            </div>
+                            
+                            <!-- Método de Diagnóstico -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-microscope me-2"></i>Método de Diagnóstico
+                                </label>
+                                <select name="metodo" class="form-select" required>
+                                    <option value="">Seleccione método...</option>
+                                    <option value="palpacion">Palpación Rectal</option>
+                                    <option value="ecografia">Ecografía</option>
+                                    <option value="laboratorio">Análisis de Laboratorio</option>
+                                    <option value="ultrasonido">Ultrasonido</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Resultado del Diagnóstico -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-clipboard-check me-2"></i>Resultado del Diagnóstico
+                                </label>
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="resultado" value="preñada" id="preñada" required>
+                                            <label class="form-check-label w-100 p-3 rounded result-positive" for="preñada">
+                                                <i class="fas fa-check-circle text-success me-2"></i>
+                                                <strong>Preñada</strong>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="resultado" value="vacia" id="vacia" required>
+                                            <label class="form-check-label w-100 p-3 rounded result-negative" for="vacia">
+                                                <i class="fas fa-times-circle text-danger me-2"></i>
+                                                <strong>Vacía</strong>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="resultado" value="dudoso" id="dudoso" required>
+                                            <label class="form-check-label w-100 p-3 rounded result-doubtful" for="dudoso">
+                                                <i class="fas fa-question-circle text-warning me-2"></i>
+                                                <strong>Dudoso</strong>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Semanas de Gestación (solo si está preñada) -->
+                            <div class="col-md-6" id="gestacion-field" style="display: none;">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-baby me-2"></i>Semanas de Gestación
+                                </label>
+                                <input type="number" class="form-control" name="semanas_gestacion" 
+                                       min="1" max="40" placeholder="Ej: 8">
+                                <small class="text-muted">Estimación basada en el diagnóstico</small>
+                            </div>
+                            
+                            <!-- Observaciones -->
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-notes-medical me-2"></i>Observaciones
+                                </label>
+                                <textarea class="form-control" name="observaciones" rows="4" 
+                                          placeholder="Detalles del diagnóstico, condición del animal, recomendaciones..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-flex gap-2 justify-content-end">
+                            <a class="btn btn-outline-secondary" href="{{ url_for('calendario_reproductivo') }}">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button class="btn btn-info" type="submit">
+                                <i class="fas fa-save me-2"></i>Registrar Diagnóstico
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Panel de Información -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información del Diagnóstico</h6>
+                </div>
+                <div class="card-body">
+                    <h6>Métodos de Diagnóstico:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Palpación:</strong> 30-45 días post-servicio</li>
+                        <li><strong>Ecografía:</strong> 28-35 días post-servicio</li>
+                        <li><strong>Laboratorio:</strong> Análisis hormonal</li>
+                        <li><strong>Ultrasonido:</strong> Más preciso, 25-30 días</li>
+                    </ul>
+                    
+                    <h6 class="mt-3">Gestación Bovina:</h6>
+                    <ul class="list-unstyled">
+                        <li>• Duración: ~280 días (9 meses)</li>
+                        <li>• Primer diagnóstico: 30-45 días</li>
+                        <li>• Segundo diagnóstico: 60-90 días</li>
+                        <li>• Preparar parto: 2 semanas antes</li>
+                    </ul>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <small><strong>Nota:</strong> Si el resultado es dudoso, programe un nuevo diagnóstico en 15-20 días.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const resultadoRadios = document.querySelectorAll('input[name="resultado"]');
+    const gestacionField = document.getElementById('gestacion-field');
+    const semanaInput = document.querySelector('input[name="semanas_gestacion"]');
+    
+    // Mostrar/ocultar campo de semanas según el resultado
+    resultadoRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'preñada') {
+                gestacionField.style.display = 'block';
+                semanaInput.required = true;
+            } else {
+                gestacionField.style.display = 'none';
+                semanaInput.required = false;
+                semanaInput.value = '';
+            }
+        });
+    });
+    
+    // Calcular fecha estimada de parto
+    semanaInput.addEventListener('input', function() {
+        const semanas = parseInt(this.value);
+        if (semanas && semanas > 0) {
+            const fechaDiagnostico = new Date(document.querySelector('input[name="fecha"]').value);
+            const diasGestacion = semanas * 7;
+            const diasRestantes = 280 - diasGestacion;
+            const fechaParto = new Date(fechaDiagnostico.getTime() + (diasRestantes * 24 * 60 * 60 * 1000));
+            
+            // Mostrar fecha estimada
+            let infoDiv = document.getElementById('fecha-parto-info');
+            if (!infoDiv) {
+                infoDiv = document.createElement('div');
+                infoDiv.id = 'fecha-parto-info';
+                infoDiv.className = 'alert alert-info mt-2';
+                this.parentNode.appendChild(infoDiv);
+            }
+            
+            infoDiv.innerHTML = `<small><strong>Fecha estimada de parto:</strong> ${fechaParto.toLocaleDateString('es-ES')}</small>`;
+        }
+    });
+});
+</script>
+{% endblock %}

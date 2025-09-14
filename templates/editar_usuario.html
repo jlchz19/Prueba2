@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Usuario{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-user-edit me-2"></i>Editar Usuario
+        </h1>
+        <a href="{{ url_for('usuarios') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user me-2"></i>Información del Usuario
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" 
+                                           value="{{ usuario.nombre }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="apellido" class="form-label">Apellido *</label>
+                                    <input type="text" class="form-control" id="apellido" name="apellido" 
+                                           value="{{ usuario.apellido }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Nombre de Usuario</label>
+                                    <input type="text" class="form-control" id="username" 
+                                           value="{{ usuario.username }}" readonly>
+                                    <div class="form-text">El nombre de usuario no se puede cambiar</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="{{ usuario.email }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="telefono" class="form-label">Teléfono *</label>
+                                    <input type="tel" class="form-control" id="telefono" name="telefono" 
+                                           value="{{ usuario.telefono }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="estado" class="form-label">Estado *</label>
+                                    <select class="form-select" id="estado" name="estado" required>
+                                        <option value="activo" {% if usuario.estado == 'activo' %}selected{% endif %}>Activo</option>
+                                        <option value="inactivo" {% if usuario.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <textarea class="form-control" id="direccion" name="direccion" rows="3">{{ usuario.direccion or '' }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="rol" class="form-label">Rol *</label>
+                                    {% if usuario.username == 'admin' %}
+                                        <select class="form-select" id="rol" disabled>
+                                            <option value="admin" selected>Administrador</option>
+                                        </select>
+                                        <input type="hidden" name="rol" value="admin">
+                                        <div class="form-text">El rol del administrador principal no se puede cambiar</div>
+                                    {% else %}
+                                        <select class="form-select" id="rol" name="rol" required>
+                                            <option value="usuario" {% if usuario.rol == 'usuario' %}selected{% endif %}>Usuario</option>
+                                            <option value="admin" {% if usuario.rol == 'admin' %}selected{% endif %}>Administrador</option>
+                                        </select>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nueva_password" class="form-label">Nueva Contraseña</label>
+                                    <input type="password" class="form-control" id="nueva_password" name="nueva_password">
+                                    <div class="form-text">Deja en blanco para mantener la contraseña actual</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('usuarios') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Información Adicional
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>ID:</strong> {{ usuario.id }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Fecha de Registro:</strong><br>
+                        {{ usuario.fecha_registro.strftime('%d/%m/%Y %H:%M') }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Estado Actual:</strong><br>
+                        {% if usuario.estado == 'activo' %}
+                            <span class="badge bg-success">Activo</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactivo</span>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Rol Actual:</strong><br>
+                        {% if usuario.rol == 'admin' %}
+                            <span class="badge bg-danger">Administrador</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Usuario</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

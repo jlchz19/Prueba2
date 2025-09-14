@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Evento de Salud{% endblock %}
+{% block page_title %}Registrar Evento de Salud{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('gestion_salud') }}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>Volver a Salud
+</a>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .health-form {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .section-header {
+        border-bottom: 2px solid #dc3545;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-panel {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-select:focus ~ label {
+        color: #dc3545;
+    }
+    
+    .btn-save {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="health-form">
+            <!-- Panel Informativo -->
+            <div class="info-panel">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="mb-1"><i class="fas fa-heartbeat me-2"></i>Registro de Evento de Salud</h5>
+                        <p class="mb-0">Complete la información del evento de salud para mantener un historial detallado</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <i class="fas fa-stethoscope fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <form method="POST" class="needs-validation" novalidate>
+                <!-- Selección de Animal -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h5 class="text-danger mb-0"><i class="fas fa-paw me-2"></i>Selección de Animal</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <select class="form-select" id="animal_id" name="animal_id" required>
+                                    <option value="">Seleccionar animal...</option>
+                                    {% for animal in animales %}
+                                    <option value="{{ animal.id }}">
+                                        {{ animal.nombre or animal.identificacion }} - {{ animal.raza }} ({{ animal.sexo|title }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <label for="animal_id">Animal *</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Básica -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h5 class="text-danger mb-0"><i class="fas fa-info-circle me-2"></i>Información Básica</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                                <label for="fecha_inicio">Fecha del Evento *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="tipo_evento" name="tipo_evento" required>
+                                    <option value="">Seleccionar tipo...</option>
+                                    <option value="vacunacion">Vacunación</option>
+                                    <option value="desparasitacion">Desparasitación</option>
+                                    <option value="enfermedad">Enfermedad</option>
+                                    <option value="tratamiento">Tratamiento</option>
+                                    <option value="medicamento">Medicamento</option>
+                                    <option value="lesion">Lesión</option>
+                                    <option value="chequeo">Chequeo General</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                                <label for="tipo_evento">Tipo de Evento *</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="descripcion" name="descripcion" placeholder="Descripción del evento" required>
+                                <label for="descripcion">Descripción del Evento *</label>
+                                <div class="form-text">Ej: Vacuna contra Aftosa, Tratamiento para mastitis, Desparasitación con Ivermectina</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalles del Tratamiento -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h5 class="text-danger mb-0"><i class="fas fa-pills me-2"></i>Detalles del Tratamiento</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="tratamiento" name="tratamiento" placeholder="Tratamiento o medicamento">
+                                <label for="tratamiento">Tratamiento/Medicamento</label>
+                                <div class="form-text">Ej: Penicilina, Ivermectina, Vacuna Triple</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" class="form-control" id="dias_tratamiento" name="dias_tratamiento" placeholder="Días de tratamiento">
+                                <label for="dias_tratamiento">Días de Tratamiento</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
+                                <label for="fecha_fin">Fecha de Finalización</label>
+                                <div class="form-text">Opcional - para tratamientos completados</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="resultado" name="resultado">
+                                    <option value="">Seleccionar resultado...</option>
+                                    <option value="total">Recuperación Total</option>
+                                    <option value="parcial">Recuperación Parcial</option>
+                                    <option value="sin_mejoria">Sin Mejoría</option>
+                                    <option value="en_proceso">En Proceso</option>
+                                </select>
+                                <label for="resultado">Resultado del Tratamiento</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h5 class="text-danger mb-0"><i class="fas fa-sticky-note me-2"></i>Observaciones</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea class="form-control" id="observaciones" name="observaciones" placeholder="Observaciones" style="height: 120px"></textarea>
+                                <label for="observaciones">Observaciones</label>
+                                <div class="form-text">Síntomas, reacciones, recomendaciones del veterinario, etc.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('gestion_salud') }}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-save text-white">
+                        <i class="fas fa-save me-2"></i>Guardar Evento de Salud
+                    </button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Centros de Costo{% endblock %}
+{% block page_title %}Centros de Costo{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header">Nuevo centro</div>
+      <div class="card-body">
+        <form method="post">
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" name="nombre" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" name="descripcion" rows="3"></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">Guardar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header">Listado</div>
+      <div class="card-body">
+        {% if centros %}
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr><th>Nombre</th><th>Descripción</th><th></th></tr>
+            </thead>
+            <tbody>
+              {% for c in centros %}
+              <tr>
+                <td>{{ c.nombre }}</td>
+                <td>{{ c.descripcion or '-' }}</td>
+                <td>
+                  <form method="post" action="{{ url_for('eliminar_centro', id=c.id) }}" onsubmit="return confirm('¿Eliminar centro?');">
+                    <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="text-muted">Sin centros registrados.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Cámara{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex align-items-center mb-3">
+    <h4 class="mb-0"><i class="fas fa-video me-2 text-primary"></i>Cámara en Vivo</h4>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="fas fa-broadcast-tower me-2"></i>Vista en vivo</span>
+          <small class="text-muted">Fuente: {{ stream_url }}</small>
+        </div>
+        <div class="card-body">
+          {# Soporte simple para MJPEG de IP Webcam: /video #}
+          <div class="ratio ratio-16x9 border rounded" style="background:#000;">
+            <img id="cameraStream" src="{{ stream_url }}" alt="Cámara" style="object-fit:contain; width:100%; height:100%;">
+          </div>
+          <div class="mt-2 d-flex align-items-center gap-2">
+            <span class="badge bg-success" id="statusBadge">Conectado</span>
+            <button class="btn btn-sm btn-outline-secondary" onclick="reloadStream()"><i class="fas fa-sync-alt me-1"></i>Recargar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-header"><i class="fas fa-cog me-2"></i>Configuración</div>
+        <div class="card-body">
+          <form method="post" class="row gy-2">
+            <div class="col-12">
+              <label class="form-label">URL del stream (IP Webcam)</label>
+              <input type="url" name="stream_url" class="form-control" value="{{ stream_url }}" placeholder="http://192.168.1.105:8080/video" required>
+              <div class="form-text">Para IP Webcam (Android), usa la ruta /video (MJPEG)
+              </div>
+            </div>
+            <div class="col-12 d-grid">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Guardar URL</button>
+            </div>
+            <div class="col-12">
+              <a href="{{ url_for('grabaciones') }}" class="btn btn-outline-primary w-100"><i class="fas fa-folder-open me-2"></i>Ver grabaciones</a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-3">
+        <div class="d-flex">
+          <i class="fas fa-info-circle me-2 mt-1"></i>
+          <div>
+            <strong>Nota:</strong> para grabación diaria automática, configura FFmpeg en el servidor para guardar en <code>static/recordings/AAAA-MM-DD.mp4</code>. Puedo guiarte.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function reloadStream(){
+  const img = document.getElementById('cameraStream');
+  if(!img) return;
+  const url = new URL(img.src, window.location.origin);
+  // Bypass cache
+  url.searchParams.set('_t', Date.now());
+  img.src = url.toString();
+}
+</script>
+{% endblock %}

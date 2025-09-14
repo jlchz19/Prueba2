@@ -1,0 +1,686 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de {{ animal.nombre or animal.identificacion }}{% endblock %}
+{% block page_title %}Historial Completo del Animal{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Animaciones personalizadas */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    /* Efectos hover para tarjetas */
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    }
+    
+    .animal-photo:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
+    }
+    
+    /* Animaciones de entrada */
+    .card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .info-card {
+        animation: slideInLeft 0.8s ease-out;
+    }
+    
+    .info-card:nth-child(2) { animation-delay: 0.1s; }
+    .info-card:nth-child(3) { animation-delay: 0.2s; }
+    .info-card:nth-child(4) { animation-delay: 0.3s; }
+    
+    /* Efectos de gradiente mejorados */
+    .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Botones con efectos */
+    .btn-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    /* Indicadores de estado animados */
+    .status-badge {
+        animation: pulse 2s infinite;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    /* Mejoras visuales para estadísticas */
+    .stat-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .stat-card:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Efectos de texto */
+    .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Loading spinner personalizado */
+    .loading-spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Estilos mejorados para las pestañas */
+    .nav-tabs .nav-link {
+        transition: all 0.3s ease;
+        font-weight: 600;
+        border-radius: 25px !important;
+        margin: 0 3px;
+        padding: 8px 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .nav-tabs .nav-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+    }
+    
+    .nav-tabs .nav-link.active {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+        color: white !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+    
+    .nav-tabs .nav-link i {
+        transition: all 0.3s ease;
+    }
+    
+    .nav-tabs .nav-link:hover i {
+        transform: scale(1.1);
+    }
+</style>
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('nueva_alimentacion', animal_id=animal.id) }}" class="btn btn-primary">
+    <i class="fas fa-utensils me-2"></i>Nueva Alimentación
+</a>
+<a href="{{ url_for('nuevo_evento_salud', animal_id=animal.id) }}" class="btn btn-warning">
+    <i class="fas fa-heartbeat me-2"></i>Nuevo Evento Salud
+</a>
+<a href="{{ url_for('registrar_evento', animal_id=animal.id) }}" class="btn btn-dark">
+    <i class="fas fa-calendar-plus me-2"></i>Registrar Evento
+</a>
+<a href="{{ url_for('editar_animal', id=animal.id) }}" class="btn btn-outline-primary">
+    <i class="fas fa-edit me-2"></i>Editar datos
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Columna izquierda: Información general -->
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h5 class="mb-0"><i class="fas fa-paw me-2"></i>Información General</h5>
+            </div>
+            <div class="card-body p-4">
+                <!-- Foto del animal con efectos avanzados -->
+                <div class="text-center mb-4 position-relative">
+                    <div class="animal-photo-container position-relative d-inline-block">
+                        {% if animal.imagen %}
+                            <img src="{{ url_for('static', filename=animal.imagen) }}" alt="Foto de {{ animal.nombre or animal.identificacion }}" class="img-fluid rounded-circle shadow-lg border border-4 border-white animal-photo" style="width: 200px; height: 200px; object-fit: cover; transition: all 0.3s ease;">
+                        {% else %}
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-lg border border-4 border-white animal-photo" style="width: 200px; height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s ease;">
+                                <i class="fas fa-cow fa-5x text-white"></i>
+                            </div>
+                        {% endif %}
+                        <!-- Indicador de estado con animación -->
+                        <div class="position-absolute top-0 end-0 translate-middle">
+                            <span class="badge rounded-pill fs-6 px-3 py-2 bg-{{ 'success' if animal.estado == 'activo' else 'warning' if animal.estado == 'en_engorde' else 'danger' }} status-badge" style="animation: pulse 2s infinite;">
+                                <i class="fas fa-circle me-1"></i>{{ animal.estado|replace('_', ' ')|title }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h3 class="text-dark mb-1 fw-bold" style="text-shadow: 0 1px 3px rgba(0,0,0,0.1);">{{ animal.nombre or 'Sin nombre' }}</h3>
+                        <p class="text-muted mb-0 fs-5"><strong>ID:</strong> {{ animal.identificacion }}</p>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                Registrado el {{ animal.fecha_nacimiento.strftime('%d/%m/%Y') }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Información básica en tarjetas mejoradas -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="card border-0 h-100 info-card" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); transition: all 0.3s ease;">
+                            <div class="card-body p-3 text-center">
+                                <div class="icon-wrapper mb-2" style="background: rgba(33, 150, 243, 0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="fas fa-paw text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="card-title text-dark mb-1 fw-bold">Tipo</h6>
+                                <p class="card-text text-dark small mb-0 fw-semibold">{{ animal.tipo|title }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-0 h-100 info-card" style="background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%); transition: all 0.3s ease;">
+                            <div class="card-body p-3 text-center">
+                                <div class="icon-wrapper mb-2" style="background: rgba(0, 150, 136, 0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="fas fa-dna text-info" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="card-title text-dark mb-1 fw-bold">Raza</h6>
+                                <p class="card-text text-dark small mb-0 fw-semibold">{{ animal.raza }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-0 h-100 info-card" style="background: linear-gradient(135deg, #fff3e0 0%, #ffcc02 100%); transition: all 0.3s ease;">
+                            <div class="card-body p-3 text-center">
+                                <div class="icon-wrapper mb-2" style="background: rgba(255, 193, 7, 0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="fas fa-venus-mars text-warning" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="card-title text-dark mb-1 fw-bold">Sexo</h6>
+                                <p class="card-text text-dark small mb-0 fw-semibold">{{ animal.sexo|title if animal.sexo else 'No especificado' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-0 h-100 info-card" style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); transition: all 0.3s ease;">
+                            <div class="card-body p-3 text-center">
+                                <div class="icon-wrapper mb-2" style="background: rgba(76, 175, 80, 0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                                    <i class="fas fa-weight text-success" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="card-title text-dark mb-1 fw-bold">Peso</h6>
+                                <p class="card-text text-dark small mb-0 fw-semibold">{{ animal.peso }} kg</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Estadísticas rápidas con efectos -->
+                <div class="row g-2 mb-4">
+                    <div class="col-4">
+                        <div class="text-center p-3 rounded stat-card" style="background: rgba(40, 167, 69, 0.1); border: 2px solid rgba(40, 167, 69, 0.2);">
+                            <div class="fw-bold text-success fs-4 text-shadow">3</div>
+                            <small class="text-muted fw-semibold">Edad (años)</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-center p-3 rounded stat-card" style="background: rgba(0, 123, 255, 0.1); border: 2px solid rgba(0, 123, 255, 0.2);">
+                            <div class="fw-bold text-primary fs-4 text-shadow">{{ animal.numero_partos or 0 }}</div>
+                            <small class="text-muted fw-semibold">Partos</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-center p-3 rounded stat-card" style="background: rgba(255, 193, 7, 0.1); border: 2px solid rgba(255, 193, 7, 0.2);">
+                            <div class="fw-bold text-warning fs-4 text-shadow">A+</div>
+                            <small class="text-muted fw-semibold">Salud</small>
+                        </div>
+                    </div>
+                </div>
+                <!-- Información adicional en acordeón -->
+                <div class="accordion" id="accordionAnimalInfo">
+                    <div class="accordion-item border-0 mb-3">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed bg-light text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetails" aria-expanded="false">
+                                <i class="fas fa-info-circle me-2"></i>Detalles Adicionales
+                            </button>
+                        </h2>
+                        <div id="collapseDetails" class="accordion-collapse collapse" data-bs-parent="#accordionAnimalInfo">
+                            <div class="accordion-body">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                            <span class="text-muted"><i class="fas fa-calendar-alt me-2"></i>Fecha de Nacimiento</span>
+                                            <span class="text-dark fw-bold">{{ animal.fecha_nacimiento.strftime('%d/%m/%Y') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                            <span class="text-muted"><i class="fas fa-weight me-2"></i>Peso al Nacer</span>
+                                            <span class="text-dark fw-bold">{{ animal.peso_nacimiento or 'No registrado' }} kg</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                            <span class="text-muted"><i class="fas fa-map-marker-alt me-2"></i>Ubicación</span>
+                                            <span class="text-dark fw-bold">{{ animal.ubicacion_actual or 'No especificada' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                            <span class="text-muted"><i class="fas fa-palette me-2"></i>Color/Señas</span>
+                                            <span class="text-dark fw-bold">{{ animal.color_señas or 'No especificadas' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between align-items-center py-2">
+                                            <span class="text-muted"><i class="fas fa-map-marked-alt me-2"></i>Potrero</span>
+                                            <span class="text-dark fw-bold">{{ animal.potrero.nombre if animal.potrero else 'Sin asignar' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Acciones rápidas mejoradas -->
+                <div class="d-grid gap-2 mb-3">
+                    <button class="btn btn-gradient btn-lg text-white fw-bold" onclick="editAnimal()">
+                        <i class="fas fa-edit me-2"></i>Editar Animal
+                    </button>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button class="btn btn-outline-info btn-sm w-100" onclick="addHealth()">
+                                <i class="fas fa-heartbeat me-1"></i>Salud
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botón para volver -->
+                <div class="text-center">
+                    <a href="{{ url_for('animales') }}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Volver al listado
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Columna derecha: Pestañas de historial -->
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light border-0">
+                <ul class="nav nav-tabs card-header-tabs" id="historialTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold text-primary bg-light rounded-pill mx-1 shadow-sm" id="salud-tab" data-bs-toggle="tab" data-bs-target="#salud" type="button" role="tab" style="border: none; transition: all 0.3s ease;">
+                            <i class="fas fa-heartbeat me-2 text-danger"></i>Salud
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold text-primary bg-light rounded-pill mx-1 shadow-sm" id="eventos-tab" data-bs-toggle="tab" data-bs-target="#eventos" type="button" role="tab" style="border: none; transition: all 0.3s ease;">
+                            <i class="fas fa-calendar-alt me-2 text-warning"></i>Eventos
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold text-primary bg-light rounded-pill mx-1 shadow-sm" id="notas-tab" data-bs-toggle="tab" data-bs-target="#notas" type="button" role="tab" style="border: none; transition: all 0.3s ease;">
+                            <i class="fas fa-sticky-note me-2 text-info"></i>Notas
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold text-dark bg-light rounded-pill mx-1 shadow-sm" id="vacunas-tab" data-bs-toggle="tab" data-bs-target="#vacunas" type="button" role="tab" style="border: none; transition: all 0.3s ease;">
+                            <i class="fas fa-syringe me-2 text-success"></i>Vacunas
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold text-dark bg-light rounded-pill mx-1 shadow-sm" id="produccion-tab" data-bs-toggle="tab" data-bs-target="#produccion" type="button" role="tab" style="border: none; transition: all 0.3s ease;">
+                            <i class="fas fa-egg me-2 text-secondary"></i>Producción
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold text-dark bg-light rounded-pill mx-1 shadow-sm" id="potreros-tab" data-bs-toggle="tab" data-bs-target="#potreros" type="button" role="tab" style="border: none; transition: all 0.3s ease;">
+                            <i class="fas fa-map-marked-alt me-2 text-success"></i>Potreros
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="historialTabsContent">
+                    <!-- Pestaña Salud -->
+                    <div class="tab-pane fade" id="salud" role="tabpanel">
+                        {% if animal.historial_salud %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-dark fw-bold">Fecha</th>
+                                        <th class="text-dark fw-bold">Tipo</th>
+                                        <th class="text-dark fw-bold">Descripción</th>
+                                        <th class="text-dark fw-bold">Tratamiento</th>
+                                        <th class="text-dark fw-bold">Resultado</th>
+                                        <th class="text-dark fw-bold">Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for salud in animal.historial_salud|sort(attribute='fecha_inicio', reverse=true) %}
+                                    <tr>
+                                        <td>{{ salud.fecha_inicio.strftime('%d/%m/%Y') }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ 'success' if salud.tipo_evento == 'vacuna' else 'danger' if salud.tipo_evento == 'enfermedad' else 'info' }}">
+                                                {{ salud.tipo_evento|title }}
+                                            </span>
+                                        </td>
+                                        <td>{{ salud.descripcion }}</td>
+                                        <td>{{ salud.tratamiento or '-' }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ 'success' if salud.resultado == 'Total' else 'warning' if salud.resultado == 'Parcial' else 'danger' }}">
+                                                {{ salud.resultado or '-' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ salud.observaciones or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-heartbeat fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay registros de salud disponibles.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <!-- Pestaña Eventos -->
+                    <div class="tab-pane fade" id="eventos" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card shadow-sm border-0">
+                                    <div class="card-header text-white" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
+                                        <h6 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Venta</h6>
+                                    </div>
+                                    <div class="card-body text-dark">
+                                        {% if animal.fecha_venta %}
+                                        <p><strong class="text-dark">Fecha:</strong> <span class="text-dark">{{ animal.fecha_venta.strftime('%d/%m/%Y') }}</span></p>
+                                        <p><strong class="text-dark">Comprador:</strong> <span class="text-dark">{{ animal.comprador or 'No especificado' }}</span></p>
+                                        <p><strong class="text-dark">Peso:</strong> <span class="text-dark">{{ animal.peso_venta or '-' }} kg</span></p>
+                                        <p><strong class="text-dark">Precio:</strong> <span class="text-dark">${{ animal.precio_venta or '-' }}</span></p>
+                                        {% else %}
+                                        <p class="text-muted">No vendido</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card shadow-sm border-0">
+                                    <div class="card-header text-white" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+                                        <h6 class="mb-0"><i class="fas fa-times-circle me-2"></i>Fallecimiento</h6>
+                                    </div>
+                                    <div class="card-body text-dark">
+                                        {% if animal.fecha_fallecimiento %}
+                                        <p><strong class="text-dark">Fecha:</strong> <span class="text-dark">{{ animal.fecha_fallecimiento.strftime('%d/%m/%Y') }}</span></p>
+                                        <p><strong class="text-dark">Causa:</strong> <span class="text-dark">{{ animal.causa_fallecimiento or 'No especificada' }}</span></p>
+                                        <p><strong class="text-dark">Disposición:</strong> <span class="text-dark">{{ animal.disposicion_final or 'No especificada' }}</span></p>
+                                        {% else %}
+                                        <p class="text-success">Animal vivo</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Pestaña Notas -->
+                    <div class="tab-pane fade" id="notas" role="tabpanel">
+                        {% if animal.notas %}
+                        {% for nota in animal.notas|sort(attribute='fecha', reverse=true) %}
+                        <div class="card mb-3 shadow-sm border-0">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1">{{ nota.nota }}</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted">{{ nota.fecha.strftime('%d/%m/%Y %H:%M') }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-sticky-note fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay notas registradas.</p>
+                        </div>
+                        {% endif %}
+                        {% if animal.observaciones %}
+                        <div class="card mt-4 shadow-sm border-0">
+                            <div class="card-header text-white" style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);">
+                                <h6 class="mb-0"><i class="fas fa-sticky-note me-2"></i>Observaciones Generales</h6>
+                            </div>
+                            <div class="card-body text-dark">
+                                <p class="text-dark">{{ animal.observaciones }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <!-- Pestaña Vacunas -->
+                    <div class="tab-pane fade" id="vacunas" role="tabpanel">
+                        {% if vacunas %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-dark fw-bold">Fecha Aplicación</th>
+                                        <th class="text-dark fw-bold">Tipo</th>
+                                        <th class="text-dark fw-bold">Próxima Dosis</th>
+                                        <th class="text-dark fw-bold">Responsable</th>
+                                        <th class="text-dark fw-bold">Lote</th>
+                                        <th class="text-dark fw-bold">Vencimiento</th>
+                                        <th class="text-dark fw-bold">Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vacuna in vacunas %}
+                                    <tr>
+                                        <td>{{ vacuna.fecha_aplicacion.strftime('%d/%m/%Y') }}</td>
+                                        <td>{{ vacuna.tipo_vacuna }}</td>
+                                        <td>{{ vacuna.fecha_proxima.strftime('%d/%m/%Y') }}</td>
+                                        <td>{{ vacuna.aplicada_por }}</td>
+                                        <td>{{ vacuna.numero_lote or '-' }}</td>
+                                        <td>{{ vacuna.fecha_vencimiento.strftime('%d/%m/%Y') if vacuna.fecha_vencimiento else '-' }}</td>
+                                        <td>{{ vacuna.observaciones or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-syringe fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay vacunas registradas.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <!-- Pestaña Producción -->
+                    <div class="tab-pane fade" id="produccion" role="tabpanel">
+                        {% if producciones %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-dark fw-bold">Fecha</th>
+                                        <th class="text-dark fw-bold">Tipo</th>
+                                        <th class="text-dark fw-bold">Cantidad</th>
+                                        <th class="text-dark fw-bold">Unidad</th>
+                                        <th class="text-dark fw-bold">Calidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for prod in producciones %}
+                                    <tr>
+                                        <td>{{ prod.fecha.strftime('%d/%m/%Y') }}</td>
+                                        <td>{{ prod.tipo_produccion|title }}</td>
+                                        <td>{{ prod.cantidad }}</td>
+                                        <td>{{ prod.unidad }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ 'success' if prod.calidad == 'buena' else 'warning' if prod.calidad == 'regular' else 'danger' }}">
+                                                {{ prod.calidad|title }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-egg fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay registros de producción.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <!-- Pestaña Potreros -->
+                    <div class="tab-pane fade" id="potreros" role="tabpanel">
+                        {% if animal.historial_potreros %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-dark fw-bold">Fecha</th>
+                                        <th class="text-dark fw-bold">Potrero</th>
+                                        <th class="text-dark fw-bold">Motivo</th>
+                                        <th class="text-dark fw-bold">Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for hp in animal.historial_potreros|sort(attribute='fecha', reverse=true) %}
+                                    <tr>
+                                        <td>{{ hp.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+                                        <td>{{ hp.potrero.nombre if hp.potrero else '-' }}</td>
+                                        <td>{{ hp.motivo or '-' }}</td>
+                                        <td>{{ hp.observaciones or '-' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-map-marked-alt fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay historial de potreros.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+// Funciones de interactividad
+function editAnimal() {
+    // Simular carga
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<div class="loading-spinner d-inline-block me-2"></div>Cargando...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        alert('Función de edición en desarrollo');
+    }, 1500);
+}
+
+function addHealth() {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Salud';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        alert('Función de registro de salud en desarrollo');
+    }, 1000);
+}
+
+// Inicialización única al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Activar la primera pestaña por defecto
+    var firstTab = document.querySelector('#historialTabs .nav-link');
+    if (firstTab) {
+        firstTab.click();
+    }
+    
+    // Animar contadores de forma segura
+    try {
+        const counters = document.querySelectorAll('.stat-card .fs-4');
+        counters.forEach(counter => {
+            const target = parseInt(counter.textContent) || 0;
+            if (target > 0) {
+                let current = 0;
+                const increment = target / 20;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        counter.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(current);
+                    }
+                }, 50);
+            }
+        });
+    } catch (error) {
+        console.log('Error en animación de contadores:', error);
+    }
+    
+    // Efectos de hover para estadísticas
+    try {
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02) translateY(-1px)';
+                this.style.transition = 'all 0.3s ease';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) translateY(0)';
+            });
+        });
+    } catch (error) {
+        console.log('Error en efectos de hover:', error);
+    }
+});
+</script>
+{% endblock %} 
