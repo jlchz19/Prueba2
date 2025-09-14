@@ -1,0 +1,41 @@
+# AgroGest Web - Dependencias para Sistema de Gestión Ganadera
+# Flask Web Application with Modern Features
+
+# Framework web principal
+Flask>=2.3.0
+Flask-SQLAlchemy>=3.0.0
+Flask-Login>=0.6.0
+Werkzeug>=2.3.0
+
+# Base de datos y manipulación de datos
+pandas>=2.0.0           # Manipulación de datos
+numpy>=1.24.0           # Cálculos numéricos
+
+# Generación de reportes y PDFs
+reportlab>=4.0.0        # Generación de PDFs profesionales
+WeasyPrint>=59.0        # HTML a PDF avanzado
+Pillow>=10.0.0          # Manipulación de imágenes
+
+# Utilidades y herramientas profesionales
+python-dateutil>=2.8.0  # Manejo avanzado de fechas
+openpyxl>=3.1.0         # Exportar a Excel
+requests>=2.31.0        # Peticiones HTTP
+
+# IA opcional (Gemini para texto/visión)
+google-generativeai>=0.7.0
+
+# Carga de variables de entorno desde .env
+python-dotenv>=1.0.0
+
+# Email y notificaciones
+Flask-Mail>=0.9.1       # Sistema de correo
+APScheduler>=3.10.0     # Programador de tareas
+
+# Escritorio (opcional)
+pywebview>=4.4          # Ventana nativa para app de escritorio
+pyinstaller>=6.0        # Empaquetado a .exe
+
+# Desarrollo y calidad de código
+pytest>=7.4.0           # Testing
+black>=23.0.0           # Formateo de código
+flake8>=6.0.0           # Linting
